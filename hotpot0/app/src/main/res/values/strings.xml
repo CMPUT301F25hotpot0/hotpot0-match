@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">hotpot0</string>
+    <string name="small_heading">Welcome to</string>
+    <string name="heading">Eventure</string>
+    <string name="create_profile_button_text">Create Profile</string>
+    <string name="admin_login_button_text">Admin Login</string>
+    <string name="admin_login_text">Admin Login</string>
+</resources>
