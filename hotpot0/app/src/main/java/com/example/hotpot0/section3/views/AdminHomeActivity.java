@@ -1,4 +1,3 @@
-// AdminHomeActivity.java
 package com.example.hotpot0.section3.views;
 
 import android.os.Bundle;
@@ -11,10 +10,13 @@ public class AdminHomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Retrieve adminID from the Intent
+        int adminID = getIntent().getIntExtra("adminID", -1);
+
         // Simple TextView to indicate AdminHomeActivity is opened
         TextView tv = new TextView(this);
-        tv.setText("Welcome to AdminHomeActivity!");
         tv.setTextSize(24);
+        tv.setText("Welcome Admin!\nAdmin ID: " + adminID);
         setContentView(tv);
     }
 }

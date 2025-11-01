@@ -312,4 +312,25 @@ public class ProfileDB {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
+
+    // To check if User already exists - and skip StartupActivity.java
+    public void getUserByDeviceID(@NonNull String deviceID, @NonNull GetCallback<UserProfile> callback) {
+        db.collection(USERS_COLLECTION)
+                .whereEqualTo("deviceID", deviceID)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        callback.onFailure(new Exception("No user found for this device"));
+                    } else {
+                        DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+                        UserProfile user = doc.toObject(UserProfile.class);
+                        if (user == null) {
+                            callback.onFailure(new Exception("Failed to parse UserProfile"));
+                        } else {
+                            callback.onSuccess(user);
+                        }
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
 }
