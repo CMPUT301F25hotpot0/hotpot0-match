@@ -1,12 +1,21 @@
 <resources>
+    <!-- Section 1 -->
     <string name="app_name">hotpot0</string>
     <string name="small_heading">Welcome to</string>
     <string name="heading">Eventure</string>
     <string name="create_profile_button_text">Create Profile</string>
     <string name="admin_login_button_text">Admin Login</string>
     <string name="admin_login_text">Admin Login</string>
+
+    <!-- Section 2 -->
     <string name="search">Search</string>
     <string name="info">Info</string>
     <string name="scan">Scan</string>
     <string name="search_event">Search Event</string>
+    <string name="notifications">Notifications</string>
+    <string name="current_invitations">Current Invitations</string>
+    <string name="other_updates">Other Updates</string>
+
+    <!-- Section 3 -->
+
 </resources>
