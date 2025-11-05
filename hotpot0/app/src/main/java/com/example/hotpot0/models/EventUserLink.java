@@ -37,4 +37,24 @@ public class EventUserLink {
     public void setLinkID(Integer linkID) {
         this.linkID = linkID;
     }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) throws InvalidStatusException {
+        this.status.setStatus(status);
+    }
+
+    public Integer getUserID() {
+        return userID;
+    }
+
+    public Integer getEventID() {
+        return eventID;
+    }
+
+    public List<String> getNotifications() {
+        return notifications;
+    }
 }

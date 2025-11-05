@@ -72,7 +72,7 @@ public class EventUserLinkDB {
 
         // Prepare the data to be updated
         java.util.Map<String, Object> updates = new java.util.HashMap<>();
-        updates.put("status", eventUserLink.getStatus().toString());
+        updates.put("status", eventUserLink.getStatus());
         updates.put("notifications", eventUserLink.getNotifications());
 
         linkRef.update(updates)
