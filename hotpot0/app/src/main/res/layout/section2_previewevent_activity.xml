@@ -18,9 +18,8 @@
             android:layout_marginBottom="16dp"
             android:background="#E0E0E0"
             android:scaleType="centerCrop"/>
-<!--            android:contentDescription="Event Image" -->
 
-        <!-- Dynamic Event Info (filled from intent or database later) -->
+        <!-- Dynamic Event Info -->
         <TextView
             android:id="@+id/tvEventName"
             android:layout_width="match_parent"

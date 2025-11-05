@@ -24,6 +24,8 @@
         <activity android:name=".section1.views.UserSignupActivity" />
         <activity android:name=".section1.views.AdminLoginActivity" />
         <activity android:name=".section2.views.HomeActivity" />
+        <activity android:name=".section2.views.CreateEventActivity" />
+        <activity android:name=".section2.views.PreviewActivity" />
         <activity android:name=".section3.views.AdminHomeActivity" />
         <meta-data
             android:name="preloaded_fonts"

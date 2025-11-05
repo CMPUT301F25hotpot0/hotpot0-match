@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <!-- Scrollable content area -->
+    <!-- Scrollable page -->
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
@@ -34,7 +34,7 @@
                 android:paddingTop="10dp"
                 android:paddingBottom="18dp" />
 
-            <!-- ===== CONFIRMED SECTION ===== -->
+            <!-- Confirmed Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
                 android:textSize="16sp"
                 android:paddingBottom="8dp" />
 
-            <!-- Container for dynamically added confirmed events -->
+            <!-- Container for confirmed events -->
             <LinearLayout
                 android:id="@+id/confirmed_container"
                 android:layout_width="match_parent"
@@ -53,7 +53,7 @@
                 android:layout_marginBottom="16dp" />
 
 
-            <!-- ===== PENDING SECTION ===== -->
+            <!-- Pending Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                 android:textSize="16sp"
                 android:paddingBottom="8dp" />
 
-            <!-- Container for dynamically added pending events -->
+            <!-- Container for pending events -->
             <LinearLayout
                 android:id="@+id/pending_container"
                 android:layout_width="match_parent"
@@ -72,7 +72,7 @@
                 android:layout_marginBottom="16dp" />
 
 
-            <!-- ===== PAST EVENTS SECTION ===== -->
+            <!-- Past Events Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                 android:textSize="16sp"
                 android:paddingBottom="8dp" />
 
-            <!-- Container for dynamically added past events -->
+            <!-- Container for past events -->
             <LinearLayout
                 android:id="@+id/past_container"
                 android:layout_width="match_parent"

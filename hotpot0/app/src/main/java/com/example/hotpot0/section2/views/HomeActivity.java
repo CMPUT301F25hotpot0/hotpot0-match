@@ -1,52 +1,35 @@
 package com.example.hotpot0.section2.views;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.hotpot0.models.ProfileDB;
-import com.example.hotpot0.models.UserProfile;
+import com.example.hotpot0.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private ProfileDB profileDB;
-    private UserProfile currentUser;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.section2_userhome_activity);
 
-        profileDB = new ProfileDB();
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // Get the userID passed from MainActivity
-        int userID = getIntent().getIntExtra("userID", -1);
-        if (userID == -1) {
-            Toast.makeText(this, "No user info found", Toast.LENGTH_SHORT).show();
-            finish(); // close activity if no userID
-            return;
-        }
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
 
-        // Fetch the full UserProfile from Firestore
-        profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
-            @Override
-            public void onSuccess(UserProfile user) {
-                currentUser = user;
-                setupUI(); // populate the UI with user data
+            if (id == R.id.nav_events) {
+                Intent intent = new Intent(HomeActivity.this, CreateEventActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
             }
 
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(HomeActivity.this, "Failed to load user profile", Toast.LENGTH_SHORT).show();
-            }
+            // PUT THE OTHER TOOLBAR ITEMS HERE
+            return false;
         });
-    }
-
-    private void setupUI() {
-        // For now, just show a welcome message with the user's name
-        TextView tv = new TextView(this);
-        tv.setText("Welcome, " + currentUser.getName() + "!");
-        tv.setTextSize(24);
-        setContentView(tv);
     }
 }
