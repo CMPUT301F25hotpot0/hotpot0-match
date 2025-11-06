@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
+    android:background="@drawable/gradient_background"
     tools:context=".section1.views.AdminLoginActivity">
 
     <!-- App Title -->
@@ -17,7 +18,7 @@
         android:layout_marginTop="60dp"
         android:text="@string/heading"
         android:textAppearance="@style/TextAppearance.Material3.DisplayLarge.Emphasized"
-        android:textColor="#000000"
+        android:textColor="@color/text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,6 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/admin_login_text"
+        android:textColor="@color/text"
         android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
         app:layout_constraintTop_toBottomOf="@id/textViewAppTitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,6 +82,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Login"
+        android:backgroundTint="@color/text"
         style="@style/Widget.Material3.Button"
         app:layout_constraintTop_toBottomOf="@id/passwordLayout"
         app:layout_constraintStart_toStartOf="parent"

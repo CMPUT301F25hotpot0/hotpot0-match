@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="?attr/colorSurface"
+    android:background="@drawable/gradient_background"
     tools:context=".section1.views.StartupActivity">
 
     <!-- Welcome Text -->
@@ -21,7 +21,7 @@
         android:fontFamily="@font/roboto"
         android:text="@string/small_heading"
         android:textAlignment="center"
-        android:textColor="?attr/colorOnSurface"
+        android:textColor="@color/text"
         android:textSize="24sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
@@ -37,7 +37,7 @@
         android:fontFamily="@font/roboto"
         android:text="@string/heading"
         android:textAlignment="center"
-        android:textColor="#000000"
+        android:textColor="@color/text"
         android:textSize="60sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/createProfileButton"
@@ -56,6 +56,7 @@
         android:layout_marginEnd="48dp"
         android:text="@string/create_profile_button_text"
         android:textSize="16sp"
+        android:backgroundTint="@color/text"
         app:cornerRadius="20dp"
         app:layout_constraintBottom_toTopOf="@+id/adminLoginButton"
         app:layout_constraintEnd_toEndOf="parent"
@@ -73,6 +74,7 @@
         android:layout_marginBottom="100dp"
         android:text="@string/admin_login_button_text"
         android:textSize="16sp"
+        android:backgroundTint="@color/text"
         app:cornerRadius="20dp"
         app:icon="@drawable/ic_account_circle"
         app:iconGravity="textStart"
@@ -81,6 +83,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/createProfileButton"
-        app:strokeColor="?attr/colorOutline" />
+        android:textColor="@color/white"
+        app:iconTint="@color/white"
+        app:strokeColor="?attr/colorOutline"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
