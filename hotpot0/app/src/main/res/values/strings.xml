@@ -38,6 +38,9 @@
     <string name="role">Role</string>
     <string name="current_invitations">Current Invitations</string>
     <string name="other_updates">Other Updates</string>
+    <string name="filter">Filters</string>
+    <string name="save">Save</string>
+    <string name="delete_profile">Delete Profile</string>
 
     <!-- Section 3 -->
 
