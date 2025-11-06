@@ -188,7 +188,7 @@ public class Event {
     }
 
     public void setCancelledIDs(ArrayList<String> cancelledIDs) {
-        this.cancelledIDs = cancelledIDs;W
+        this.cancelledIDs = cancelledIDs;
     }
 
     public boolean addLinkID(String linkID) {

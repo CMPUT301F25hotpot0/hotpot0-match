@@ -248,4 +248,24 @@ public class EventDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
+
+    public void setEventActiveStatus(@NonNull Event event, boolean isActive, @NonNull GetCallback<Void> callback) {
+        event.setIsEventActive(isActive);
+
+        DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                .document(String.valueOf(event.getEventID()));
+        eventRef.update("isEventActive", isActive)
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public void setGeolocationRequired(@NonNull Event event, boolean isRequired, @NonNull GetCallback<Void> callback) {
+        event.setGeolocationRequired(isRequired);
+
+        DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                .document(String.valueOf(event.getEventID()));
+        eventRef.update("geolocationRequired", isRequired)
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
 }
