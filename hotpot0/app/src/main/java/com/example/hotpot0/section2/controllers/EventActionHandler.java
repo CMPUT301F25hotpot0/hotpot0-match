@@ -15,11 +15,19 @@ public class EventActionHandler {
         event = new EventDB();
     }
 
+    private String generateLinkID(Integer userID, Integer eventID) {
+        // Assuming linkID is created by combining userID and eventID as a string
+        return userID + "_" + eventID;  // You can adjust this structure as per your requirements
+    }
+
     public void joinWaitList(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
+        // Construct the linkID
+        String linkID = generateLinkID(userID, eventID);
+
         // Fetch the user's EventUserLink from Firestore
         EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
 
-        eventUserLinkDB.getEventUserLinkByUserAndEvent(userID, eventID, new ProfileDB.GetCallback<EventUserLink>() {
+        eventUserLinkDB.getEventUserLinkByID(linkID, new ProfileDB.GetCallback<EventUserLink>() {
             @Override
             public void onSuccess(EventUserLink eventUserLink) {
                 // If an EventUserLink is found, it means the user already has an affiliation with the event.
@@ -58,16 +66,19 @@ public class EventActionHandler {
     }
 
     public void leaveWaitList(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
+        // Construct the linkID
+        String linkID = generateLinkID(userID, eventID);
+
         // Fetch the user's EventUserLink from Firestore
         EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
 
-        eventUserLinkDB.getEventUserLinkByUserAndEvent(userID, eventID, new ProfileDB.GetCallback<EventUserLink>() {
+        eventUserLinkDB.getEventUserLinkByID(linkID, new ProfileDB.GetCallback<EventUserLink>() {
             @Override
             public void onSuccess(EventUserLink eventUserLink) {
                 // Check if the current status is "inWaitList"
                 if ("inWaitList".equals(eventUserLink.getStatus())) {
                     // The user is on the waitlist, proceed with removing them from it
-                    eventUserLinkDB.deleteEventUserLink(eventUserLink.getLinkID(), new ProfileDB.ActionCallback() {
+                    eventUserLinkDB.deleteEventUserLink(linkID, new ProfileDB.ActionCallback() {
                         @Override
                         public void onSuccess() {
                             // Successfully removed the user from the waitlist
@@ -95,10 +106,13 @@ public class EventActionHandler {
     }
 
     public void acceptInvite(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
+        // Construct the linkID
+        String linkID = generateLinkID(userID, eventID);
+
         // Fetch the user's EventUserLink from Firestore
         EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
 
-        eventUserLinkDB.getEventUserLinkByUserAndEvent(userID, eventID, new ProfileDB.GetCallback<EventUserLink>() {
+        eventUserLinkDB.getEventUserLinkByID(linkID, new ProfileDB.GetCallback<EventUserLink>() {
             @Override
             public void onSuccess(EventUserLink eventUserLink) {
                 try {
@@ -140,10 +154,13 @@ public class EventActionHandler {
     }
 
     public void declineInvite(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
+        // Construct the linkID
+        String linkID = generateLinkID(userID, eventID);
+
         // Fetch the user's EventUserLink from Firestore
         EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
 
-        eventUserLinkDB.getEventUserLinkByUserAndEvent(userID, eventID, new ProfileDB.GetCallback<EventUserLink>() {
+        eventUserLinkDB.getEventUserLinkByID(linkID, new ProfileDB.GetCallback<EventUserLink>() {
             @Override
             public void onSuccess(EventUserLink eventUserLink) {
                 try {
@@ -183,5 +200,9 @@ public class EventActionHandler {
             }
         });
     }
+
+    public void sampleUsers(Integer userID, Integer eventID) {}
+
+    public void cancelUser(Integer userID, Integer eventID) {}
 
 }
