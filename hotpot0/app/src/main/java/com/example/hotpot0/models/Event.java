@@ -14,6 +14,7 @@ public class Event {
     private Boolean isEventActive;
     private ArrayList<String> linkIDs;
     private ArrayList<String> sampledIDs;
+    private ArrayList<String> cancelledIDs;
 
     public Event() {
         this.eventID = null; // Handled by Firestore in EventDB
@@ -182,12 +183,23 @@ public class Event {
         this.sampledIDs = sampledIDs;
     }
 
+    public ArrayList<String> getCancelledIDs() {
+        return cancelledIDs;
+    }
+
+    public void setCancelledIDs(ArrayList<String> cancelledIDs) {
+        this.cancelledIDs = cancelledIDs;W
+    }
+
     public boolean addLinkID(String linkID) {
         if (linkID == null || linkID.isEmpty()) {
             return false;
         }
         if (linkIDs == null) {
             linkIDs = new ArrayList<>();
+        }
+        if (linkIDs.size() == capacity) {
+            return false;
         }
         if (linkIDs.contains(linkID)) {
             return false; // Avoid duplicates

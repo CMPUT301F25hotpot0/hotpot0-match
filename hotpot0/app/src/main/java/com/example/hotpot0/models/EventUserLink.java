@@ -57,4 +57,15 @@ public class EventUserLink {
     public List<String> getNotifications() {
         return notifications;
     }
+
+    @Override
+    public String toString() {
+        return "EventUserLink{" +
+                "userID=" + userID +
+                ", eventID=" + eventID +
+                ", linkID='" + linkID + '\'' +
+                ", status='" + status.getStatus() + '\'' +
+                ", notifications=" + notifications +
+                '}';
+    }
 }

@@ -226,4 +226,26 @@ public class EventDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
+
+    public void addCancelledIDToEvent(@NonNull Event event, @NonNull String cancelledID, @NonNull GetCallback<Void> callback) {
+        if (event.getCancelledIDs() == null) event.setCancelledIDs(new ArrayList<>());
+        if (!event.getCancelledIDs().contains(cancelledID))
+            event.getCancelledIDs().add(cancelledID);
+
+        DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                .document(String.valueOf(event.getEventID()));
+        eventRef.update("cancelledIDs", FieldValue.arrayUnion(cancelledID))
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public void removeCancelledIDFromEvent(@NonNull Event event, @NonNull String cancelledID, @NonNull GetCallback<Void> callback) {
+        if (event.getCancelledIDs() != null) event.getCancelledIDs().remove(cancelledID);
+
+        DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                .document(String.valueOf(event.getEventID()));
+        eventRef.update("cancelledIDs", FieldValue.arrayRemove(cancelledID))
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
 }
