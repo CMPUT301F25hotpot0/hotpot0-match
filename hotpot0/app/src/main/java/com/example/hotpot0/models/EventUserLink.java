@@ -6,12 +6,12 @@ import java.util.List;
 public class EventUserLink {
     private final Integer userID;
     private final Integer eventID;
-    private Integer linkID;
+    private String linkID;
     private Status status;
     private List<String> notifications;
 
     public EventUserLink(Integer userID, Integer eventID, String status) throws InvalidStatusException {
-        this.linkID = null; // Assigned by FireStore when the instance is saved
+        this.linkID = eventID.toString() + '_' + userID.toString(); // Assigned by FireStore when the instance is saved
         this.userID = userID;
         this.eventID = eventID;
         this.status.setStatus(status);
@@ -19,7 +19,7 @@ public class EventUserLink {
     }
 
     public EventUserLink(Integer userID, Integer eventID) throws InvalidStatusException {
-        this.linkID = null; // Assigned by FireStore when the instance is saved
+        this.linkID = eventID.toString() + '_' + userID.toString(); // Assigned by FireStore when the instance is saved
         this.userID = userID;
         this.eventID = eventID;
         this.status.setStatus("inWaitList");
@@ -30,16 +30,16 @@ public class EventUserLink {
         notifications.add(notification);
     }
 
-    public Integer getLinkID() {
+    public String getLinkID() {
         return linkID;
     }
 
-    public void setLinkID(Integer linkID) {
+    public void setLinkID(String linkID) {
         this.linkID = linkID;
     }
 
-    public Status getStatus() {
-        return status;
+    public String getStatus() {
+        return status.getStatus();
     }
 
     public void setStatus(String status) throws InvalidStatusException {

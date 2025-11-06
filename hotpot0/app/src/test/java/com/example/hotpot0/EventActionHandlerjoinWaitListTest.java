@@ -1,15 +1,22 @@
 package com.example.eventstestcases;
 
+import com.example.hotpot0.models.ProfileDB;
+import com.example.hotpot0.models.UserProfile;
+import com.example.hotpot0.section2.controllers.EventActionHandler;
+import com.google.firebase.firestore.auth.User;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals
 
 public class EventActionHandlerjoinWaitListTest {
     // Test Models
-    private User testUser;
-    private User testOrganizer;
+    private UserProfile testUser;
+    private UserProfile testOrganizer;
     private Event testEvent;
     private EventActionHandler testHandler;
+    private ProfileDB profileHandler;
 
     @Before
     public void setUp() {
@@ -17,6 +24,7 @@ public class EventActionHandlerjoinWaitListTest {
         testOrganizer = new User("Test Organizer", "organizer@testcase.com", "1029384756");
         testEvent = new Event(testOrganizer.getUserID(), "Test Event", "This is a test event", "LocationX", "12:00", "01-01-26", null, 500, 10, "10-10-25", "12-12-25");
         testHandler = new EventActionHandler();
+        profileHandler = new ProfileDB();
     }
     // Run all tests sequentially
     @Test
@@ -35,7 +43,7 @@ public class EventActionHandlerjoinWaitListTest {
     // Cleanup
     @After
     public void Cleanup() {
-        testUser.deleteProfile();
+        profileHandler.deleteUser(testUser.getUserID());
         testOrganizer.deleteProfile();
         testEvent.deleteEvent();
     }

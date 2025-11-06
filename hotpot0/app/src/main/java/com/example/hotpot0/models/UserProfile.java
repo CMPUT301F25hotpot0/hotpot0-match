@@ -15,7 +15,7 @@ public class UserProfile {
 
     // Firestore document fields
 
-    private Integer userID;                // Firestore document ID
+    private Integer userID;               // Firestore document ID
     private String deviceID;              // Device-specific identifier
     private String name;                  // User's name
     private String emailID;               // User's email
@@ -23,7 +23,7 @@ public class UserProfile {
     private Boolean notificationsEnabled; // User's notification preference
     private Double latitude;              // User's current latitude
     private Double longitude;             // User's current longitude
-    private ArrayList<String> linkIDs;   // User's EventUserLink IDs
+    private ArrayList<String> linkIDs;    // User's EventUserLink IDs
 
     // Constructors
 

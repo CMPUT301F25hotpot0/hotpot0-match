@@ -1,13 +1,18 @@
 package com.example.eventstestcases;
 
+import com.example.hotpot0.models.UserProfile;
+import com.example.hotpot0.section2.controllers.EventActionHandler;
+import com.google.firebase.firestore.auth.User;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals
 
 public class EventActionHandlerleaveWaitListTest {
     // Test Models
-    private User testUser;
-    private User testOrganizer;
+    private UserProfile testUser;
+    private UserProfile testOrganizer;
     private Event testEvent;
     private EventActionHandler testHandler;
 

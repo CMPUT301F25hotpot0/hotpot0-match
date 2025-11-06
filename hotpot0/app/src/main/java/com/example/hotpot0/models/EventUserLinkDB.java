@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * EventUserLinkDB handles all Firestore operations for EventUserLink.
@@ -119,6 +120,48 @@ public class EventUserLinkDB {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
+
+    /**
+     * Fetches EventUserLink(s) by userID, eventID, or both.
+     *
+     * @param userID   The userID to search for (optional).
+     * @param eventID  The eventID to search for (optional).
+     * @param callback Callback to return the EventUserLink or an error.
+     */
+    public void getEventUserLinkByUserAndEvent(Integer userID, Integer eventID, @NonNull ProfileDB.GetCallback<EventUserLink> callback) {
+        // Start building the query
+        com.google.firebase.firestore.Query query = db.collection(EVENT_USER_LINK_COLLECTION);
+
+        // Add filters based on the input parameters
+        if (userID != null) {
+            query = query.whereEqualTo("userID", userID);
+        }
+        if (eventID != null) {
+            query = query.whereEqualTo("eventID", eventID);
+        }
+
+        // Execute the query to find matching documents
+        query.get()
+                .addOnSuccessListener(querySnapshot -> {
+                    // Assuming there will be at most one matching document
+                    if (querySnapshot.isEmpty()) {
+                        callback.onFailure(new Exception("No EventUserLink found for the provided userID and eventID"));
+                        return;
+                    }
+
+                    // We should only get one document, so retrieve the first one
+                    DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+
+                    EventUserLink eventUserLink = doc.toObject(EventUserLink.class);
+                    if (eventUserLink != null) {
+                        callback.onSuccess(eventUserLink);  // Pass the single EventUserLink
+                    } else {
+                        callback.onFailure(new Exception("Failed to parse EventUserLink"));
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
 
     /**
      * Generates the next smallest available linkID for EventUserLink.

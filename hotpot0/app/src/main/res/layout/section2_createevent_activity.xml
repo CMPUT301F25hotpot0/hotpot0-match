@@ -178,7 +178,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/geolocation_for_participants"
-                android:textColor="color/text"
+                android:textColor="@color/text"
                 android:textSize="16sp"/>
 
             <Switch
