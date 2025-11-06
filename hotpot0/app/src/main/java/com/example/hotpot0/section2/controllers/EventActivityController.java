@@ -70,22 +70,22 @@ public class EventActivityController {
     }
 
     private void openEventInitialActivity() {
-        Intent intent = new Intent(context, EventInitialActivity.class);
-        context.startActivity(intent);
+//        Intent intent = new Intent(context, EventInitialActivity.class);
+//        context.startActivity(intent);
     }
 
     private void openWaitListActivity() {
-        Intent intent = new Intent(context, EventWaitListActivity.class);
-        context.startActivity(intent);
+//        Intent intent = new Intent(context, EventWaitListActivity.class);
+//        context.startActivity(intent);
     }
 
     private void openSampledActivity() {
-        Intent intent = new Intent(context, EventSampledActivity.class);
-        context.startActivity(intent);
+//        Intent intent = new Intent(context, EventSampledActivity.class);
+//        context.startActivity(intent);
     }
 
     private void openOrganizerActivity() {
-        Intent intent = new Intent(context, OrganizerEventActivity.class);
-        context.startActivity(intent);
+//        Intent intent = new Intent(context, OrganizerEventActivity.class);
+//        context.startActivity(intent);
     }
 }

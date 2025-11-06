@@ -65,6 +65,13 @@
             android:layout_marginBottom="8dp" />
 
         <TextView
+            android:id="@+id/tvDuration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
             android:id="@+id/tvPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -80,6 +87,13 @@
 
         <TextView
             android:id="@+id/tvDaysLeft"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:id="@+id/tvGeolocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
