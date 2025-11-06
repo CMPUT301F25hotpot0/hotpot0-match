@@ -158,11 +158,11 @@ public class Event {
         this.geolocationRequired = geolocationRequired;
     }
 
-    public Boolean getEventActive() {
+    public Boolean getIsEventActive() {
         return isEventActive;
     }
 
-    public void setEventActive(Boolean eventActive) {
+    public void setIsEventActive(Boolean eventActive) {
         isEventActive = eventActive;
     }
 
