@@ -20,6 +20,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity that allows users to search and view active events.
+ * <p>
+ * Users can search for events by name, view their status in each event,
+ * and navigate between different sections of the app using the bottom navigation.
+ * The activity also provides a help/info dialog explaining the app's functionality.
+ * </p>
+ */
 public class SearchActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
@@ -30,6 +38,12 @@ public class SearchActivity extends AppCompatActivity {
     private ImageButton infoButton;
     private int userID;
 
+    /**
+     * Initializes the activity, sets up UI elements, bottom navigation,
+     * search functionality, and loads all active events.
+     *
+     * @param savedInstanceState previously saved state (if any)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +125,10 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Loads all active events from the database, fetches the user's status for each event,
+     * and updates the {@link ListView} with an {@link EventBlobAdapter}.
+     */
     public void loadAllEvents() {
         eventDB.getAllActiveEvents(new EventDB.GetCallback<List<Event>>() {
             @Override
@@ -171,6 +189,11 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Filters events based on the search query and updates the {@link ListView} with results.
+     *
+     * @param query the search query entered by the user
+     */
     private void filterEvents(String query) {
         eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
             @Override

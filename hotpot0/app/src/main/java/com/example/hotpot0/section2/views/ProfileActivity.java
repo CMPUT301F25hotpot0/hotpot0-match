@@ -20,8 +20,15 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
- * This class opens a view which shows the user's profile. The user can edit their profile,
- * or delete it from the database.
+ * Activity that displays the user's profile and allows the user to:
+ * <ul>
+ *     <li>Edit profile details (name, email, phone)</li>
+ *     <li>Toggle notification and location preferences</li>
+ *     <li>Delete the profile</li>
+ * </ul>
+ * <p>
+ * Also provides bottom navigation to other sections of the app.
+ * </p>
  */
 public class ProfileActivity extends AppCompatActivity{
     private TextInputEditText nameInput, emailInput, phoneInput;
@@ -32,6 +39,13 @@ public class ProfileActivity extends AppCompatActivity{
     private final ProfileDB profileDB = new ProfileDB();
     private int userID;
 
+    /**
+     * Called when the activity is first created.
+     * Initializes UI components, loads the user profile, and sets up event listeners.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being
+     *                           shut down, this contains the data it most recently supplied.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,7 +124,11 @@ public class ProfileActivity extends AppCompatActivity{
     }
 
     /**
-     * Loads user profile data from database and displays it.
+     * Loads the current user's profile data from the database and updates the UI.
+     * <p>
+     * Populates the name, email, phone number, and notification switch based on the stored profile.
+     * If the profile cannot be loaded, a toast message is shown.
+     * </p>
      */
     private void loadUserProfile() {
         profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
@@ -136,7 +154,11 @@ public class ProfileActivity extends AppCompatActivity{
     }
 
     /**
-     * Saves the user profile, after user edited it using ProfileEditHandler.
+     * Saves the user's profile after editing.
+     * <p>
+     * Validates the input fields and calls {@link ProfileEditHandler#handleProfileUpdate} to update
+     * the profile in the database. Displays toast messages for success or failure.
+     * </p>
      */
     private void saveUserProfile() {
         String name = nameInput.getText() != null ? nameInput.getText().toString().trim() : "";
@@ -164,7 +186,11 @@ public class ProfileActivity extends AppCompatActivity{
     }
 
     /**
-     * Deletes user profile and clears the fields.
+     * Deletes the user's profile from the database and clears the saved user ID.
+     * <p>
+     * Displays a toast message upon success or failure.
+     * After deletion, the user's ID is removed from shared preferences.
+     * </p>
      */
     private void deleteUserProfile() {
         profileHandler.deleteUserProfile(userID, new ProfileDB.ActionCallback() {

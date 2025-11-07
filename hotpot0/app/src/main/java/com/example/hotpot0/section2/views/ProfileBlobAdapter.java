@@ -15,12 +15,33 @@ import com.example.hotpot0.models.UserProfile;
 
 import java.util.List;
 
+/**
+ * Custom {@link ArrayAdapter} to display user profiles in a ListView.
+ * <p>
+ * Each list item (blob) shows the user's profile icon and name.
+ * </p>
+ */
 public class ProfileBlobAdapter extends ArrayAdapter<UserProfile> {
 
+    /**
+     * Constructs a new {@code ProfileBlobAdapter}.
+     *
+     * @param context  the current context
+     * @param profiles the list of {@link UserProfile} objects to display
+     */
     public ProfileBlobAdapter(@NonNull Context context, @NonNull List<UserProfile> profiles) {
         super(context, 0, profiles);
     }
 
+    /**
+     * Provides a view for an AdapterView (ListView, GridView, etc.)
+     * for the given position in the dataset.
+     *
+     * @param position    the position of the item within the adapter's data set
+     * @param convertView the old view to reuse, if possible
+     * @param parent      the parent view that this view will eventually be attached to
+     * @return a {@link View} corresponding to the data at the specified position
+     */
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
