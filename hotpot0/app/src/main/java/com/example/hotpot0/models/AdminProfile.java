@@ -16,9 +16,16 @@ public class AdminProfile {
 
     // Constructors
 
-    // Required empty constructor for Firestore deserialization
+    /** Required empty constructor for Firestore deserialization
+     */
     public AdminProfile() {}
 
+    /**
+     * Parameterized constructor
+     * @param context
+     * @param username
+     * @param password
+     */
     public AdminProfile(Context context, String username, String password) {
         this.adminID = null;    // Firestore will assign this later
         this.username = username;

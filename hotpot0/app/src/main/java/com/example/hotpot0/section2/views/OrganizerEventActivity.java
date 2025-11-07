@@ -71,7 +71,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
                             } else if (!event.getSampledIDs().isEmpty()) {
                                 setContentView(R.layout.section2_organizereventview_postdraw);
-                                setupPostDrawLayout(eventUserLink);
+//                                setupPostDrawLayout(eventUserLink);
 
                         }
                     }}
@@ -213,7 +213,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
                             // --- SWITCH TO POST-DRAW LAYOUT ---
                             setContentView(R.layout.section2_organizereventview_postdraw);
-                            setupPostDrawLayout(eventUserLink); // <-- initialize all UI elements
+//                            setupPostDrawLayout(eventUserLink); // <-- initialize all UI elements
                         }
 
                         @Override
@@ -265,65 +265,65 @@ public class OrganizerEventActivity extends AppCompatActivity {
     /**
      * Setup logic for the Post-Draw layout
      */
-    private void setupPostDrawLayout(EventUserLink eventUserLink) {
-        // --- View bindings ---
-        ImageView eventImage = findViewById(R.id.eventImage);
-        TextView previewEventName = findViewById(R.id.preview_event_name);
-        TextView previewDescription = findViewById(R.id.preview_description);
-        TextView previewGuidelines = findViewById(R.id.preview_guidelines);
-        TextView previewLocation = findViewById(R.id.preview_location);
-        TextView previewTimeAndDay = findViewById(R.id.preview_time_and_day);
-        TextView previewDateRange = findViewById(R.id.preview_date_range);
-        TextView previewDuration = findViewById(R.id.preview_duration);
-        TextView previewPrice = findViewById(R.id.preview_price);
-        TextView previewSpotsOpen = findViewById(R.id.preview_spots_open);
-        TextView previewDaysLeft = findViewById(R.id.preview_days_left);
-        TextView currentlyWaiting = findViewById(R.id.currently_waiting);
-
-        LinearLayout sampledEntrantsContainer = findViewById(R.id.sampled_entrants_container);
-        LinearLayout cancelledEntrantsContainer = findViewById(R.id.cancelled_entrants_container);
-        LinearLayout allEntrantsContainer = findViewById(R.id.all_entrants_container);
-
-        Button buttonFillSpots = findViewById(R.id.button_fillSpots);
-        Button buttonConfirm = findViewById(R.id.button_confirm);
-        Button buttonBack = findViewById(R.id.button_BackPostDraw);
-        ImageView mapPreview = findViewById(R.id.mapPreview);
-
-        // --- Populate static placeholders ---
-        previewEventName.setText("Post-Draw Event Preview");
-        previewDescription.setText("Here’s your event’s post-draw details.");
-        buttonConfirm.setEnabled(false); // Disabled until confirmation ready
-
-        // --- Button interactions ---
-        buttonBack.setOnClickListener(v -> finish());
-
-        buttonFillSpots.setOnClickListener(v -> {
-            Toast.makeText(this, "Filling remaining event spots...", Toast.LENGTH_SHORT).show();
-
-            // TODO: integrate with controller later
-            buttonConfirm.setEnabled(true);
-        });
-
-        buttonConfirm.setOnClickListener(v -> {
-            Toast.makeText(this, "Confirmed selected entrants!", Toast.LENGTH_SHORT).show();
-
-            // TODO: add eventHandler.confirmEntrants(eventID)
-            buttonConfirm.setEnabled(false);
-        });
-
-        // --- Bottom Navigation setup (placeholder) ---
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.nav_home:
-                    Toast.makeText(this, "Home clicked", Toast.LENGTH_SHORT).show();
-                    return true;
-                case R.id.nav_profile:
-                    Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
-                    return true;
-                default:
-                    return false;
-            }
-        });
-    }
+//    private void setupPostDrawLayout(EventUserLink eventUserLink) {
+//        // --- View bindings ---
+//        ImageView eventImage = findViewById(R.id.eventImage);
+//        TextView previewEventName = findViewById(R.id.preview_event_name);
+//        TextView previewDescription = findViewById(R.id.preview_description);
+//        TextView previewGuidelines = findViewById(R.id.preview_guidelines);
+//        TextView previewLocation = findViewById(R.id.preview_location);
+//        TextView previewTimeAndDay = findViewById(R.id.preview_time_and_day);
+//        TextView previewDateRange = findViewById(R.id.preview_date_range);
+//        TextView previewDuration = findViewById(R.id.preview_duration);
+//        TextView previewPrice = findViewById(R.id.preview_price);
+//        TextView previewSpotsOpen = findViewById(R.id.preview_spots_open);
+//        TextView previewDaysLeft = findViewById(R.id.preview_days_left);
+//        TextView currentlyWaiting = findViewById(R.id.currently_waiting);
+//
+//        LinearLayout sampledEntrantsContainer = findViewById(R.id.sampled_entrants_container);
+//        LinearLayout cancelledEntrantsContainer = findViewById(R.id.cancelled_entrants_container);
+//        LinearLayout allEntrantsContainer = findViewById(R.id.all_entrants_container);
+//
+//        Button buttonFillSpots = findViewById(R.id.button_fillSpots);
+//        Button buttonConfirm = findViewById(R.id.button_confirm);
+//        Button buttonBack = findViewById(R.id.button_BackPostDraw);
+//        ImageView mapPreview = findViewById(R.id.mapPreview);
+//
+//        // --- Populate static placeholders ---
+//        previewEventName.setText("Post-Draw Event Preview");
+//        previewDescription.setText("Here’s your event’s post-draw details.");
+//        buttonConfirm.setEnabled(false); // Disabled until confirmation ready
+//
+//        // --- Button interactions ---
+//        buttonBack.setOnClickListener(v -> finish());
+//
+//        buttonFillSpots.setOnClickListener(v -> {
+//            Toast.makeText(this, "Filling remaining event spots...", Toast.LENGTH_SHORT).show();
+//
+//            // TODO: integrate with controller later
+//            buttonConfirm.setEnabled(true);
+//        });
+//
+//        buttonConfirm.setOnClickListener(v -> {
+//            Toast.makeText(this, "Confirmed selected entrants!", Toast.LENGTH_SHORT).show();
+//
+//            // TODO: add eventHandler.confirmEntrants(eventID)
+//            buttonConfirm.setEnabled(false);
+//        });
+//
+//        // --- Bottom Navigation setup (placeholder) ---
+//        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
+//        bottomNav.setOnItemSelectedListener(item -> {
+//            switch (item.getItemId()) {
+//                case R.id.nav_home:
+//                    Toast.makeText(this, "Home clicked", Toast.LENGTH_SHORT).show();
+//                    return true;
+//                case R.id.nav_profile:
+//                    Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
+//                    return true;
+//                default:
+//                    return false;
+//            }
+//        });
+//    }
 }
