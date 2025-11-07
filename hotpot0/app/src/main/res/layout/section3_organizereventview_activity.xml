@@ -1,220 +1,187 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <LinearLayout
+    <!-- Scrollable content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Event Image -->
+            <ImageView
+                android:id="@+id/event_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="16dp"
+                android:background="#E0E0E0"
+                android:scaleType="centerCrop"/>
+
+            <!-- Event Details -->
+            <TextView
+                android:id="@+id/preview_event_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_guidelines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_time_and_day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_date_range"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_spots_open"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/preview_days_left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/currently_waiting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="16dp" />
+
+            <!-- QR Code Image -->
+            <ImageView
+                android:id="@+id/qr_code_image"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center_horizontal"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="@string/qr_code_scanner" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/generate_sample_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/text"
+                android:text="@string/generate_sample"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+            <!-- Geolocation Map Placeholder -->
+            <ImageView
+                android:id="@+id/map_preview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"
+                android:background="#D0D0D0"
+                android:contentDescription="@string/map"/>
+
+            <TextView
+                android:id="@+id/list_of_entrants_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/all_entrants"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/text"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Entrants List -->
+            <LinearLayout
+                android:id="@+id/entrants_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+
+
+                <include layout="@layout/profile_blob" />
+                <include layout="@layout/profile_blob" />
+                <include layout="@layout/profile_blob" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Fixed Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:background="@color/bar"
+        app:itemIconSize="30dp"
+        app:itemIconTint="@color/nav_item_selector"
+        app:itemTextColor="@color/nav_item_selector"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 
-        <Button
-            android:id="@+id/button_BackCreateEvent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:backgroundTint="@color/text"
-            android:text="@string/back"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:padding="6dp"
-            android:layout_gravity="start" />
-
-        <!-- Page Title -->
-
-        <!-- Upload Image Section -->
-        <TextView
-            android:id="@+id/title_event"
-            android:layout_width="360dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:paddingTop="10dp"
-            android:text="Event 1"
-            android:textAlignment="center"
-            android:textColor="@color/text"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:id="@+id/upload_section"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:background="#F3F3F3"
-            android:layout_marginBottom="8dp"
-            android:padding="16dp"
-            android:layout_gravity="center"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true">
-
-            <ImageView
-                android:id="@+id/icon_upload"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_camera"
-                app:tint="@color/black"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/upload_image"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:layout_marginTop="8dp"/>
-
-            <!-- Delete icon -->
-            <ImageView
-                android:id="@+id/delete_image"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_delete"
-                app:tint="#A0A0A0"
-                android:visibility="gone" />
-        </LinearLayout>
-
-        <!-- Input Fields -->
-        <EditText
-            android:id="@+id/input_event_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/event_name"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/input_event_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/event_description"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="textMultiLine"/>
-
-        <EditText
-            android:id="@+id/input_event_guidelines"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/event_guidelines"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="textMultiLine"/>
-
-        <EditText
-            android:id="@+id/input_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/location"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/input_event_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/what_time_does_event_occur"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/input_event_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/when_does_event_occur"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="date"/>
-
-        <EditText
-            android:id="@+id/input_event_duration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/how_long_will_event_occur_dd_mm_yyyy_dd_mm_yyyy"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/input_price"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/price_of_event"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="numberDecimal"/>
-
-        <EditText
-            android:id="@+id/input_capacity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/number_of_people_you_can_accommodate"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="number"/>
-
-        <EditText
-            android:id="@+id/input_registration_period"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/registration_period_dd_mm_yyyy_dd_mm_yyyy"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <!-- Geolocation Switch -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="16dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/geolocation_for_participants"
-                android:textColor="@color/text"
-                android:textSize="16sp"/>
-
-            <Switch
-                android:id="@+id/switch_geolocation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:thumbTint="@color/text"
-                android:trackTint="@color/bar"/>
-        </LinearLayout>
-
-        <!-- Preview Button -->
-        <Button
-            android:id="@+id/button_preview_event"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="@color/text"
-            android:text="@string/preview_event"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:padding="12dp"
-            android:layout_gravity="center" />
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>
