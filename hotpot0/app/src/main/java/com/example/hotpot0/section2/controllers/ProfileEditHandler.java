@@ -1,9 +1,12 @@
 package com.example.hotpot0.section2.controllers;
 
 import android.content.Context;
+import android.util.Patterns;
 
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
+
+import java.util.regex.Pattern;
 
 public class ProfileEditHandler {
 
@@ -29,6 +32,38 @@ public class ProfileEditHandler {
             public void onSuccess(UserProfile currentUser) {
                 // Check if any of the fields have changed
                 boolean isUpdated = false;
+
+                if (newName == null || newName.trim().isEmpty()) {
+                    callback.onFailure(new IllegalArgumentException("Please enter your name"));
+                    return;
+                }
+
+                if (newEmailID == null || newEmailID.trim().isEmpty()) {
+                    callback.onFailure(new IllegalArgumentException("Please enter your email"));
+                    return;
+                }
+
+                // Name: only letters, spaces, dots, hyphens
+                Pattern namePattern = Pattern.compile("^[a-zA-Z .-]+$");
+                if (!namePattern.matcher(newName.trim()).matches()) {
+                    callback.onFailure(new IllegalArgumentException("Name contains invalid characters"));
+                    return;
+                }
+
+                // Email format
+                if (!Patterns.EMAIL_ADDRESS.matcher(newEmailID.trim()).matches()) {
+                    callback.onFailure(new IllegalArgumentException("Please enter a valid email address"));
+                    return;
+                }
+
+                // Phone number optional
+                if (newPhoneNumber != null && !newPhoneNumber.trim().isEmpty()) {
+                    Pattern phonePattern = Pattern.compile("^[0-9]{7,15}$");
+                    if (!phonePattern.matcher(newPhoneNumber.trim()).matches()) {
+                        callback.onFailure(new IllegalArgumentException("Phone number is invalid"));
+                        return;
+                    }
+                }
 
                 if (!currentUser.getName().equals(newName)) {
                     currentUser.setName(newName);

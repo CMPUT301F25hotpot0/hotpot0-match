@@ -1,6 +1,8 @@
 package com.example.hotpot0.models;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Event {
     private Integer eventID;
@@ -242,5 +244,19 @@ public class Event {
                 ", linkIDs=" + linkIDs +
                 ", sampledIDs=" + sampledIDs +
                 '}';
+    }
+
+    public ArrayList<String> sampleParticipants() {
+        if (linkIDs == null || linkIDs.isEmpty()) {
+            throw new IllegalStateException("No participants to sample from.");
+        }
+        int cap = this.capacity != null ? this.capacity : 0;
+        int sampleSize = Math.min(cap, linkIDs.size());
+        ArrayList<String> randomized = new ArrayList<>();
+        Collections.shuffle(randomized);
+
+        List<String> sampled = randomized.subList(0, sampleSize);
+        this.sampledIDs = new ArrayList<>(sampled);
+        return this.sampledIDs;
     }
 }

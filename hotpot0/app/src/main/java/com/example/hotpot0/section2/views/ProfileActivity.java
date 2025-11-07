@@ -1,5 +1,6 @@
 package com.example.hotpot0.section2.views;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.CompoundButton;
@@ -13,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.ProfileDB;
+import com.example.hotpot0.section1.views.StartupActivity;
 import com.example.hotpot0.section2.controllers.ProfileEditHandler;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -64,7 +66,6 @@ public class ProfileActivity extends AppCompatActivity{
                 return;
             }
 
-            // todo save to database
             profileHandler.handleProfileUpdate(this, userID, name, email, phone,     new ProfileDB.ActionCallback() {
                         @Override
                         public void onSuccess() {
@@ -79,17 +80,18 @@ public class ProfileActivity extends AppCompatActivity{
                         }
                     }
             );
-            Toast.makeText(this, "Profile saved successfully", Toast.LENGTH_SHORT).show();
         });
 
         // Delete profile button
         deleteProfileButton.setOnClickListener(v -> {
-            // todo delete from database
             profileHandler.deleteUserProfile(userID, new ProfileDB.ActionCallback() {
                 @Override
                 public void onSuccess() {
                     // Handle success, e.g., show a Toast
                     Toast.makeText(getApplicationContext(), "Profile deleted!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(ProfileActivity.this, StartupActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 }
 
                 @Override
@@ -102,7 +104,6 @@ public class ProfileActivity extends AppCompatActivity{
             emailInput.setText("");
             phoneInput.setText("");
             notificationSwitch.setChecked(false);
-            Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
         });
 
         // Bottom navigation setup
