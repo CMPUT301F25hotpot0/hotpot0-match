@@ -11,22 +11,62 @@ import com.example.hotpot0.models.ProfileDB;
 
 import java.util.List;
 
+/**
+ * Handles user actions related to events such as joining or leaving waitlists,
+ * accepting or declining invitations, and managing event-user relationships.
+ * <p>
+ * This class provides asynchronous methods that interact with
+ * {@link EventDB}, {@link ProfileDB}, and {@link EventUserLinkDB}
+ * to perform these operations using callback-based responses.
+ * </p>
+ */
 public class EventActionHandler {
     private ProfileDB profileDB;
     private EventDB eventDB;
     private EventUserLinkDB eventUserLinkDB;
 
+    /**
+     * Constructs a new {@code EventActionHandler}.
+     * <p>
+     * Initializes the database handler instances used for event, profile,
+     * and event-user link operations.
+     * </p>
+     */
     public EventActionHandler(){
         profileDB = new ProfileDB();
         eventDB = new EventDB();
         eventUserLinkDB = new EventUserLinkDB();
     }
 
+    /**
+     * Generates a unique link ID combining the user ID and event ID.
+     * <p>
+     * The link ID is used as a unique key in the {@link EventUserLinkDB}.
+     * </p>
+     *
+     * @param userID  the user’s ID
+     * @param eventID the event’s ID
+     * @return a string identifier in the format "eventID_userID"
+     */
     private String generateLinkID(Integer userID, Integer eventID) {
         // Assuming linkID is created by combining userID and eventID as a string
         return eventID + "_" + userID;  // You can adjust this structure as per your requirements
     }
 
+    /**
+     * Allows a user to join an event’s waitlist if they are not already affiliated
+     * with the event and the waitlist is not full.
+     *
+     * @param userID   the user’s ID
+     * @param eventID  the event’s ID
+     * @param callback callback invoked upon completion:
+     *                 <ul>
+     *                     <li>{@code onSuccess(0)} – successfully joined waitlist</li>
+     *                     <li>{@code onSuccess(1)} – user already affiliated</li>
+     *                     <li>{@code onSuccess(2)} – waitlist is full</li>
+     *                     <li>{@code onFailure(e)} – failure during database operation</li>
+     *                 </ul>
+     */
     public void joinWaitList(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
         // Construct the linkID
         String linkID = generateLinkID(userID, eventID);
@@ -134,6 +174,22 @@ public class EventActionHandler {
         });
     }
 
+    /**
+     * Removes a user from an event’s waitlist.
+     * <p>
+     * The method deletes the associated {@link EventUserLink} and removes
+     * the link reference from both the user’s profile and the event record.
+     * </p>
+     *
+     * @param userID   the user’s ID
+     * @param eventID  the event’s ID
+     * @param callback callback invoked upon completion:
+     *                 <ul>
+     *                     <li>{@code onSuccess(0)} – successfully removed</li>
+     *                     <li>{@code onSuccess(1)} – user not on waitlist</li>
+     *                     <li>{@code onFailure(e)} – failure during database operation</li>
+     *                 </ul>
+     */
     public void leaveWaitList(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
         // Construct the linkID
         String linkID = generateLinkID(userID, eventID);
@@ -222,6 +278,22 @@ public class EventActionHandler {
         });
     }
 
+    /**
+     * Allows a user to accept an invitation to an event.
+     * <p>
+     * Only users with the "Sampled" status can accept an invitation.
+     * Upon acceptance, the status is updated to "Accepted".
+     * </p>
+     *
+     * @param userID   the user’s ID
+     * @param eventID  the event’s ID
+     * @param callback callback invoked upon completion:
+     *                 <ul>
+     *                     <li>{@code onSuccess(0)} – successfully accepted invite</li>
+     *                     <li>{@code onSuccess(1)} – user not eligible</li>
+     *                     <li>{@code onFailure(e)} – failure during update</li>
+     *                 </ul>
+     */
     public void acceptInvite(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
         // Construct the linkID
         String linkID = generateLinkID(userID, eventID);
@@ -265,6 +337,22 @@ public class EventActionHandler {
         });
     }
 
+    /**
+     * Allows a user to decline an invitation to an event.
+     * <p>
+     * Only users with the "Sampled" status can decline an invitation.
+     * Upon declining, the status is updated to "Declined".
+     * </p>
+     *
+     * @param userID   the user’s ID
+     * @param eventID  the event’s ID
+     * @param callback callback invoked upon completion:
+     *                 <ul>
+     *                     <li>{@code onSuccess(0)} – successfully declined invite</li>
+     *                     <li>{@code onSuccess(1)} – user not eligible</li>
+     *                     <li>{@code onFailure(e)} – failure during update</li>
+     *                 </ul>
+     */
     public void declineInvite(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
         // Construct the linkID
         String linkID = generateLinkID(userID, eventID);

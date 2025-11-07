@@ -14,12 +14,24 @@ import com.example.hotpot0.models.UserProfile;
 
 import java.util.regex.Pattern;
 
+/**
+ * Handles the creation of new events in the system.
+ * <p>
+ * This class performs validation on event details, creates a new {@link Event},
+ * links it to the organizer through {@link EventUserLink}, and updates the organizer’s profile.
+ * </p>
+ */
 public class CreateEventHandler {
     private final EventDB eventDB;
     private final Context context;
     private EventUserLinkDB eventUserLinkDB;
     private ProfileDB profileDB;
 
+    /**
+     * Constructs a new {@code CreateEventHandler}.
+     *
+     * @param context the Android context used for database access and UI feedback.
+     */
     public CreateEventHandler(Context context) {
         this.context = context;
         this.eventDB = new EventDB();
@@ -27,6 +39,30 @@ public class CreateEventHandler {
         this.profileDB = new ProfileDB();
     }
 
+    /**
+     * Creates a new event and associates it with the organizer.
+     * <p>
+     * This method performs validation on all required fields before creating the event.
+     * If successful, it creates the event record, links it to the organizer as an "Organizer"
+     * in {@link EventUserLinkDB}, and updates both the organizer’s profile and event record
+     * with the link ID.
+     * </p>
+     *
+     * @param organizerID          the ID of the user organizing the event
+     * @param name                 the event name (required)
+     * @param description          a brief description of the event (required)
+     * @param guidelines           optional guidelines for participants
+     * @param location             the location where the event will take place (required)
+     * @param time                 the time of the event (required)
+     * @param date                 the date of the event in YYYY-MM-DD format (required)
+     * @param duration             the duration of the event (required)
+     * @param capacity             the maximum number of participants allowed (must be positive)
+     * @param price                the entry fee or price (cannot be negative)
+     * @param registrationPeriod   the period during which registration is open (required)
+     * @param imageURL             an optional image URL for the event
+     * @param geolocationRequired  whether the event requires location access
+     * @param callback             callback for success or failure
+     */
     public void createEvent(Integer organizerID, String name,
                             String description,
                             String guidelines,

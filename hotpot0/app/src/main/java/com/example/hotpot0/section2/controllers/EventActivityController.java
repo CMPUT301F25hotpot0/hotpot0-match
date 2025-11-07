@@ -14,11 +14,29 @@ import com.example.hotpot0.section2.views.EventSampledActivity;
 import com.example.hotpot0.section2.views.OrganizerEventActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+/**
+ * Controller class responsible for navigating users to the appropriate event-related activity
+ * based on their affiliation and status with a given event.
+ * <p>
+ * This class fetches the {@link EventUserLink} for a user and event, then opens
+ * one of the following activities depending on the status:
+ * <ul>
+ *     <li>{@link EventInitialActivity} – user is on waitlist or has no affiliation</li>
+ *     <li>{@link EventSampledActivity} – user is sampled, accepted, or declined</li>
+ *     <li>{@link OrganizerEventActivity} – user is an organizer</li>
+ * </ul>
+ * </p>
+ */
 public class EventActivityController {
 
     private final EventUserLinkDB eventUserLinkDB;
     private final Context context;
 
+    /**
+     * Constructs a new {@code EventActivityController}.
+     *
+     * @param context the Android context used to start activities
+     */
     public EventActivityController(Context context) {
         this.context = context;
         this.eventUserLinkDB = new EventUserLinkDB();
@@ -76,18 +94,33 @@ public class EventActivityController {
         });
     }
 
+    /**
+     * Opens {@link EventInitialActivity} for the specified event.
+     *
+     * @param eventID the ID of the event
+     */
     private void openEventInitialActivity(int eventID) {
         Intent intent = new Intent(context, EventInitialActivity.class);
         intent.putExtra("event_id", eventID);
         context.startActivity(intent);
     }
 
+    /**
+     * Opens {@link EventSampledActivity} for the specified event.
+     *
+     * @param eventID the ID of the event
+     */
     private void openSampledActivity(int eventID) {
         Intent intent = new Intent(context, EventSampledActivity.class);
         intent.putExtra("event_id", eventID);
         context.startActivity(intent);
     }
 
+    /**
+     * Opens {@link OrganizerEventActivity} for the specified event.
+     *
+     * @param eventID the ID of the event
+     */
     private void openOrganizerActivity(int eventID) {
         Intent intent = new Intent(context, OrganizerEventActivity.class);
         intent.putExtra("event_id", eventID);

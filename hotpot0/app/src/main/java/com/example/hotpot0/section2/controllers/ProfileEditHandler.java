@@ -8,10 +8,23 @@ import com.example.hotpot0.models.UserProfile;
 
 import java.util.regex.Pattern;
 
+/**
+ * Handles operations related to editing and managing user profiles.
+ * <p>
+ * This class provides methods to update user details, validate inputs,
+ * and delete user profiles in the Firestore database using {@link ProfileDB}.
+ * </p>
+ */
 public class ProfileEditHandler {
 
     private ProfileDB profileDB;
 
+    /**
+     * Constructs a new {@code ProfileEditHandler}.
+     * <p>
+     * Initializes the {@link ProfileDB} instance used to interact with user profiles.
+     * </p>
+     */
     public ProfileEditHandler() {
         profileDB = new ProfileDB(); // Initialize ProfileDB to interact with Firestore
     }
@@ -114,6 +127,11 @@ public class ProfileEditHandler {
         });
     }
 
+    /**
+     * Deletes the user profile with the given userID.
+     * @param userID The user ID of the profile to delete
+     * @param callback A callback interface to notify success or failure
+     */
     public void deleteUserProfile(int userID, ProfileDB.ActionCallback callback) {
         profileDB.deleteUser(userID, new ProfileDB.ActionCallback() {
             @Override
