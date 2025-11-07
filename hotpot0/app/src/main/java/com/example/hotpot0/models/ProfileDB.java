@@ -233,7 +233,7 @@ public class ProfileDB {
      * @param user     The UserProfile object with updated values (must have userID)
      * @param callback Callback to notify success or failure
      */
-    public void updateUser(@NonNull UserProfile user, @NonNull ActionCallback callback) {
+    public void updateUser(@NonNull UserProfile user, @NonNull ActionCallback callback, Double longitude, Double latitude, Boolean notificationsEnabled) {
         Integer userID = user.getUserID();
         if (userID == null) {
             callback.onFailure(new IllegalArgumentException("User ID cannot be null for update"));
@@ -247,6 +247,15 @@ public class ProfileDB {
         updates.put("name", user.getName());
         updates.put("emailID", user.getEmailID());
         updates.put("phoneNumber", user.getPhoneNumber());
+
+        // UPDATE NOTIFICATIONS PREFERENCES AND LOCATION
+        // Add latitude and longitude only if provided
+        if (latitude != null && longitude != null) {
+            updates.put("latitude", latitude);
+            updates.put("longitude", longitude);
+        }
+        // Update notifications preference
+        if (notificationsEnabled != null) updates.put("notificationsEnabled", notificationsEnabled);
 
         userRef.update(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())

@@ -41,8 +41,8 @@ public class UserProfile {
         this.emailID = emailID;
         this.phoneNumber = phoneNumber;
         this.notificationsEnabled = true;
-        this.latitude = null;
-        this.longitude = null;
+        this.latitude = 37.7749;
+        this.longitude = -122.4194;
         this.linkIDs = new ArrayList<>();
     }
 
