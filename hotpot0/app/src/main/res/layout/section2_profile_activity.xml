@@ -111,7 +111,7 @@
         style="@style/Widget.Material3.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="64dp"
         android:backgroundTint="@color/text"
         android:text="@string/save"
         app:layout_constraintEnd_toEndOf="parent"
@@ -151,15 +151,24 @@
         app:layout_constraintVertical_bias="1.0"
         app:menu="@menu/bottom_nav_menu" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch1"
         android:layout_width="273dp"
         android:layout_height="46dp"
         android:layout_marginTop="20dp"
-        android:text="Notifications/Geo-Location"
+        android:text="@string/notifications"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phoneLayout" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch2"
+        android:layout_width="273dp"
+        android:layout_height="46dp"
+        android:text="@string/geo_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch1" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

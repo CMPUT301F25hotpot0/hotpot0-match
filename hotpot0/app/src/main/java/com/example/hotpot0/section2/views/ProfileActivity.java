@@ -27,7 +27,7 @@ public class ProfileActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.section2_profile);
+        setContentView(R.layout.section2_profile_activity);
 
         // Initialize UI components
         nameInput = findViewById(R.id.nameInput);

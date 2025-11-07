@@ -41,6 +41,7 @@
     <string name="filter">Filters</string>
     <string name="save">Save</string>
     <string name="delete_profile">Delete Profile</string>
+    <string name="geo_location">Geo-Location</string>
 
     <!-- Section 3 -->
 
