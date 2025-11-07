@@ -24,6 +24,8 @@ public class Event {
         this.sampledIDs = new ArrayList<>();
         this.isEventActive = true;
         this.geolocationRequired = false;
+        this.sampledIDs = new ArrayList<>();
+        this.cancelledIDs = new ArrayList<>();
     }
 
     public Event(Integer organizerID, String name, String description, String guidelines,
