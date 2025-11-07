@@ -10,21 +10,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * EventDB handles all Firestore operations for Event.
- * It can add, delete, update, and fetch Event data.
+ * Handles all Firestore database operations related to {@link Event}.
+ * <p>
+ * This class encapsulates methods to add, update, delete, and fetch events,
+ * as well as to modify participant-related arrays (linkIDs, sampledIDs, cancelledIDs).
+ * </p>
+ * <p>
+ * Each method is asynchronous and uses callback interfaces to return results
+ * or report failures to the caller.
+ * </p>
  */
 public class EventDB {
     private final FirebaseFirestore db;
     private static final String EVENT_COLLECTION = "Events";
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
 
+    /** Initializes the EventDB instance and Firestore connection. */
     public EventDB() {
         db = FirebaseFirestore.getInstance();
     }
 
     /**
      * Generic callback interface for asynchronous Firestore operations.
-     * @param <T> The result type.
+     * @param <T> The expected result type.
      */
     public interface GetCallback<T> {
         void onSuccess(T result);
@@ -125,7 +133,9 @@ public class EventDB {
     }
 
     /**
-     * Fetches an event by its ID.
+     * Fetches a single event document by its unique ID.
+     * @param eventID  the ID of the event to fetch
+     * @param callback callback returning the {@code Event} object or an error
      */
     public void getEventByID(@NonNull Integer eventID, @NonNull GetCallback<Event> callback) {
         db.collection(EVENT_COLLECTION)
@@ -144,6 +154,7 @@ public class EventDB {
 
     /**
      * Fetches all active events.
+     * @param callback callback returning the list of active {@code Event} objects
      */
     public void getAllActiveEvents(@NonNull GetCallback<java.util.List<Event>> callback) {
         db.collection(EVENT_COLLECTION)
@@ -161,6 +172,7 @@ public class EventDB {
 
     /**
      * Fetches all events, regardless of status.
+     * @param callback callback returning all event documents
      */
     public void getAllEvents(@NonNull GetCallback<java.util.List<Event>> callback) {
         db.collection(EVENT_COLLECTION)
@@ -177,6 +189,9 @@ public class EventDB {
 
     /**
      * Adds a linkID to an event's linkIDs array.
+     * @param event    the event to update
+     * @param linkID   the participant’s link ID to add
+     * @param callback callback indicating completion status
      */
     public void addLinkIDToEvent(@NonNull Event event, @NonNull String linkID, @NonNull GetCallback<Void> callback) {
         if (event.getLinkIDs() == null) event.setLinkIDs(new ArrayList<>());
@@ -191,6 +206,9 @@ public class EventDB {
 
     /**
      * Removes a linkID from an event's linkIDs array.
+     * @param event    the event to update
+     * @param linkID   the link ID to remove
+     * @param callback callback indicating completion status
      */
     public void removeLinkIDFromEvent(@NonNull Event event, @NonNull String linkID, @NonNull GetCallback<Void> callback) {
         if (event.getLinkIDs() != null) event.removeLinkID(linkID);
@@ -204,6 +222,9 @@ public class EventDB {
 
     /**
      * Adds a sampledID to an event's sampledIDs array.
+     * @param event      the event to update
+     * @param sampledID  the sampled participant’s ID
+     * @param callback   callback indicating completion status
      */
     public void addSampledIDToEvent(@NonNull Event event, @NonNull String sampledID, @NonNull GetCallback<Void> callback) {
         if (event.getSampledIDs() == null) event.setSampledIDs(new ArrayList<>());
@@ -218,6 +239,9 @@ public class EventDB {
 
     /**
      * Removes a sampledID from an event's sampledIDs array.
+     * @param event      the event to update
+     * @param sampledID  the sampled participant ID to remove
+     * @param callback   callback indicating completion status
      */
     public void removeSampledIDFromEvent(@NonNull Event event, @NonNull String sampledID, @NonNull GetCallback<Void> callback) {
         if (event.getSampledIDs() != null) event.getSampledIDs().remove(sampledID);
@@ -229,6 +253,12 @@ public class EventDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
+    /**
+     * Adds a cancelled participant ID to the event’s cancelledID array .
+     * @param event       the event to update
+     * @param cancelledID the cancelled participant ID to add
+     * @param callback    callback indicating completion status
+     */
     public void addCancelledIDToEvent(@NonNull Event event, @NonNull String cancelledID, @NonNull GetCallback<Void> callback) {
         if (event.getCancelledIDs() == null) event.setCancelledIDs(new ArrayList<>());
         if (!event.getCancelledIDs().contains(cancelledID))
@@ -241,6 +271,12 @@ public class EventDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
+    /**
+     * Removes a cancelled participant ID from the event’s cancelledIDs array.
+     * @param event       the event to update
+     * @param cancelledID the cancelled participant ID to remove
+     * @param callback    callback indicating completion status
+     */
     public void removeCancelledIDFromEvent(@NonNull Event event, @NonNull String cancelledID, @NonNull GetCallback<Void> callback) {
         if (event.getCancelledIDs() != null) event.getCancelledIDs().remove(cancelledID);
 
@@ -251,6 +287,12 @@ public class EventDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
+    /**
+     * Updates the event’s active status in Firestore.
+     * @param event    the event to update
+     * @param isActive true to mark the event active, false otherwise
+     * @param callback callback indicating completion status
+     */
     public void setEventActiveStatus(@NonNull Event event, boolean isActive, @NonNull GetCallback<Void> callback) {
         event.setIsEventActive(isActive);
 
@@ -261,6 +303,12 @@ public class EventDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
+    /**
+     * Updates the event’s geolocation requirement flag in Firestore.
+     * @param event      the event to update
+     * @param isRequired true if geolocation verification is required
+     * @param callback   callback indicating completion status
+     */
     public void setGeolocationRequired(@NonNull Event event, boolean isRequired, @NonNull GetCallback<Void> callback) {
         event.setGeolocationRequired(isRequired);
 
@@ -307,6 +355,19 @@ public class EventDB {
 //        }
 //    }
 
+    /**
+     * Randomly samples new participants for an event based on its waitlist.
+     * <p>
+     * This method first retrieves the list of users on the waitlist using
+     * {@link EventUserLinkDB#getWaitListUsers(List, EventUserLinkDB.GetCallback)}.
+     * Once the waitlist is obtained, it calls {@link Event#sampleParticipants(List)}
+     * to randomly select participants up to the event's capacity and updates
+     * Firestore with the new {@code sampledIDs}.
+     * </p>
+     * @param event    the Event object for which participants are being sampled
+     * @param callback the callback invoked upon success or failure;
+     *                 {@code onSuccess} returns the list of sampled participant IDs
+     */
     public void sampleEvent(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
         List<String> allLinkIDs = event.getLinkIDs();
 
@@ -333,6 +394,12 @@ public class EventDB {
         });
     }
 
+    /**
+     * Fills empty sampled participant slots for an event using its waitlist.
+     * Updates Firestore with the newly added sampled participants.
+     * @param event    the event to update
+     * @param callback callback returning the newly sampled participant IDs
+     */
     public void fillEmptySampledSpots(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
         List<String> allLinkIDs = event.getLinkIDs();
 

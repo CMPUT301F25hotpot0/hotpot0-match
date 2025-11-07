@@ -27,6 +27,7 @@ public class ProfileDB {
     private static final String ADMINS_COLLECTION = "AdminProfiles";
     private static final String COUNTERS_COLLECTION = "Counters";
 
+    /** Initializes a ProfileDB instance and connects to Firestore. */
     public ProfileDB() {
         db = FirebaseFirestore.getInstance();
     }
@@ -52,6 +53,9 @@ public class ProfileDB {
      * to Firestore format (ArrayList<String>), if needed.
      * Currently UserProfile uses ArrayList<String> so no conversion is needed,
      * but this method is ready if any processing is required in the future.
+     *
+     * @param linkIDs list of link IDs to convert
+     * @return a Firestore-compatible list of link IDs
      */
     private ArrayList<String> convertLinkIDsForFirestore(ArrayList<String> linkIDs) {
         if (linkIDs == null) return new ArrayList<>();
@@ -323,7 +327,12 @@ public class ProfileDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    // To check if User already exists - and skip StartupActivity.java
+    /**
+     * To check if User already exists - and skip StartupActivity.java
+     *
+     * @param deviceID device identifier associated with the user
+     * @param callback callback returning the {@code UserProfile} or an error
+     */
     public void getUserByDeviceID(@NonNull String deviceID, @NonNull GetCallback<UserProfile> callback) {
         db.collection(USERS_COLLECTION)
                 .whereEqualTo("deviceID", deviceID)
@@ -347,6 +356,10 @@ public class ProfileDB {
 
     /**
      * Adds a linkID to the user's linkIDs array, avoiding duplicates.
+     *
+     * @param user     the user profile to update
+     * @param linkID   the link ID to add
+     * @param callback callback to notify success or failure
      */
     public void addLinkIDToUser(@NonNull UserProfile user, @NonNull String linkID, @NonNull GetCallback<Void> callback) {
 
@@ -366,6 +379,9 @@ public class ProfileDB {
 
     /**
      * Removes a linkID from the user's linkIDs array.
+     * @param user     the user profile to update
+     * @param linkID   the link ID to remove
+     * @param callback callback to notify success or failure
      */
     public void removeLinkIDFromUser(@NonNull UserProfile user, @NonNull String linkID, @NonNull GetCallback<Void> callback) {
 

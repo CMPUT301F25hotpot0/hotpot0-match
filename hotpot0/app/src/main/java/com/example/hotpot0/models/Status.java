@@ -9,6 +9,12 @@ public class Status {
 
     /**
      * Constructs a Status object with a predefined list of valid statuses.
+     * <p>
+     * The {@code Status} class defines a fixed set of allowed statuses that describe
+     * the relationship between a user and an event, like waitlisted, accepted, cancelled, etc.
+     * Attempting to assign a status not present in this predefined list will throw
+     * an IllegalArgumentException.
+     * </p>
      */
     public Status() {
         statuses = new ArrayList<>();

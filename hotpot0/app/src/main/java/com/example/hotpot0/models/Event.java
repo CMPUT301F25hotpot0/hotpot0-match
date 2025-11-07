@@ -4,6 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents an event managed by an organizer and stored in Firestore.
+ * <p>
+ * Each {@code Event} contains metadata such as name, description, schedule, and location,
+ * as well as participant lists, pricing, and registration details.
+ * The class provides methods for sampling and managing participant IDs.
+ * </p>
+ */
 public class Event {
     private Integer eventID;
     private Integer organizerID;
@@ -18,6 +26,10 @@ public class Event {
     private ArrayList<String> sampledIDs;
     private ArrayList<String> cancelledIDs;
 
+    /**
+     * Default constructor used by Firestore for deserialization.
+     * Initializes empty participant lists and default values.
+     */
     public Event() {
         this.eventID = null; // Handled by Firestore in EventDB
         this.linkIDs = new ArrayList<>();
@@ -28,6 +40,22 @@ public class Event {
         this.cancelledIDs = new ArrayList<>();
     }
 
+    /**
+     * Constructs an {@code Event} instance with all specified details.
+     * @param organizerID         the ID of the event organizer
+     * @param name                the name of the event
+     * @param description         the description of the event
+     * @param guidelines          event rules and participation guidelines
+     * @param location            location of the event
+     * @param time                time the event starts
+     * @param date                date of the event
+     * @param duration            duration of the event
+     * @param capacity            maximum allowed participants
+     * @param price               price to attend
+     * @param registration_period registration period
+     * @param imageURL            URL of the event image
+     * @param geolocationRequired whether geolocation validation is required
+     */
     public Event(Integer organizerID, String name, String description, String guidelines,
                  String location, String time, String date, String duration,
                  Integer capacity, Double price, String registration_period,
@@ -52,150 +80,192 @@ public class Event {
         this.cancelledIDs = new ArrayList<>();
     }
 
+    /** @return the event ID assigned by Firestore
+     */
     public Integer getEventID() {
         return eventID;
     }
 
+    /** @param eventID the unique event ID assigned by Firestore */
     public void setEventID(Integer eventID) {
         this.eventID = eventID;
     }
 
+    /** @return the ID of the event organizer */
     public Integer getOrganizerID() {
         return organizerID;
     }
 
+    /** @param organizerID the ID of the event organizer */
     public void setOrganizerID(Integer organizerID) {
         this.organizerID = organizerID;
     }
 
+    /** @return the name of the event */
     public String getName() {
         return name;
     }
 
+    /** @param name the name of the event */
     public void setName(String name) {
         this.name = name;
     }
 
+    /** @return the event description */
     public String getDescription() {
         return description;
     }
 
+    /** @param description a brief summary of the event */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /** @return event participation guidelines */
     public String getGuidelines() {
         return guidelines;
     }
 
+    /** @param guidelines event participation guidelines */
     public void setGuidelines(String guidelines) {
         this.guidelines = guidelines;
     }
 
+    /** @return event location */
     public String getLocation() {
         return location;
     }
 
+    /** @param location the location where the event will take place */
     public void setLocation(String location) {
         this.location = location;
     }
 
+    /** @return time of the event */
     public String getTime() {
         return time;
     }
 
+    /** @param time the time when the event begins */
     public void setTime(String time) {
         this.time = time;
     }
 
+    /** @return date of the event */
     public String getDate() {
         return date;
     }
 
+    /** @param date the date when the event will occur */
     public void setDate(String date) {
         this.date = date;
     }
 
+    /** @return duration of the event */
     public String getDuration() {
         return duration;
     }
 
+    /** @param duration the duration of the event */
     public void setDuration(String duration) {
         this.duration = duration;
     }
 
+    /** @return registration period for the event */
     public String getRegistration_period() {
         return registration_period;
     }
 
+    /** @param registration_period the time window for registration */
     public void setRegistration_period(String registration_period) {
         this.registration_period = registration_period;
     }
 
+    /** @return the maximum participant capacity */
     public Integer getCapacity() {
         return capacity;
     }
 
+    /** @param capacity the number of participants allowed */
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
     }
 
+    /** @return the event price */
     public Double getPrice() {
         return price;
     }
 
+    /** @param price the participation cost */
     public void setPrice(Double price) {
         this.price = price;
     }
 
+    /** @return the event’s image URL */
     public String getImageURL() {
         return imageURL;
     }
 
+    /** @param imageURL URL of the event image */
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
 
+    /** @return whether geolocation tracking is required */
     public Boolean getGeolocationRequired() {
         return geolocationRequired;
     }
 
+    /** @param geolocationRequired true if geolocation verification is required */
     public void setGeolocationRequired(Boolean geolocationRequired) {
         this.geolocationRequired = geolocationRequired;
     }
 
+    /** @return whether the event is currently active */
     public Boolean getIsEventActive() {
         return isEventActive;
     }
 
+    /** @param eventActive true if the event is active */
     public void setIsEventActive(Boolean eventActive) {
         isEventActive = eventActive;
     }
 
+    /** @return the list of registered participant IDs */
     public ArrayList<String> getLinkIDs() {
         return linkIDs;
     }
 
+    /** @param linkIDs list of participant IDs registered for the event */
     public void setLinkIDs(ArrayList<String> linkIDs) {
         this.linkIDs = linkIDs;
     }
 
+    /** @return list of sampled participant IDs */
     public ArrayList<String> getSampledIDs() {
         return sampledIDs;
     }
 
+    /** @param sampledIDs list of participants selected for participation */
     public void setSampledIDs(ArrayList<String> sampledIDs) {
         this.sampledIDs = sampledIDs;
     }
 
+    /** @return list of participant IDs that cancelled registration */
     public ArrayList<String> getCancelledIDs() {
         return cancelledIDs;
     }
 
+    /** @param cancelledIDs list of participants who have cancelled */
     public void setCancelledIDs(ArrayList<String> cancelledIDs) {
         this.cancelledIDs = cancelledIDs;
     }
 
+    /**
+     * Adds a participant ID to the list of registered participants.
+     * @param linkID the unique participant ID
+     * @return {@code true} if the ID was added successfully, {@code false} otherwise
+     */
     public boolean addLinkID(String linkID) {
         if (linkID == null || linkID.isEmpty()) {
             return false;
@@ -212,6 +282,11 @@ public class Event {
         return linkIDs.add(linkID);
     }
 
+    /**
+     * Removes a participant ID from the list of registered participants.
+     * @param linkID the participant ID to remove
+     * @return {@code true} if the ID was successfully removed, {@code false} otherwise
+     */
     public boolean removeLinkID(String linkID) {
         if (linkID == null || linkID.isEmpty()) {
             return false;
@@ -219,22 +294,36 @@ public class Event {
         return linkIDs.remove(linkID);
     }
 
+    /** @return the total number of registered participants */
     public int getTotalLinks() {
         return (linkIDs != null) ? linkIDs.size() : 0;
     }
 
+    /** @return the total number of sampled participants */
     public int getTotalSampled() {
         return (sampledIDs != null) ? sampledIDs.size() : 0;
     }
 
+    /** @return the total number of cancelled participants */
     public int getTotalCancelled() {
         return (cancelledIDs != null) ? cancelledIDs.size() : 0;
     }
 
+    /**
+     * Calculates the number of participants currently on the waitlist.
+     * @return the total number of waitlisted participants
+     */
     public int getTotalWaitlist() {
         return getTotalLinks() - getTotalCancelled() - 1;
     }
 
+    /**
+     * Returns a human-readable summary of this event including core fields such as IDs,
+     * name, schedule, capacity, pricing, image URL, geolocation flag, active status,
+     * and the current registered/sampled participant IDs.
+     * @return a formatted string describing this {@code Event}
+     */
+    @Override
     public String toString() {
         return "Event{" +
                 "eventID=" + eventID +
@@ -302,9 +391,14 @@ public class Event {
 //        return newlySampled;
 //    }
 
+
     /**
-     * Randomly samples participants from the provided waitlist.
-     * The number of samples is limited by the event's capacity.
+     * Randomly samples participants from a provided waitlist up to the event's capacity.
+     * <p>
+     * Existing sampled participants are cleared before adding new ones.
+     * </p>
+     * @param waitListParticipants the list of participants to sample from
+     * @return a list of sampled participant IDs
      */
     public ArrayList<String> sampleParticipants(List<String> waitListParticipants) {
         if (waitListParticipants == null || waitListParticipants.isEmpty()) {
@@ -332,7 +426,10 @@ public class Event {
     }
 
     /**
-     * Fills remaining sampled spots with additional participants from the waitlist.
+     * Fills remaining sample slots with additional participants from the waitlist
+     * until the capacity is reached or the waitlist is exhausted.
+     * @param waitListParticipants the list of participants to sample from
+     * @return a list of newly added sampled participant IDs
      */
     public ArrayList<String> fillSampledParticipants(List<String> waitListParticipants) {
         if (waitListParticipants == null || waitListParticipants.isEmpty()) {

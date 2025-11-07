@@ -13,6 +13,10 @@ import java.util.List;
 /**
  * EventUserLinkDB handles all Firestore operations for EventUserLink.
  * It can add, delete, update, and fetch EventUserLink data.
+ * <p>
+ * It also provides helper functions to retrieve all users currently
+ * on a waitlist for a given event based on their {@code linkIDs}.
+ * </p>
  */
 public class EventUserLinkDB {
 
@@ -22,24 +26,47 @@ public class EventUserLinkDB {
     // Collection name for EventUserLink
     private static final String EVENT_USER_LINK_COLLECTION = "EventUserLinks";
 
+    /** Initializes a new {@code EventUserLinkDB} and connects to Firestore. */
     public EventUserLinkDB() {
         db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Callback interface for Firestore operations that return data.
+     * @param <T> the expected result type
+     */
     public interface GetCallback<T> {
+        /**
+         * Called when the Firestore operation completes successfully.
+         * @param result the result data returned from Firestore
+         */
         void onSuccess(T result);
+
+        /**
+         * Called when the Firestore operation fails.
+         * @param e the exception representing the error
+         */
         void onFailure(Exception e);
     }
 
+    /**
+     * Callback interface for Firestore operations that perform an action
+     * without returning specific data, like update or delete.
+     */
     public interface ActionCallback {
+        /** Called when the action completes successfully. */
         void onSuccess();
+
+        /**
+         * Called when the action fails.
+         * @param e the exception describing the error
+         */
         void onFailure(Exception e);
     }
 
     /**
      * Adds a new EventUserLink and returns the created EventUserLink on success.
      * This method creates and retrieves the new EventUserLink in one step.
-     *
      * @param eventUserLink The EventUserLink object to be added (without linkID)
      * @param callback      Callback that returns the created EventUserLink
      */
@@ -72,7 +99,6 @@ public class EventUserLinkDB {
     /**
      * Updates an existing EventUserLink in Firestore.
      * Only updates status and notifications fields.
-     *
      * @param eventUserLink The EventUserLink object with updated values (must have linkID)
      * @param callback      Callback to notify success or failure
      */
@@ -97,7 +123,6 @@ public class EventUserLinkDB {
 
     /**
      * Deletes an EventUserLink by linkID.
-     *
      * @param linkID  The ID of the EventUserLink to delete
      * @param callback Callback to notify success or failure
      */
@@ -111,7 +136,6 @@ public class EventUserLinkDB {
 
     /**
      * Fetches an EventUserLink by linkID.
-     *
      * @param linkID   The ID of the EventUserLink to fetch
      * @param callback Callback to return the EventUserLink or an error
      */
@@ -156,6 +180,19 @@ public class EventUserLinkDB {
 //        return waitListUsers;
 //    }
 
+    /**
+     * Retrieves all user link IDs currently marked as {@code "inWaitList"}
+     * from a given list of {@code linkIDs}.
+     * <p>
+     * For each provided link ID, this method asynchronously fetches the
+     * corresponding {@link EventUserLink} document and checks if its status
+     * equals {@code "inWaitList"}. Once all requests are complete,
+     * the callback is invoked with the filtered list.
+     * </p>
+     *
+     * @param linkIDs  list of {@code linkIDs} to check
+     * @param callback callback returning the list of link IDs currently in the waitlist
+     */
     public void getWaitListUsers(List<String> linkIDs, @NonNull GetCallback<List<String>> callback) {
         if (linkIDs == null || linkIDs.isEmpty()) {
             callback.onSuccess(Collections.emptyList());
