@@ -23,6 +23,8 @@ public class PreviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.section2_previewevent_activity);
 
+        int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+
         eventImage = findViewById(R.id.eventImage);
         tvEventName = findViewById(R.id.tvEventName);
         tvDescription = findViewById(R.id.tvDescription);
@@ -77,7 +79,7 @@ public class PreviewActivity extends AppCompatActivity {
 
             // Call the handler to create the event
             eventHandler.createEvent(
-                    1, // Assume '1' is the organizer ID
+                    userID, // Assume '1' is the organizer ID
                     eventName,
                     eventDesc,
                     eventGuidelines,

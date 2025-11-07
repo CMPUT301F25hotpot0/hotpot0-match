@@ -73,5 +73,21 @@ public class ProfileEditHandler {
             }
         });
     }
+
+    public void deleteUserProfile(int userID, ProfileDB.ActionCallback callback) {
+        profileDB.deleteUser(userID, new ProfileDB.ActionCallback() {
+            @Override
+            public void onSuccess() {
+                // Notify that the profile was successfully deleted
+                callback.onSuccess();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Notify failure in deleting the profile
+                callback.onFailure(e);
+            }
+        });
+    }
 }
 

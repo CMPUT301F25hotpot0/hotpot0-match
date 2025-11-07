@@ -50,9 +50,11 @@ public class UserSignupActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UserProfile user) {
                 Toast.makeText(UserSignupActivity.this, "Profile created successfully!", Toast.LENGTH_SHORT).show();
-
+                getSharedPreferences("app_prefs", MODE_PRIVATE)
+                        .edit()
+                        .putInt("userID", user.getUserID())
+                        .apply();
                 Intent intent = new Intent(UserSignupActivity.this, HomeActivity.class);
-                intent.putExtra("userID", user.getUserID());
                 startActivity(intent);
                 finish();
             }

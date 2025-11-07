@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.hotpot0.R;
+import com.example.hotpot0.models.ProfileDB;
+import com.example.hotpot0.section2.controllers.ProfileEditHandler;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -23,11 +25,14 @@ public class ProfileActivity extends AppCompatActivity{
     private MaterialButton saveProfileButton, deleteProfileButton;
     private Switch notificationSwitch;
     private BottomNavigationView bottomNavigationView;
+    private ProfileEditHandler profileHandler = new ProfileEditHandler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.section2_profile);
+
+        int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
 
         // Initialize UI components
         nameInput = findViewById(R.id.nameInput);
@@ -60,12 +65,39 @@ public class ProfileActivity extends AppCompatActivity{
             }
 
             // todo save to database
+            profileHandler.handleProfileUpdate(this, userID, name, email, phone,     new ProfileDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Handle success, e.g., show a Toast
+                            Toast.makeText(getApplicationContext(), "Profile updated!", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Handle failure
+                            Toast.makeText(getApplicationContext(), "Update failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+            );
             Toast.makeText(this, "Profile saved successfully", Toast.LENGTH_SHORT).show();
         });
 
         // Delete profile button
         deleteProfileButton.setOnClickListener(v -> {
             // todo delete from database
+            profileHandler.deleteUserProfile(userID, new ProfileDB.ActionCallback() {
+                @Override
+                public void onSuccess() {
+                    // Handle success, e.g., show a Toast
+                    Toast.makeText(getApplicationContext(), "Profile deleted!", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    // Handle failure
+                    Toast.makeText(getApplicationContext(), "Deletion failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
             nameInput.setText("");
             emailInput.setText("");
             phoneInput.setText("");

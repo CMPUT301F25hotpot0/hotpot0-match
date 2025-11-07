@@ -30,8 +30,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UserProfile user) {
                 // Device exists → go to HomeActivity
+                getSharedPreferences("app_prefs", MODE_PRIVATE)
+                        .edit()
+                        .putInt("userID", user.getUserID())
+                        .apply();
                 Intent intent = new Intent(MainActivity.this, com.example.hotpot0.section2.views.HomeActivity.class);
-                intent.putExtra("userID", user.getUserID()); // Pass user info
                 startActivity(intent);
                 finish();
             }
