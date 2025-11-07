@@ -26,12 +26,12 @@
     <string name="event_guidelines">Event Guidelines</string>
     <string name="location">Location</string>
     <string name="what_time_does_event_occur">What time does event occur?</string>
-    <string name="when_does_event_occur">When does event occur?</string>
+    <string name="when_does_event_occur">When does event occur? YYYY-MM-DD</string>
     <string name="price_of_event">Price of event</string>
     <string name="number_of_people_you_can_accommodate">Number of people you can accommodate</string>
     <string name="preview_event">Preview Event</string>
-    <string name="how_long_will_event_occur_dd_mm_yyyy_dd_mm_yyyy">How long will event occur? DD/MM/YYYY - DD/MM/YYYY</string>
-    <string name="registration_period_dd_mm_yyyy_dd_mm_yyyy">Registration period DD/MM/YYYY - DD/MM/YYYY</string>
+    <string name="how_long_will_event_occur_dd_mm_yyyy_dd_mm_yyyy">How long will event occur?</string>
+    <string name="registration_period_dd_mm_yyyy_dd_mm_yyyy">Registration period</string>
     <string name="geolocation_for_participants">Geolocation for Participants</string>
     <string name="back">Back</string>
     <string name="confirm">Confirm</string>
