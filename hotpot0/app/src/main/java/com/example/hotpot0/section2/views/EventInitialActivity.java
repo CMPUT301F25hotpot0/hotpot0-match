@@ -28,7 +28,7 @@ public class EventInitialActivity extends AppCompatActivity {
     private TextView GeolocationStatus;
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
 
-    private EventActionHandler eventHandler; // Reference to controller
+    private EventActionHandler eventHandler = new EventActionHandler(); // Reference to controller
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +36,7 @@ public class EventInitialActivity extends AppCompatActivity {
         setContentView(R.layout.section3_entranteventview_activity);
 
         int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+        int eventID = 1;
 
         eventImage = findViewById(R.id.eventImage);
         previewEventName = findViewById(R.id.previewEventName);
@@ -63,11 +64,10 @@ public class EventInitialActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {
                 joinLeaveButton.setText(getString(R.string.join_waitlist));
-                eventHandler.joinWaitList(userID, eventID, new ProfileDB.ActionCallback<Integer>() {
+                eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
                     @Override
-                    public void onSuccess() {
-                        Toast.makeText(EventInitialActivity.this, "Joined waitlist successfully!", Toast.LENGTH_SHORT).show();
-                        joinLeaveButton.setText(getString(R.string.leave_waitlist));
+                    public void onSuccess(Integer result) {
+                        Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -80,8 +80,6 @@ public class EventInitialActivity extends AppCompatActivity {
 
         backButton = findViewById(R.id.button_BottomBackPreviewEvent);
 
-        // Initialize controller (CreateEventHandler)
-        eventHandler = new CreateEventHandler(this);
 
         // Get event data from the Intent
         Bundle extras = getIntent().getExtras();
@@ -121,41 +119,17 @@ public class EventInitialActivity extends AppCompatActivity {
             String imageURL = ""; // Add the image URL logic here if needed
 
             // Call the handler to create the event
-            eventHandler.createEvent(
-                    userID, // Assume '1' is the organizer ID
-                    eventName,
-                    eventDesc,
-                    eventGuidelines,
-                    eventLocation,
-                    eventTime,
-                    eventDate,
-                    eventDuration,
-                    eventCapacity,
-                    eventPrice,
-                    registrationPeriod,
-                    imageURL,
-                    geolocationRequired,
-                    new EventDB.GetCallback<Event>() {
-                        @Override
-                        public void onSuccess(Event result) {
-                            // Event successfully created
-                            Toast.makeText(EventInitialActivity.this, "Event created successfully!", Toast.LENGTH_LONG).show();
+            eventHandler.leaveWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                @Override
+                public void onSuccess(Integer result) {
+                    Toast.makeText(EventInitialActivity.this, "Successfully left the waitlist!", Toast.LENGTH_SHORT).show();
+                }
 
-                            // Navigate back to HomeActivity
-                            Intent intent = new Intent(EventInitialActivity.this, HomeActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);  // Clear the stack
-                            startActivity(intent);
-                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                            finish(); // Finish EventInitialActivity
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            // Error during event creation
-                            Toast.makeText(EventInitialActivity.this, "Error creating event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-            );
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(EventInitialActivity.this, "Error leaving waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         // Back button

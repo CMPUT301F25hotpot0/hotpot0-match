@@ -25,7 +25,7 @@ public class ProfileEditHandler {
      * @param newPhoneNumber The new phone number to update to
      * @param callback A callback interface to notify success or failure
      */
-    public void handleProfileUpdate(Context context, int userID, String newName, String newEmailID, String newPhoneNumber, ProfileDB.ActionCallback callback) {
+    public void handleProfileUpdate(Context context, int userID, String newName, String newEmailID, String newPhoneNumber, Boolean notificationsEnabled, ProfileDB.ActionCallback callback) {
         // Fetch the current user profile from Firestore using the userID
         profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
             @Override
@@ -80,6 +80,11 @@ public class ProfileEditHandler {
                     isUpdated = true;
                 }
 
+                if (currentUser.getNotificationsEnabled() != notificationsEnabled) {
+                    currentUser.setNotificationsEnabled(notificationsEnabled);
+                    isUpdated = true;
+                }
+
                 // If any field has changed, proceed to update the profile in Firestore
                 if (isUpdated) {
                     profileDB.updateUser(currentUser, new ProfileDB.ActionCallback() {
@@ -94,7 +99,7 @@ public class ProfileEditHandler {
                             // Notify failure in updating the profile
                             callback.onFailure(e);
                         }
-                    });
+                    }, 0.0, 0.0, notificationsEnabled);
                 } else {
                     // Notify that there was no change to update
                     callback.onFailure(new Exception("No changes detected in the user profile."));

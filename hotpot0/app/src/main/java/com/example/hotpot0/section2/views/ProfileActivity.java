@@ -60,13 +60,14 @@ public class ProfileActivity extends AppCompatActivity{
             String name = nameInput.getText() != null ? nameInput.getText().toString().trim() : "";
             String email = emailInput.getText() != null ? emailInput.getText().toString().trim() : "";
             String phone = phoneInput.getText() != null ? phoneInput.getText().toString().trim() : "";
+            Boolean notificationsEnabled = notificationSwitch.isChecked();
 
             if (name.isEmpty() || email.isEmpty()) {
                 Toast.makeText(this, "Please enter both name and email", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            profileHandler.handleProfileUpdate(this, userID, name, email, phone, new ProfileDB.ActionCallback() {
+            profileHandler.handleProfileUpdate(this, userID, name, email, phone, notificationsEnabled, new ProfileDB.ActionCallback() {
                         @Override
                         public void onSuccess() {
                             // Handle success, e.g., show a Toast
