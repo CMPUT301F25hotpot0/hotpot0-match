@@ -18,6 +18,10 @@ import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
 
+/**
+ * Activity that displays the details of a selected event and allows a user
+ * to join or leave the waitlist based on their current status.
+ */
 public class EventInitialActivity extends AppCompatActivity {
     private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft;
     private ImageView eventImage;
@@ -29,6 +33,13 @@ public class EventInitialActivity extends AppCompatActivity {
     private int eventID;
     private Event currentEvent;
 
+    /**
+     * Called when the activity is first created.
+     * Initializes UI elements, fetches event details, and sets up the
+     * join/leave waitlist functionality.
+     *
+     * @param savedInstanceState Android cached state bundle
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,7 +177,7 @@ public class EventInitialActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
     }
 
-    // Helper method to navigate back to HomeActivity
+    /** Helper method to navigate back to HomeActivity */
     private void navigateHome() {
         Intent intent = new Intent(EventInitialActivity.this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);  // Clear the stack

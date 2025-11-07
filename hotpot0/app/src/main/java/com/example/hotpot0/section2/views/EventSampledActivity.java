@@ -18,6 +18,11 @@ import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
 
+/**
+ * Activity that displays a sampled view of an event for a user who
+ * has received an invitation. Allows the user to confirm or decline
+ * their attendance, and shows status messages accordingly.
+ */
 public class EventSampledActivity extends AppCompatActivity {
 
     private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay,
@@ -90,6 +95,9 @@ public class EventSampledActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Populates the UI elements with the current event's details.
+     */
     private void populateUI() {
         previewEventName.setText(currentEvent.getName());
         previewDescription.setText(currentEvent.getDescription());
@@ -107,6 +115,10 @@ public class EventSampledActivity extends AppCompatActivity {
         GeolocationStatus.setText(getString(R.string.event_geolocation, geolocationEnabled ? "Enabled" : "Disabled"));
     }
 
+    /**
+     * Checks the current user's status for this event (Accepted, Declined, or Pending)
+     * and updates the UI and buttons accordingly.
+     */
     private void checkUserStatus() {
         String linkID = eventID + "_" + userID;
 
@@ -135,6 +147,10 @@ public class EventSampledActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sets up click listeners for the confirm and decline buttons.
+     * Also makes the buttons visible and hides the status message.
+     */
     private void setupButtonListeners() {
         confirmButton.setVisibility(View.VISIBLE);
         declineButton.setVisibility(View.VISIBLE);
@@ -172,6 +188,11 @@ public class EventSampledActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Displays a status message to the user and hides the confirm/decline buttons.
+     *
+     * @param message The message to display
+     */
     private void showStatusMessage(String message) {
         confirmButton.setVisibility(View.GONE);
         declineButton.setVisibility(View.GONE);
@@ -184,6 +205,9 @@ public class EventSampledActivity extends AppCompatActivity {
         statusMessage.setTextSize(16);
     }
 
+    /**
+     * Navigates the user back to HomeActivity.
+     */
     private void navigateHome() {
         Intent intent = new Intent(EventSampledActivity.this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -15,6 +15,10 @@ import com.example.hotpot0.R;
 
 import java.io.IOException;
 
+/**
+ * Activity for creating a new event. Users can input event details, upload an image,
+ * and preview the event before submission.
+ */
 public class CreateEventActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -28,6 +32,12 @@ public class CreateEventActivity extends AppCompatActivity {
     private Button backButtonCreateEvents;
     private Button previewButton;
 
+    /**
+     * Called when the activity is first created. Initializes all views, sets click listeners
+     * for uploading/deleting images, previewing the event, and navigating back.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,11 +88,22 @@ public class CreateEventActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Opens the image picker so the user can select an image from their gallery.
+     */
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Handles the result of the image picker activity.
+     * Loads the selected image into the ImageView and stores it as a Bitmap.
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult().
+     * @param resultCode  The integer result code returned by the child activity.
+     * @param data        The intent returned by the child activity, containing image URI.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -100,6 +121,10 @@ public class CreateEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Opens the preview activity, passing all entered event details as extras.
+     * Validates that required fields (event name and description) are filled.
+     */
     private void openPreview() {
         // Collect data
         String eventName = name.getText().toString().trim();
