@@ -348,8 +348,14 @@ public class OrganizerEventActivity extends AppCompatActivity {
             container.addView(noEntrantsText);
             return;
         }
+
+        int organizerId = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+
         for (String id : linkIDs) {
             String userID = id.split("_")[1];
+            if (Integer.parseInt(userID) == organizerId) {
+                continue; // Skip organizer's own profile
+            }
             profileDB.getUserByID(Integer.parseInt(userID), new ProfileDB.GetCallback<UserProfile>() {
                 @Override
                 public void onSuccess(UserProfile profile) {
