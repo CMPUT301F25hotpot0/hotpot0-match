@@ -26,14 +26,13 @@ public class Status {
      * Sets the current status to the provided status if it is valid.
      *
      * @param status The status to set. It must be one of the predefined valid statuses.
-     * @throws InvalidStatusException If the provided status is not valid.
      */
-    public void setStatus(String status) throws InvalidStatusException {
+    public void setStatus(String status) {
         if (statuses.contains(status)) {
             this.status = status;
         }
-        else{
-            throw new InvalidStatusException("Invalid status: " + status);
+        else {
+            throw new IllegalArgumentException("Invalid status: " + status);
         }
     }
 

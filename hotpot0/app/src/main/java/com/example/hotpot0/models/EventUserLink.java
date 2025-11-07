@@ -7,10 +7,10 @@ public class EventUserLink {
     private final Integer userID;
     private final Integer eventID;
     private String linkID;
-    private Status status;
+    private Status status = new Status();
     private List<String> notifications;
 
-    public EventUserLink(Integer userID, Integer eventID, String status) throws InvalidStatusException {
+    public EventUserLink(Integer userID, Integer eventID, String status) {
         this.linkID = eventID.toString() + '_' + userID.toString(); // Assigned by FireStore when the instance is saved
         this.userID = userID;
         this.eventID = eventID;
@@ -18,7 +18,7 @@ public class EventUserLink {
         this.notifications = new ArrayList<>();
     }
 
-    public EventUserLink(Integer userID, Integer eventID) throws InvalidStatusException {
+    public EventUserLink(Integer userID, Integer eventID) {
         this.linkID = eventID.toString() + '_' + userID.toString(); // Assigned by FireStore when the instance is saved
         this.userID = userID;
         this.eventID = eventID;
@@ -42,7 +42,7 @@ public class EventUserLink {
         return status.getStatus();
     }
 
-    public void setStatus(String status) throws InvalidStatusException {
+    public void setStatus(String status) {
         this.status.setStatus(status);
     }
 
