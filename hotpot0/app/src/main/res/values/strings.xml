@@ -35,6 +35,7 @@
     <string name="geolocation_for_participants">Geolocation for Participants</string>
     <string name="back">Back</string>
     <string name="confirm">Confirm</string>
+    <string name="decline">Decline</string>
     <string name="role">Role</string>
     <string name="current_invitations">Current Invitations</string>
     <string name="other_updates">Other Updates</string>
