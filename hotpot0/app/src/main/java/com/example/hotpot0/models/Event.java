@@ -49,6 +49,7 @@ public class Event {
         this.isEventActive = true;
         this.linkIDs = new ArrayList<>();
         this.sampledIDs = new ArrayList<>();
+        this.cancelledIDs = new ArrayList<>();
     }
 
     public Integer getEventID() {

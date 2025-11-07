@@ -255,8 +255,8 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
         // DEBUG
 
-//        populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
-//        populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
+        populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
+        populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
 
         // --- Button actions ---
         buttonBack.setOnClickListener(v -> finish());
@@ -281,6 +281,12 @@ public class OrganizerEventActivity extends AppCompatActivity {
     // ------------------ HELPER METHODS ------------------
     private void populateEntrants(LinearLayout container, List<String> linkIDs) {
         container.removeAllViews();
+        if (linkIDs == null || linkIDs.isEmpty()) {
+            TextView noEntrantsText = new TextView(this);
+            noEntrantsText.setText("No entrants found.");
+            container.addView(noEntrantsText);
+            return;
+        }
         for (String id : linkIDs) {
             String userID = id.split("_")[1];
             profileDB.getUserByID(Integer.parseInt(userID), new ProfileDB.GetCallback<UserProfile>() {
