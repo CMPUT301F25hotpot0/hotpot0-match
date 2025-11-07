@@ -8,6 +8,8 @@ import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.Status;
+import com.example.hotpot0.section2.views.EventInitialActivity;
+import com.example.hotpot0.section2.views.OrganizerEventActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 public class EventActivityController {
@@ -85,7 +87,7 @@ public class EventActivityController {
     }
 
     private void openOrganizerActivity() {
-//        Intent intent = new Intent(context, OrganizerEventActivity.class);
-//        context.startActivity(intent);
+        Intent intent = new Intent(context, EventInitialActivity.class);
+        context.startActivity(intent);
     }
 }

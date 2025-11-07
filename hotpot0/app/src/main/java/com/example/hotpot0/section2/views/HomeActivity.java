@@ -31,7 +31,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+        userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
         Toast .makeText(this, "Welcome User #" + userID, Toast.LENGTH_SHORT).show();
         setContentView(R.layout.section2_userhome_activity);
 
@@ -76,7 +76,6 @@ public class HomeActivity extends AppCompatActivity {
         pastList = findViewById(R.id.past_list);
 
         eventDB = new EventDB();
-        userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
 
         loadUserEvents();
     }
@@ -108,7 +107,7 @@ public class HomeActivity extends AppCompatActivity {
                 for (Event event : allEvents) {
                     String linkID = event.getEventID() + "_" + userID;
 
-                    eventUserLinkDB.getEventUserLinkByID(linkID, new ProfileDB.GetCallback<EventUserLink>() {
+                    eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
                         @Override
                         public void onSuccess(EventUserLink link) {
                             if (link == null || link.getStatus() == null) return;
@@ -132,9 +131,10 @@ public class HomeActivity extends AppCompatActivity {
 
                             // Update adapters each time a new event's link is retrieved
                             runOnUiThread(() -> {
-                                confirmedList.setAdapter(new EventBlobAdapter(HomeActivity.this, confirmed, confirmedStatuses));
-                                pendingList.setAdapter(new EventBlobAdapter(HomeActivity.this, pending, pendingStatuses));
-                                pastList.setAdapter(new EventBlobAdapter(HomeActivity.this, past, pastStatuses));
+                                // Pass the userID to the adapter
+                                confirmedList.setAdapter(new EventBlobAdapter(HomeActivity.this, confirmed, confirmedStatuses, userID));
+                                pendingList.setAdapter(new EventBlobAdapter(HomeActivity.this, pending, pendingStatuses, userID));
+                                pastList.setAdapter(new EventBlobAdapter(HomeActivity.this, past, pastStatuses, userID));
                             });
                         }
 
@@ -152,5 +152,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }

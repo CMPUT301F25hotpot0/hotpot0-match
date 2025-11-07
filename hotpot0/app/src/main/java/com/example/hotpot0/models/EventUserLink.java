@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventUserLink {
-    private final Integer userID;
-    private final Integer eventID;
+    private Integer userID;
+    private Integer eventID;
     private String linkID;
     private Status status = new Status();
     private List<String> notifications;
+
+    public EventUserLink() {}
 
     public EventUserLink(Integer userID, Integer eventID, String status) {
         this.linkID = eventID.toString() + '_' + userID.toString(); // Assigned by FireStore when the instance is saved

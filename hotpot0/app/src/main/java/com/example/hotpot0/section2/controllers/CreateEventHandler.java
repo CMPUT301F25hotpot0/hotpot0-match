@@ -2,6 +2,8 @@ package com.example.hotpot0.section2.controllers;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
@@ -110,11 +112,24 @@ public class CreateEventHandler {
                             @Override
                             public void onSuccess(UserProfile userProfile) {
                                 // Update the organizer's profile
+                                // add log of success
+                                Log.i("CreateEventHandler", "Successfully created EventUserLink with ID: " + linkResult.getLinkID());
+
                                 profileDB.addLinkIDToUser(userProfile, linkResult.getLinkID(), new ProfileDB.GetCallback<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        // Successfully updated organizer profile
-                                        callback.onSuccess(result);  // Call success after all actions complete
+                                        eventDB.addLinkIDToEvent(event, linkResult.getLinkID(), new EventDB.GetCallback<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                callback.onSuccess(result);
+                                            }
+
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                // Log the error but do not fail the event creation
+                                                e.printStackTrace();
+                                            }
+                                        });
                                     }
 
                                     @Override
@@ -124,23 +139,12 @@ public class CreateEventHandler {
                                         callback.onSuccess(result);  // Continue with success even if update fails
                                     }
                                 });
-                                eventDB.addLinkIDToEvent(event, linkResult.getLinkID(), new EventDB.GetCallback<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        // Link ID added successfully
-                                    }
-
-                                    @Override
-                                    public void onFailure(Exception e) {
-                                        // Log the error but do not fail the event creation
-                                        e.printStackTrace();
-                                    }
-                                });
                             }
 
                             @Override
                             public void onFailure(Exception e) {
                                 // Log the error but do not fail the event creation
+                                Log.i("CreateEventHandler", "Failed to retrieve user profile for ID: " + organizerID);
                                 e.printStackTrace();
                                 callback.onSuccess(result);  // Continue with success even if user retrieval fails
                             }

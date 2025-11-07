@@ -32,7 +32,7 @@ public class EventInitialActivity extends AppCompatActivity {
         setContentView(R.layout.section3_entranteventview_activity);
 
         int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
-        int eventID = 1;
+        int eventID = 1; // Example event ID, you should replace this with actual event ID
 
         eventImage = findViewById(R.id.eventImage);
         previewEventName = findViewById(R.id.previewEventName);
@@ -49,33 +49,72 @@ public class EventInitialActivity extends AppCompatActivity {
 
         joinLeaveButton = findViewById(R.id.button_join_or_leave_waitlist);
 
+        // Build the linkID based on user and event
         String linkID = eventID + "_" + userID;
 
         eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
             @Override
             public void onSuccess(EventUserLink eventUserLink) {
-                joinLeaveButton.setText(getString(R.string.leave_waitlist));
+                // If the user is already in the event (e.g., in the waitlist)
+                if (eventUserLink != null && "inWaitList".equals(eventUserLink.getStatus())) {
+                    joinLeaveButton.setText(getString(R.string.leave_waitlist));
+                    // When the button is clicked, leave the waitlist
+                    joinLeaveButton.setOnClickListener(v -> {
+                        eventHandler.leaveWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                            @Override
+                            public void onSuccess(Integer result) {
+                                Toast.makeText(EventInitialActivity.this, "Successfully left the waitlist!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(EventInitialActivity.this, "Error leaving waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    });
+                } else {
+                    // If the user does not have an EventUserLink (they're not on the waitlist)
+                    joinLeaveButton.setText(getString(R.string.join_waitlist));
+                    // When the button is clicked, join the waitlist
+                    joinLeaveButton.setOnClickListener(v -> {
+                        eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                            @Override
+                            public void onSuccess(Integer result) {
+                                Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(EventInitialActivity.this, "Error joining waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    });
+                }
             }
 
             @Override
             public void onFailure(Exception e) {
+                // In case the EventUserLink does not exist, allow joining the waitlist
                 joinLeaveButton.setText(getString(R.string.join_waitlist));
-                eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
-                    @Override
-                    public void onSuccess(Integer result) {
-                        Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
-                    }
+                joinLeaveButton.setOnClickListener(v -> {
+                    eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                        @Override
+                        public void onSuccess(Integer result) {
+                            Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                        }
 
-                    @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(EventInitialActivity.this, "Error joining waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(EventInitialActivity.this, "Error joining waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 });
             }
         });
 
+        // Back button
         backButton = findViewById(R.id.button_BottomBackPreviewEvent);
-
+        backButton.setOnClickListener(v -> finish());
 
         // Get event data from the Intent
         Bundle extras = getIntent().getExtras();
@@ -92,43 +131,8 @@ public class EventInitialActivity extends AppCompatActivity {
             previewDaysLeft.setText(getString(R.string.event_registration, extras.getString("registration", "")));
 
             boolean geolocationEnabled = getIntent().getBooleanExtra("geolocationEnabled", false);
-
             GeolocationStatus.setVisibility(View.VISIBLE);
             GeolocationStatus.setText(getString(R.string.event_geolocation, geolocationEnabled ? "Enabled" : "Disabled"));
         }
-
-        // Confirm button (Final event creation)
-        joinLeaveButton.setOnClickListener(v -> {
-            // Extract data from the preview to pass to the handler
-            String eventName = previewEventName.getText().toString().trim();
-            String eventDesc = previewDescription.getText().toString().trim();
-            String eventGuidelines = previewGuidelines.getText().toString().trim();
-            String eventLocation = previewLocation.getText().toString().replace("Location ", ""); // Removing the prefix
-            String eventTime = previewTimeAndDay.getText().toString().replace("Time ", "");
-            String eventDate = previewDateRange.getText().toString().replace("Date ", "");
-            String eventDuration = previewDuration.getText().toString().replace("Duration: ", "").trim();
-            Integer eventCapacity = Integer.parseInt(previewSpotsOpen.getText().toString().replace("Capacity: ", "").trim());
-            Double eventPrice = Double.parseDouble(previewPrice.getText().toString().replace("Price ", "").replace(" CAD", "").trim());
-            String registrationPeriod = previewDaysLeft.getText().toString().replace("Registration Period: ", "").trim();
-            Boolean geolocationRequired = GeolocationStatus.getText().toString().equals("Yes");
-
-            String imageURL = ""; // Add the image URL logic here if needed
-
-            // Call the handler to create the event
-            eventHandler.leaveWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
-                @Override
-                public void onSuccess(Integer result) {
-                    Toast.makeText(EventInitialActivity.this, "Successfully left the waitlist!", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(EventInitialActivity.this, "Error leaving waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-
-        // Back button
-        backButton.setOnClickListener(v -> finish());
     }
 }
