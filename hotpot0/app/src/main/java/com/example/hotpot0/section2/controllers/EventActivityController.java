@@ -30,7 +30,7 @@ public class EventActivityController {
         String linkID = eventID + "_" + userID;
 
         // Fetch the EventUserLink for the user and event
-        eventUserLinkDB.getEventUserLinkByID(linkID, new ProfileDB.GetCallback<EventUserLink>() {
+        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
             @Override
             public void onSuccess(EventUserLink eventUserLink) {
                 // User is affiliated with the event, check their status

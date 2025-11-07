@@ -11,13 +11,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
-import com.example.hotpot0.models.Event;
-import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
-import com.example.hotpot0.models.InvalidStatusException;
 import com.example.hotpot0.models.ProfileDB;
-import com.example.hotpot0.section2.controllers.CreateEventHandler;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
 
 
@@ -55,7 +51,7 @@ public class EventInitialActivity extends AppCompatActivity {
 
         String linkID = eventID + "_" + userID;
 
-        eventUserLinkDB.getEventUserLinkByID(linkID, new ProfileDB.GetCallback<EventUserLink>() {
+        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
             @Override
             public void onSuccess(EventUserLink eventUserLink) {
                 joinLeaveButton.setText(getString(R.string.leave_waitlist));
