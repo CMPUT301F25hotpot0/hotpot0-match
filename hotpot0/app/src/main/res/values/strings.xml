@@ -61,6 +61,7 @@
     <string name="rejection_text">We’re sorry, you have not been selected to join. Do you want to remain in Wait List?</string>
     <string name="join_waitlist">Join</string>
     <string name="leave_waitlist">Leave</string>
+    <string name="name">Name</string>
 
     <!-- Section 3 -->
 
