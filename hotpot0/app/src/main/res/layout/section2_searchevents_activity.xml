@@ -91,6 +91,7 @@
         app:srcCompat="@drawable/filter_list_icon" />
 
     <ListView
+        android:id="@+id/event_list_view"
         android:layout_width="match_parent"
         android:layout_height="594dp"
         android:layout_marginStart="20dp"
