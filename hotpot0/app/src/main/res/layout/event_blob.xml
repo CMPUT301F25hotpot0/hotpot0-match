@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:text="@string/event_name"
             android:textStyle="italic"
-            android:textColor="#AAAAAA"
+            android:textColor="@color/white"
             android:textSize="16sp" />
 
         <TextView
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:text="@string/role"
             android:textStyle="italic"
-            android:textColor="#BBBBBB"
+            android:textColor="@color/white"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -46,6 +46,6 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:src="@drawable/ic_chevron_right"
-        app:tint="#CCCCCC"
+        app:tint="@color/white"
         android:layout_gravity="center_vertical" />
 </LinearLayout>
