@@ -18,10 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
+import com.example.hotpot0.models.Event;
+import com.example.hotpot0.models.EventDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,11 +51,31 @@ public class SearchActivity extends AppCompatActivity {
         infoButton = findViewById(R.id.info_button);
         bottomNav = findViewById(R.id.bottomNavigationView);
 
+        eventList = new ArrayList<>();
         filteredList = new ArrayList<>(eventList);
 
-        // Set up adapter
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, filteredList);
         listView.setAdapter(adapter);
+
+        // Get all events from database
+        EventDB eventDB = new EventDB();
+        eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
+            @Override
+            public void onSuccess(List<Event> events) {
+                eventList.clear();
+                for (Event e : events) {
+                    eventList.add(e.getName());
+                }
+                filteredList.clear();
+                filteredList.addAll(eventList);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(SearchActivity.this, "Failed to load events.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // SearchView filtering
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -155,7 +176,9 @@ public class SearchActivity extends AppCompatActivity {
 
         // Back button inside the dialog
         Button backButton = dialogView.findViewById(R.id.button_BackSearchEvents);
-        backButton.setOnClickListener(v -> dialog.dismiss());
+        backButton.setOnClickListener(v -> {
+                    dialog.dismiss();
+                });
 
         // Handling a filter action
         CheckBox filter1 = dialogView.findViewById(R.id.checkBox4);
