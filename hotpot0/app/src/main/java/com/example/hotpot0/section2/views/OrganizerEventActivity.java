@@ -150,8 +150,49 @@ public class OrganizerEventActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(List<String> sampledUsers) {
 
-                    for (String id : sampledUsers) {
+                    // Change status of EventUserLinks to "Sampled"
+                    for (String linkID : sampledUsers) {
+                        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                            @Override
+                            public void onSuccess(EventUserLink eventUserLink) {
+                                if (eventUserLink != null) {
+                                    // Update status to "Sampled"
+                                    eventUserLink.setStatus("Sampled");
+                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            ;
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Toast.makeText(
+                                                    OrganizerEventActivity.this,
+                                                    "Error updating link " + linkID + ": " + e.getMessage(),
+                                                    Toast.LENGTH_SHORT
+                                            ).show();
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(
+                                            OrganizerEventActivity.this,
+                                            "EventUserLink not found for " + linkID,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(
+                                        OrganizerEventActivity.this,
+                                        "Error fetching EventUserLink " + linkID + ": " + e.getMessage(),
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        });
                     }
+
 
                     Toast.makeText(OrganizerEventActivity.this,
                             "Sample generated successfully! Total: " + sampledUsers.size(),
