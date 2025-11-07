@@ -227,6 +227,14 @@ public class Event {
         return (sampledIDs != null) ? sampledIDs.size() : 0;
     }
 
+    public int getTotalCancelled() {
+        return (cancelledIDs != null) ? cancelledIDs.size() : 0;
+    }
+
+    public int getTotalWaitlist() {
+        return getTotalLinks() - getTotalCancelled() - 1;
+    }
+
     public String toString() {
         return "Event{" +
                 "eventID=" + eventID +

@@ -56,14 +56,9 @@ public class EventSampledActivity extends AppCompatActivity {
         GeolocationStatus = findViewById(R.id.GeolocationStatus);
         confirmButton = findViewById(R.id.button_confirm);
         declineButton = findViewById(R.id.Decline);
+        backButton = findViewById(R.id.button_back);
 
-        // Create Back button programmatically
-        backButton = new Button(this);
-        backButton.setText("Back to Home");
-        backButton.setVisibility(View.GONE);
-        ((View) confirmButton.getParent()).post(() -> {
-            ((android.widget.LinearLayout) confirmButton.getParent()).addView(backButton);
-        });
+        backButton.setOnClickListener(v -> navigateHome());
 
         // Optional status message
         statusMessage = new TextView(this);
@@ -72,8 +67,6 @@ public class EventSampledActivity extends AppCompatActivity {
             ((android.widget.LinearLayout) confirmButton.getParent()).addView(statusMessage);
         });
 
-        // Back button click handler
-        backButton.setOnClickListener(v -> navigateHome());
 
         // Fetch event details
         eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {

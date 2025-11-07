@@ -112,7 +112,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void loadAllEvents() {
-        eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
+        eventDB.getAllActiveEvents(new EventDB.GetCallback<List<Event>>() {
             @Override
             public void onSuccess(List<Event> allEvents) {
                 List<Event> events = new ArrayList<>();

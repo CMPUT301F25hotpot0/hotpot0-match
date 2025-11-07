@@ -115,7 +115,10 @@ public class HomeActivity extends AppCompatActivity {
                             String status = link.getStatus();
                             boolean isActive = event.getIsEventActive() != null && event.getIsEventActive();
 
-                            if ((status.equals("Accepted") && isActive) || (status.equals("Organizer") && isActive)) {
+                            if (!isActive) {
+                                past.add(event);
+                                pastStatuses.add(status);
+                            } else if ((status.equals("Accepted") && isActive) || (status.equals("Organizer") && isActive)) {
                                 confirmed.add(event);
                                 confirmedStatuses.add(status);
                             }
