@@ -19,8 +19,11 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * This class opens a view which shows the user's profile. The user can edit their profile,
+ * or delete it from the database.
+ */
 public class ProfileActivity extends AppCompatActivity{
-
     private TextInputEditText nameInput, emailInput, phoneInput;
     private MaterialButton saveProfileButton, deleteProfileButton;
     private Switch notificationSwitch, locationSwitch;
@@ -41,6 +44,7 @@ public class ProfileActivity extends AppCompatActivity{
             finish();
             return;
         }
+
         // Initialize UI components
         nameInput = findViewById(R.id.edit_name_input);
         emailInput = findViewById(R.id.edit_email_input);
@@ -52,24 +56,21 @@ public class ProfileActivity extends AppCompatActivity{
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         loadUserProfile();
+
         saveProfileButton.setOnClickListener(v -> saveUserProfile());
         deleteProfileButton.setOnClickListener(v -> deleteUserProfile());
 
         notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
-                String message = isChecked
-                        ? "Notifications Enabled"
-                        : "Notifications Disabled";
+                String message = isChecked ? "Notifications Enabled" : "Notifications Disabled";
             }
         });
 
         locationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
-                String message = isChecked
-                        ? "Location Enabled"
-                        : "Location Disabled";
+                String message = isChecked ? "Location Enabled" : "Location Disabled";
             }
         });
 
@@ -129,7 +130,7 @@ public class ProfileActivity extends AppCompatActivity{
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(ProfileActivity.this, "Failed to load profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileActivity.this, "Failed to load profile.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -144,7 +145,7 @@ public class ProfileActivity extends AppCompatActivity{
         Boolean notificationsEnabled = notificationSwitch.isChecked();
 
         if (name.isEmpty() || email.isEmpty()) {
-            Toast.makeText(this, "Please enter both name and email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter both name and email.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -156,7 +157,7 @@ public class ProfileActivity extends AppCompatActivity{
 
                     @Override
                     public void onFailure(Exception e) {
-                        Toast.makeText(ProfileActivity.this, "Update failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfileActivity.this, "Update failed.", Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -178,7 +179,7 @@ public class ProfileActivity extends AppCompatActivity{
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(ProfileActivity.this, "Profile deletion failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileActivity.this, "Profile deletion failed.", Toast.LENGTH_SHORT).show();
             }
         });
     }
