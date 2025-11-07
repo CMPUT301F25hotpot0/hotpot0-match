@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * EventDB handles all Firestore operations for Event.
@@ -269,16 +270,19 @@ public class EventDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public void saveSampledIDs(@NonNull Event event, @NonNull GetCallback<Void> callback) {
-        if (event.getEventID() == null) {
-            callback.onFailure(new IllegalArgumentException("Event ID cannot be null for update."));
-            return;
-        }
+    public void sampleEvent(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
+        try {
+            ArrayList<String> sampled = event.sampleParticipants();
 
-        DocumentReference eventRef = db.collection(EVENT_COLLECTION)
-                .document(String.valueOf(event.getEventID()));
-        eventRef.update("sampledIDs", event.getSampledIDs())
-                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
-                .addOnFailureListener(callback::onFailure);
+            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                    .document(String.valueOf(event.getEventID()));
+
+            eventRef.update("sampledIDs", sampled)
+                    .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
+                    .addOnFailureListener(callback::onFailure);
+
+        } catch (Exception e) {
+            callback.onFailure(e);
+        }
     }
 }
