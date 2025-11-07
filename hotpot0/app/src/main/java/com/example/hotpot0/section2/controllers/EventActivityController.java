@@ -2,6 +2,7 @@ package com.example.hotpot0.section2.controllers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.hotpot0.models.EventUserLink;
@@ -35,13 +36,15 @@ public class EventActivityController {
         eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
             @Override
             public void onSuccess(EventUserLink eventUserLink) {
+
+                Log.d("EventActivityController", "EventUserLink status: " + eventUserLink.getStatus());
                 // User is affiliated with the event, check their status
                 String status = eventUserLink.getStatus();
 
                 switch (status) {
                     case "inWaitList":
                         // User is on the waitlist
-                        openEventInitialActivity(eventID);
+                        openOrganizerActivity(eventID);
                         break;
 
                     case "Sampled":
@@ -65,6 +68,7 @@ public class EventActivityController {
 
             @Override
             public void onFailure(Exception e) {
+                Log.e("EventActivityController", "Failed to fetch EventUserLink", e);
                 // If the user is not affiliated with the event (no EventUserLink)
                 openEventInitialActivity(eventID);
             }

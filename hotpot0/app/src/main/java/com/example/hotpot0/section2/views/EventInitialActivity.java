@@ -64,6 +64,11 @@ public class EventInitialActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Integer result) {
                                 Toast.makeText(EventInitialActivity.this, "Successfully left the waitlist!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(EventInitialActivity.this, HomeActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);  // Clear the stack
+                                startActivity(intent);
+                                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                finish();
                             }
 
                             @Override
@@ -81,6 +86,11 @@ public class EventInitialActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Integer result) {
                                 Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(EventInitialActivity.this, HomeActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);  // Clear the stack
+                                startActivity(intent);
+                                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                finish();
                             }
 
                             @Override
@@ -101,6 +111,11 @@ public class EventInitialActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Integer result) {
                             Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(EventInitialActivity.this, HomeActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);  // Clear the stack
+                            startActivity(intent);
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                            finish();
                         }
 
                         @Override
