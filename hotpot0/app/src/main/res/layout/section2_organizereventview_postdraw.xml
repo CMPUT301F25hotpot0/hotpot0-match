@@ -45,7 +45,7 @@
 
             <!-- Event Info -->
             <TextView
-                android:id="@+id/tvEventName"
+                android:id="@+id/previewEventName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -73,7 +73,7 @@
 
             <!-- Sampled Entrants Section -->
             <TextView
-                android:id="@+id/tvSampledEntrantsLabel"
+                android:id="@+id/SampledEntrantsLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/sampled_entrants"
@@ -105,7 +105,7 @@
 
             <!-- Cancelled Entrants Section -->
             <TextView
-                android:id="@+id/tvCancelledEntrantsLabel"
+                android:id="@+id/CancelledEntrantsLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/cancelled_entrants"
@@ -125,7 +125,7 @@
 
             <!-- All Entrants -->
             <TextView
-                android:id="@+id/tvAllEntrantsLabel"
+                android:id="@+id/AllEntrantsLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/all_entrants"

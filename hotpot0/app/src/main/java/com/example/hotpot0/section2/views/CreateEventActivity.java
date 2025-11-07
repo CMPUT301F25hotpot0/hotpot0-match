@@ -24,13 +24,16 @@ public class CreateEventActivity extends AppCompatActivity {
     private Bitmap eventImageBitmap;
 
     private EditText name, description, guidelines, location, time, date, duration, price, capacity, registrationPeriod;
-    private Switch tvGeolocationStatus;
+    private Switch GeolocationStatus;
     private Button backButtonCreateEvents;
     private Button previewButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
         setContentView(R.layout.section2_createevent_activity);
 
         // Initialize Views
@@ -48,7 +51,7 @@ public class CreateEventActivity extends AppCompatActivity {
         price = findViewById(R.id.input_price);
         capacity = findViewById(R.id.input_capacity);
         registrationPeriod = findViewById(R.id.input_registration_period);
-        tvGeolocationStatus = findViewById(R.id.switch_geolocation);
+        GeolocationStatus = findViewById(R.id.switch_geolocation);
         backButtonCreateEvents = findViewById(R.id.button_BackCreateEvent);
         previewButton = findViewById(R.id.button_preview_event);
 
@@ -118,7 +121,7 @@ public class CreateEventActivity extends AppCompatActivity {
         intent.putExtra("price", price.getText().toString().trim());
         intent.putExtra("capacity", capacity.getText().toString().trim());
         intent.putExtra("registration", registrationPeriod.getText().toString().trim());
-        intent.putExtra("geolocationEnabled", tvGeolocationStatus.isChecked());
+        intent.putExtra("geolocationEnabled", GeolocationStatus.isChecked());
 
         startActivity(intent);
     }

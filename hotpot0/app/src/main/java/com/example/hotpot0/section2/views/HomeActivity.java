@@ -1,5 +1,6 @@
 package com.example.hotpot0.section2.views;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,7 +29,27 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             }
 
-            // PUT THE OTHER TOOLBAR ITEMS HERE
+            if (id == R.id.nav_search) {
+                Intent intent = new Intent(HomeActivity.this, SearchActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
+            }
+
+            if (id == R.id.nav_notifications) {
+                Intent intent = new Intent(HomeActivity.this, NotificationsActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
+            }
+
             return false;
         });
     }

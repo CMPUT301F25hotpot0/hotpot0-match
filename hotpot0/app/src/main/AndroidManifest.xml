@@ -27,6 +27,10 @@
         <activity android:name=".section2.views.CreateEventActivity" />
         <activity android:name=".section2.views.PreviewActivity" />
         <activity android:name=".section3.views.AdminHomeActivity" />
+        <activity android:name=".section2.views.SearchActivity" />
+        <activity android:name=".section2.views.NotificationsActivity" />
+        <activity android:name=".section2.views.ProfileActivity" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
