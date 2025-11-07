@@ -232,7 +232,7 @@ public class Event {
     }
 
     public int getTotalWaitlist() {
-        return getTotalLinks();
+        return getTotalLinks() - getTotalCancelled() - 1;
     }
 
     public String toString() {

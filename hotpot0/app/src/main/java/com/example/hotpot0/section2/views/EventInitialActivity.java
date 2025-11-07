@@ -110,8 +110,20 @@ public class EventInitialActivity extends AppCompatActivity {
                                 eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
                                     @Override
                                     public void onSuccess(Integer result) {
-                                        Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
-                                        navigateHome();
+                                        switch (result) {
+                                            case 0: // Successfully added to waitlist
+                                                Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                                                navigateHome();
+                                                break;
+                                            case 1:
+                                                Toast.makeText(EventInitialActivity.this, "You are already affiliated with this event.", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            case 2: // Waitlist full
+                                                Toast.makeText(EventInitialActivity.this, "Waitlist is full, cannot join!", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            default:
+                                                Toast.makeText(EventInitialActivity.this, "Unknown status: " + result, Toast.LENGTH_SHORT).show();
+                                        }
                                     }
 
                                     @Override

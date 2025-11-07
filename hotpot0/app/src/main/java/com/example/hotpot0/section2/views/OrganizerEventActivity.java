@@ -263,7 +263,68 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
         buttonFillSpots.setOnClickListener(v -> {
             Toast.makeText(this, "Filling remaining spots...", Toast.LENGTH_SHORT).show();
-            // TODO: Add logic to fill spots
+            eventDB.fillEmptySampledSpots(currentEvent, new EventDB.GetCallback<List<String>>() {
+                @Override
+                public void onSuccess(List<String> newlySampledUsers) {
+
+                    // Change status of EventUserLinks to "Sampled"
+                    for (String linkID : newlySampledUsers) {
+                        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                            @Override
+                            public void onSuccess(EventUserLink eventUserLink) {
+                                if (eventUserLink != null) {
+                                    // Update status to "Sampled"
+                                    eventUserLink.setStatus("Sampled");
+                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            ;
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Toast.makeText(
+                                                    OrganizerEventActivity.this,
+                                                    "Error updating link " + linkID + ": " + e.getMessage(),
+                                                    Toast.LENGTH_SHORT
+                                            ).show();
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(
+                                            OrganizerEventActivity.this,
+                                            "EventUserLink not found for " + linkID,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(
+                                        OrganizerEventActivity.this,
+                                        "Error fetching EventUserLink " + linkID + ": " + e.getMessage(),
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        });
+                    }
+
+
+                    Toast.makeText(OrganizerEventActivity.this,
+                            "Filled spots successfully! Total: " + newlySampledUsers.size(),
+                            Toast.LENGTH_SHORT).show();
+
+                    // Switch to Post-Draw layout
+                    setContentView(R.layout.section2_organizereventview_postdraw);
+                    setupPostDrawLayout();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(OrganizerEventActivity.this, "Error generating sample: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
             buttonConfirm.setEnabled(true);
             // After filling, you could refresh UI:
             // setupPostDrawLayout();

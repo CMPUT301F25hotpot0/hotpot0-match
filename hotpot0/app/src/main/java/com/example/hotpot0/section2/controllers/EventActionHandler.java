@@ -1,5 +1,8 @@
 package com.example.hotpot0.section2.controllers;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
