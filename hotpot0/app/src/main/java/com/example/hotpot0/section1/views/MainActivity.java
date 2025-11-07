@@ -8,9 +8,29 @@ import com.example.hotpot0.R;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
 
+/**
+ * MainActivity is the entry point of the app.
+ * <p>
+ * It checks whether a user profile already exists for the current device.
+ * If a user is found, it navigates to {@code HomeActivity};
+ * otherwise, it navigates to {@code StartupActivity}.
+ * </p>
+ */
+
 public class MainActivity extends AppCompatActivity {
 
+    /** Reference to the ProfileDB for accessing user data. */
     private ProfileDB profileDB;
+
+    /**
+     * Called when the activity is created.
+     * <p>
+     * Displays a loading screen, checks the database for an existing user,
+     * and navigates to the appropriate activity based on the result.
+     * </p>
+     *
+     * @param savedInstanceState The saved instance state bundle, if any.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +69,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Helper method to get device ID
+    /**
+     * Returns the unique Android device ID.
+     *
+     * @return The device ID as a String.
+     */
     private String getDeviceID() {
         return android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
     }

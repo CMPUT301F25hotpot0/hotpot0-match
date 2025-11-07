@@ -14,6 +14,14 @@ import com.example.hotpot0.section2.views.HomeActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+/**
+ * UserSignupActivity handles the user registration process.
+ * <p>
+ * It collects user details (name, email, and phone),
+ * validates the inputs, stores the user profile in the database,
+ * and redirects the user to the {@code HomeActivity} upon success.
+ * </p>
+ */
 public class UserSignupActivity extends AppCompatActivity {
 
     private TextInputEditText nameInput, emailInput, phoneInput;
@@ -22,6 +30,15 @@ public class UserSignupActivity extends AppCompatActivity {
     private ProfileDB profileDB;
     private UserSignupValidator signupValidator;
 
+    /**
+     * Called when the activity is created.
+     * <p>
+     * Initializes the views, sets up the database and validator,
+     * and attaches a listener to handle profile creation.
+     * </p>
+     *
+     * @param savedInstanceState The saved instance state bundle, if any.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +58,13 @@ public class UserSignupActivity extends AppCompatActivity {
         createProfileBtn.setOnClickListener(v -> handleCreateProfile());
     }
 
+    /**
+     * Handles user input validation and profile creation.
+     * <p>
+     * If validation succeeds, saves the user ID in shared preferences
+     * and navigates to {@code HomeActivity}. Otherwise, shows an error message.
+     * </p>
+     */
     private void handleCreateProfile() {
         String name = nameInput.getText() != null ? nameInput.getText().toString() : "";
         String email = emailInput.getText() != null ? emailInput.getText().toString() : "";

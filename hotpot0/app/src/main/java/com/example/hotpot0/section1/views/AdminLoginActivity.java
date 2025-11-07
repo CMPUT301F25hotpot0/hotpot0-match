@@ -14,6 +14,14 @@ import com.example.hotpot0.section3.views.AdminHomeActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+/**
+ * AdminLoginActivity handles the login process for administrators.
+ * <p>
+ * It collects admin credentials, validates them through
+ * {@link AdminLoginVerifier}, and navigates to the {@code AdminHomeActivity}
+ * upon successful authentication.
+ * </p>
+ */
 public class AdminLoginActivity extends AppCompatActivity {
 
     private TextInputEditText usernameInput;
@@ -23,6 +31,15 @@ public class AdminLoginActivity extends AppCompatActivity {
     private ProfileDB profileDB;
     private AdminLoginVerifier loginVerifier;
 
+    /**
+     * Called when the activity is created.
+     * <p>
+     * Initializes the user interface, sets up database and verifier instances,
+     * and attaches a click listener to handle login attempts.
+     * </p>
+     *
+     * @param savedInstanceState The saved instance state bundle, if any.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +58,13 @@ public class AdminLoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(v -> attemptLogin());
     }
 
+    /**
+     * Attempts to log in the admin by verifying their credentials.
+     * <p>
+     * If successful, navigates to {@code AdminHomeActivity};
+     * otherwise, shows an error message.
+     * </p>
+     */
     private void attemptLogin() {
         String username = usernameInput.getText() != null ? usernameInput.getText().toString().trim() : "";
         String password = passwordInput.getText() != null ? passwordInput.getText().toString() : "";
