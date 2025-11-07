@@ -21,7 +21,7 @@
 
         <!-- Dynamic Event Info -->
         <TextView
-            android:id="@+id/tvEventName"
+            android:id="@+id/previewEventName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -30,74 +30,77 @@
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvDescription"
+            android:id="@+id/previewDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvGuidelines"
+            android:id="@+id/previewGuidelines"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvLocation"
+            android:id="@+id/previewLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvTimeAndDay"
+            android:id="@+id/previewTimeAndDay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvDateRange"
+            android:id="@+id/previewDateRange"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvDuration"
+            android:id="@+id/previewDuration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvPrice"
+            android:id="@+id/previewPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvSpotsOpen"
+            android:id="@+id/previewSpotsOpen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="8dp" />
 
         <TextView
-            android:id="@+id/tvDaysLeft"
+            android:id="@+id/previewDaysLeft"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginBottom="24dp" />
 
         <TextView
-            android:id="@+id/tvGeolocation"
+            android:id="@+id/GeolocationStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="24dp"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
         <!-- Confirm and Back Buttons -->
         <LinearLayout

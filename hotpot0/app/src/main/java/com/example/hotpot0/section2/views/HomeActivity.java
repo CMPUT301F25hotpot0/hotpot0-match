@@ -7,12 +7,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
-import com.example.hotpot0.models.ProfileDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +54,6 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             }
 
-            // PUT THE OTHER TOOLBAR ITEMS HERE
             return false;
         });
     }
