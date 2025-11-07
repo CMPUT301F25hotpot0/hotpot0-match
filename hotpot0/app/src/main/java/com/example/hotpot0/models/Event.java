@@ -259,4 +259,35 @@ public class Event {
         this.sampledIDs = new ArrayList<>(sampled);
         return this.sampledIDs;
     }
+
+    public ArrayList<String> fillSampledParticipants(List<String> waitListParticipants) {
+        if (linkIDs == null || linkIDs.isEmpty()) {
+            throw new IllegalStateException("No participants to sample from.");
+        }
+        int cap = this.capacity != null ? this.capacity : 0;
+        int currentSampledSize = this.sampledIDs != null ? this.sampledIDs.size() : 0;
+        int spotsLeft = cap - currentSampledSize;
+        if (spotsLeft <= 0) {
+            return new ArrayList<>(); // No spots left to fill
+        }
+
+        ArrayList<String> randomized = new ArrayList<>(waitListParticipants);
+        Collections.shuffle(randomized);
+
+        ArrayList<String> newlySampled = new ArrayList<>();
+        for (String participant : randomized) {
+            if (newlySampled.size() >= spotsLeft) {
+                break;
+            }
+            if (!this.sampledIDs.contains(participant)) {
+                newlySampled.add(participant);
+            }
+        }
+
+        if (this.sampledIDs == null) {
+            this.sampledIDs = new ArrayList<>();
+        }
+        this.sampledIDs.addAll(newlySampled);
+        return newlySampled;
+    }
 }

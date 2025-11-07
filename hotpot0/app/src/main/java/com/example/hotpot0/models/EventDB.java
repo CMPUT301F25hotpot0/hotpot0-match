@@ -288,4 +288,22 @@ public class EventDB {
             callback.onFailure(e);
         }
     }
+
+    public void fillEmptySampledSpots(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
+        try {
+            List<String> allLinkIDs = event.getLinkIDs();
+            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
+            ArrayList<String> newlySampled = event.fillSampledParticipants(waitListLinkIDs);
+
+            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                    .document(String.valueOf(event.getEventID()));
+
+            eventRef.update("sampledIDs", event.getSampledIDs())
+                    .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
+                    .addOnFailureListener(callback::onFailure);
+
+        } catch (Exception e) {
+            callback.onFailure(e);
+        }
+    }
 }

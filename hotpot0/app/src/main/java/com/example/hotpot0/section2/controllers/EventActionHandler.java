@@ -1,17 +1,22 @@
 package com.example.hotpot0.section2.controllers;
 
+import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 
+import java.util.List;
+
 public class EventActionHandler {
-    private ProfileDB profile;
-    private EventDB event;
+    private ProfileDB profileDB;
+    private EventDB eventDB;
+    private EventUserLinkDB eventUserLinkDB;
 
     public EventActionHandler(){
-        profile = new ProfileDB();
-        event = new EventDB();
+        profileDB = new ProfileDB();
+        eventDB = new EventDB();
+        eventUserLinkDB = new EventUserLinkDB();
     }
 
     private String generateLinkID(Integer userID, Integer eventID) {
@@ -46,7 +51,55 @@ public class EventActionHandler {
                     @Override
                     public void onSuccess(EventUserLink eventUserLink) {
                         // Successfully created a new EventUserLink, user is now on the waitlist
-                        callback.onSuccess(0); // Success: User has been added to the waitlist
+                        profileDB.getUserByID(userID, new ProfileDB.GetCallback<com.example.hotpot0.models.UserProfile>() {
+                            @Override
+                            public void onSuccess(com.example.hotpot0.models.UserProfile userProfile) {
+                                // Update the user's profile with the new linkID
+                                profileDB.addLinkIDToUser(userProfile, eventUserLink.getLinkID(), new ProfileDB.GetCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        // Successfully updated the user's profile
+                                        eventDB.getEventByID(eventID, new EventDB.GetCallback<com.example.hotpot0.models.Event>() {
+                                            @Override
+                                            public void onSuccess(com.example.hotpot0.models.Event eventObj) {
+                                                // Update the event with the new linkID
+                                                eventDB.addLinkIDToEvent(eventObj, eventUserLink.getLinkID(), new EventDB.GetCallback<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        // Successfully updated the event
+                                                        callback.onSuccess(0); // Success: User added to waitlist
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Exception e) {
+                                                        // Failed to update the event
+                                                        callback.onFailure(e); // Failure to update event
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                // Failed to retrieve the event
+                                                callback.onFailure(e); // Failure to retrieve event
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // Failed to update the user's profile
+                                        callback.onFailure(e); // Failure to update user profile
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Failed to retrieve the user's profile
+                                callback.onFailure(e); // Failure to retrieve user profile
+                            }
+                        });
                     }
 
                     @Override
@@ -76,7 +129,55 @@ public class EventActionHandler {
                         @Override
                         public void onSuccess() {
                             // Successfully removed the user from the waitlist
-                            callback.onSuccess(0); // Success: User has left the waitlist
+                            profileDB.getUserByID(userID, new ProfileDB.GetCallback<com.example.hotpot0.models.UserProfile>() {
+                                @Override
+                                public void onSuccess(com.example.hotpot0.models.UserProfile userProfile) {
+                                    // Update the user's profile to remove the linkID
+                                    profileDB.removeLinkIDFromUser(userProfile, linkID, new ProfileDB.GetCallback<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // Successfully updated the user's profile
+                                            eventDB.getEventByID(eventID, new EventDB.GetCallback<com.example.hotpot0.models.Event>() {
+                                                @Override
+                                                public void onSuccess(com.example.hotpot0.models.Event eventObj) {
+                                                    // Update the event to remove the linkID
+                                                    eventDB.removeLinkIDFromEvent(eventObj, linkID, new EventDB.GetCallback<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            // Successfully updated the event
+                                                            callback.onSuccess(0); // Success: User removed from waitlist
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Exception e) {
+                                                            // Failed to update the event
+                                                            callback.onFailure(e); // Failure to update event
+                                                        }
+                                                    });
+                                                }
+
+                                                @Override
+                                                public void onFailure(Exception e) {
+                                                    // Failed to retrieve the event
+                                                    callback.onFailure(e); // Failure to retrieve event
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            // Failed to update the user's profile
+                                            callback.onFailure(e); // Failure to update user profile
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    // Failed to retrieve the user's profile
+                                    callback.onFailure(e); // Failure to retrieve user profile
+                                }
+                            });
                         }
 
                         @Override
@@ -185,7 +286,59 @@ public class EventActionHandler {
         });
     }
 
-    public void sampleUsers(Integer userID, Integer eventID) {}
+    public void sampleUsers(Integer eventID, ProfileDB.GetCallback<Integer> callback) {
+        eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
+            @Override
+            public void onSuccess(Event eventObj) {
+                eventDB.sampleEvent(eventObj, new EventDB.GetCallback<List<String>>(){
+                    @Override
+                    public void onSuccess(List<String> result) {
+                        for (String linkID : result) {
+                            // For each sampled user, update their EventUserLink status to "Sampled"
+                            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                                @Override
+                                public void onSuccess(EventUserLink eventUserLink) {
+                                    eventUserLink.setStatus("Sampled");
+                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            // Successfully updated the user's status to "Sampled"
+                                            callback.onSuccess(0); // Success: Users sampled
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            // Failed to update the user's status
+                                            callback.onFailure(e); // Failure to update user status
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    // Failed to retrieve the EventUserLink
+                                    callback.onFailure(e); // Failure to retrieve EventUserLink
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        // Failed to sample users for the event
+                        callback.onFailure(e); // Failure to sample users
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Failed to retrieve the event
+                callback.onFailure(e); // Failure to retrieve event
+            }
+        });
+
+    }
 
     public void cancelUser(Integer userID, Integer eventID) {}
 
