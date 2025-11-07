@@ -45,7 +45,7 @@ public class EventUserLinkDB {
      */
     public void addEventUserLink(@NonNull EventUserLink eventUserLink, @NonNull GetCallback<EventUserLink> callback) {
         // Create a new document reference with an auto-generated ID
-        DocumentReference newLinkRef = db.collection(EVENT_USER_LINK_COLLECTION).document();
+        DocumentReference newLinkRef = db.collection(EVENT_USER_LINK_COLLECTION).document(eventUserLink.getLinkID());
 
         // Add the EventUserLink to Firestore
         newLinkRef.set(eventUserLink)

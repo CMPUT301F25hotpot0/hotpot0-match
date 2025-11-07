@@ -7,7 +7,7 @@ public class EventUserLink {
     private final Integer userID;
     private final Integer eventID;
     private String linkID;
-    private Status status;
+    private Status status = new Status();
     private List<String> notifications;
 
     public EventUserLink(Integer userID, Integer eventID, String status) {
