@@ -1,42 +1,31 @@
 package com.example.hotpot0.section2.views;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
+import com.example.hotpot0.models.EventUserLink;
+import com.example.hotpot0.models.EventUserLinkDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This view shows the Search tab where the user can search for a specific
- * event by name or QR code. The user can also apply filters to refine their search.
- */
 public class SearchActivity extends AppCompatActivity {
-    private ListView listView;
-    private SearchView searchView;
-    private ImageButton filterButton, qrButton, infoButton;
+
     private BottomNavigationView bottomNav;
-    private ArrayAdapter<String> adapter;
-    private List<String> eventList;
-    private List<String> filteredList;
+    private ListView eventListView;
+    private SearchView searchView;
+    private EventDB eventDB;
+    private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
+    private int userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,151 +33,145 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.section2_searchevents_activity);
 
         // Initialize UI elements
-        listView = findViewById(R.id.event_list_view);
+        eventListView = findViewById(R.id.event_list_view);
         searchView = findViewById(R.id.searchView);
-        filterButton = findViewById(R.id.filter_button);
-        qrButton = findViewById(R.id.scan_qr_button);
-        infoButton = findViewById(R.id.info_button);
         bottomNav = findViewById(R.id.bottomNavigationView);
 
-        eventList = new ArrayList<>();
-        filteredList = new ArrayList<>(eventList);
+        userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, filteredList);
-        listView.setAdapter(adapter);
+        eventDB = new EventDB();
 
-        // Get all events from database
-        EventDB eventDB = new EventDB();
-        eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
-            @Override
-            public void onSuccess(List<Event> events) {
-                eventList.clear();
-                for (Event e : events) {
-                    eventList.add(e.getName());
-                }
-                filteredList.clear();
-                filteredList.addAll(eventList);
-                adapter.notifyDataSetChanged();
+        // Handle bottom navigation clicks
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(SearchActivity.this, HomeActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
             }
-
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(SearchActivity.this, "Failed to load events.", Toast.LENGTH_SHORT).show();
+            if (id == R.id.nav_profile) {
+                startActivity(new Intent(SearchActivity.this, ProfileActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
             }
+            if (id == R.id.nav_notifications) {
+                startActivity(new Intent(SearchActivity.this, NotificationsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
+            }
+            if (id == R.id.nav_events) {
+                startActivity(new Intent(SearchActivity.this, CreateEventActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
+            }
+            return false;
         });
 
-        // SearchView filtering
+        // Load all events on activity start
+        loadAllEvents();
+
+        // Search functionality
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                filterList(query);
+                filterEvents(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterList(newText);
+                filterEvents(newText);
                 return true;
             }
         });
+    }
 
-        // Filter Button
-        filterButton.setOnClickListener(view -> filterDialog());
-
-        // QR Button
-        qrButton.setOnClickListener(new View.OnClickListener() {
+    public void loadAllEvents() {
+        eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
             @Override
-            public void onClick(View view) {
-//                Intent intent = new Intent(SearchActivity.this, Section3QrCodeSearchActivity.class);
-//                startActivity(intent);
-//                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                Toast.makeText(SearchActivity.this, "Open QR Scanner", Toast.LENGTH_SHORT).show();
+            public void onSuccess(List<Event> allEvents) {
+                List<Event> events = new ArrayList<>();
+                List<String> statuses = new ArrayList<>();
 
-            }
-        });
-
-        // Info Button
-        infoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(SearchActivity.this, "Open Information Dialog", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-        // Bottom Navigation
-        bottomNav.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_home) {
-                    Intent intent = new Intent(SearchActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    return true;
-                } else if (id == R.id.nav_profile) {
-                    Intent intent = new Intent(SearchActivity.this, ProfileActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    return true;
-                } else if (id == R.id.nav_notifications) {
-                    Intent intent = new Intent(SearchActivity.this, NotificationsActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    return true;
-                } else if (id == R.id.nav_events) {
-                    Intent intent = new Intent(SearchActivity.this, CreateEventActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    return true;
-                } else if (id == R.id.nav_search) {
-                    return true;
+                if (allEvents.isEmpty()) {
+                    Toast.makeText(SearchActivity.this, "No events found", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
-                return false;
+                for (Event event : allEvents) {
+                    String linkID = event.getEventID() + "_" + userID;
+
+                    eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                        @Override
+                        public void onSuccess(EventUserLink link) {
+                            String status = "";  // Default empty status
+
+                            if (link != null) {
+                                // If the user has a link to the event, set the actual status
+                                status = link.getStatus();
+                            }
+
+                            events.add(event);
+                            statuses.add(status);  // Add the status (either empty or actual)
+
+                            // Once all statuses are fetched, update the adapter
+                            if (events.size() == allEvents.size()) {
+                                runOnUiThread(() -> {
+                                    eventListView.setAdapter(new EventBlobAdapter(SearchActivity.this, events, statuses, userID));
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // If no EventUserLink exists, treat as having no status (empty)
+                            events.add(event);
+                            statuses.add("");  // Empty status for non-linked events
+
+                            // Once all events are processed, update the adapter
+                            if (events.size() == allEvents.size()) {
+                                runOnUiThread(() -> {
+                                    eventListView.setAdapter(new EventBlobAdapter(SearchActivity.this, events, statuses, userID));
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(SearchActivity.this, "Error loading events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void filterList(String query) {
-        filteredList.clear();
-        if (query == null || query.isEmpty()) {
-            filteredList.addAll(eventList);
-        } else {
-            for (String event : eventList) {
-                if (event.toLowerCase().contains(query.toLowerCase())) {
-                    filteredList.add(event);
+    private void filterEvents(String query) {
+        eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
+            @Override
+            public void onSuccess(List<Event> allEvents) {
+                List<Event> filteredEvents = new ArrayList<>();
+                List<String> statuses = new ArrayList<>();
+
+                // Filter events based on the search query
+                for (Event event : allEvents) {
+                    if (event.getName().toLowerCase().contains(query.toLowerCase())) {
+                        filteredEvents.add(event);
+                        statuses.add("");  // Add a placeholder status for now
+                    }
                 }
-            }
-        }
-        adapter.notifyDataSetChanged();
-    }
 
-    // Opening filer dialog box
-    private void filterDialog() {
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.section2_filterdialogbox_activity, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(dialogView);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        // Back button inside the dialog
-        Button backButton = dialogView.findViewById(R.id.button_BackSearchEvents);
-        backButton.setOnClickListener(v -> {
-                    dialog.dismiss();
+                // Update the adapter with filtered events
+                runOnUiThread(() -> {
+                    EventBlobAdapter adapter = new EventBlobAdapter(SearchActivity.this, filteredEvents, statuses, userID);
+                    eventListView.setAdapter(adapter);
                 });
+            }
 
-        // Handling a filter action
-        CheckBox filter1 = dialogView.findViewById(R.id.checkBox4);
-        filter1.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                Toast.makeText(this, "CheckBox 1 selected", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(SearchActivity.this, "Error filtering events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 }
-
-
-
