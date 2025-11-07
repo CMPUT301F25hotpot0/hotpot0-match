@@ -42,6 +42,9 @@
     <string name="save">Save</string>
     <string name="delete_profile">Delete Profile</string>
     <string name="geo_location">Geo-Location</string>
+    <string name="name">Name</string>
+    <string name="email_id">Email ID</string>
+    <string name="phone_number">Phone Number (Optional)</string>
 
     <!-- Section 3 -->
 

@@ -18,7 +18,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ProfileActivity extends AppCompatActivity{
 
-    private Toolbar toolbar;
     private TextInputEditText nameInput, emailInput, phoneInput;
     private MaterialButton saveProfileButton, deleteProfileButton;
     private Switch notificationSwitch;

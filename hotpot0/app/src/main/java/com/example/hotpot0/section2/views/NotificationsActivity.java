@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 public class NotificationsActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
-    private TextView titleView, currentInvitationsLabel, otherUpdatesLabel;
     private ListView currentInvitationsList, otherUpdatesList;
     private BottomNavigationView bottomNavigationView;
 
