@@ -45,11 +45,12 @@
                 android:paddingBottom="8dp" />
 
             <!-- Container for confirmed events -->
-            <LinearLayout
-                android:id="@+id/confirmed_container"
+            <ListView
+                android:id="@+id/confirmed_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:dividerHeight="1dp"
                 android:layout_marginBottom="16dp" />
 
 
@@ -64,12 +65,13 @@
                 android:paddingBottom="8dp" />
 
             <!-- Container for pending events -->
-            <LinearLayout
-                android:id="@+id/pending_container"
+            <ListView
+                android:id="@+id/pending_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:dividerHeight="1dp"/>
 
 
             <!-- Past Events Section -->
@@ -83,12 +85,13 @@
                 android:paddingBottom="8dp" />
 
             <!-- Container for past events -->
-            <LinearLayout
-                android:id="@+id/past_container"
+            <ListView
+                android:id="@+id/past_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:dividerHeight="1dp"/>
 
         </LinearLayout>
     </ScrollView>
