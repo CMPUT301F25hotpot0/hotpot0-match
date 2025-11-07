@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "721965358450",
+    "project_id": "hotpot0",
+    "storage_bucket": "hotpot0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721965358450:android:3a81793aaa0ab17802d1eb",
+        "android_client_info": {
+          "package_name": "com.example.hotpot0"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ4TX_wm4_Y0xfsPD-0kZV3VM_dc0_7uA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

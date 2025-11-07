@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Hotpot0">
+        <activity
+            android:name=".section1.views.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".section1.views.StartupActivity" />
+        <activity android:name=".section1.views.UserSignupActivity" />
+        <activity android:name=".section1.views.AdminLoginActivity" />
+        <activity android:name=".section2.views.HomeActivity" />
+        <activity android:name=".section2.views.CreateEventActivity" />
+        <activity android:name=".section2.views.PreviewActivity" />
+        <activity android:name=".section3.views.AdminHomeActivity" />
+        <activity android:name=".section2.views.ProfileActivity"/>
+        <activity android:name=".section2.views.NotificationsActivity"/>
+        <activity android:name=".section2.views.SearchActivity"/>
+        <activity android:name=".section2.views.EventInitialActivity"/>
+        <activity android:name=".section2.views.OrganizerEventActivity" />
+        <activity android:name=".section2.views.EventSampledActivity" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+    </application>
+
+</manifest>
