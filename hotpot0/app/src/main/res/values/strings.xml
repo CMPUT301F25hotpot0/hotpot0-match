@@ -56,6 +56,11 @@
     <string name="filter">Filters</string>
     <string name="save">Save</string>
     <string name="delete_profile">Delete Profile</string>
+    <string name="qr_text">Please position QR code in the box</string>
+    <string name="invitation_text">You have been invited to join!</string>
+    <string name="rejection_text">We’re sorry, you have not been selected to join. Do you want to remain in Wait List?</string>
+    <string name="join_waitlist">Join</string>
+    <string name="leave_waitlist">Leave</string>
 
     <!-- Section 3 -->
 

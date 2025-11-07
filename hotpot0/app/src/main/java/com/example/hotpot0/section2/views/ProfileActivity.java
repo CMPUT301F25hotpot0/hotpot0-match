@@ -66,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity{
                 return;
             }
 
-            profileHandler.handleProfileUpdate(this, userID, name, email, phone,     new ProfileDB.ActionCallback() {
+            profileHandler.handleProfileUpdate(this, userID, name, email, phone, new ProfileDB.ActionCallback() {
                         @Override
                         public void onSuccess() {
                             // Handle success, e.g., show a Toast

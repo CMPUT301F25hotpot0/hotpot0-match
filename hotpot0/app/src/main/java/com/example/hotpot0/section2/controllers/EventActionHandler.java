@@ -17,7 +17,7 @@ public class EventActionHandler {
 
     private String generateLinkID(Integer userID, Integer eventID) {
         // Assuming linkID is created by combining userID and eventID as a string
-        return userID + "_" + eventID;  // You can adjust this structure as per your requirements
+        return eventID + "_" + userID;  // You can adjust this structure as per your requirements
     }
 
     public void joinWaitList(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
