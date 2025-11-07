@@ -41,24 +41,24 @@ public class EventActivityController {
                 switch (status) {
                     case "inWaitList":
                         // User is on the waitlist
-                        openWaitListActivity();
+                        openEventInitialActivity(eventID);
                         break;
 
                     case "Sampled":
                     case "Accepted":
                     case "Declined":
                         // User has sampled, accepted, or declined the event
-                        openSampledActivity();
+                        openSampledActivity(eventID);
                         break;
 
                     case "Organizer":
                         // User is an organizer
-                        openOrganizerActivity();
+                        openOrganizerActivity(eventID);
                         break;
 
                     default:
                         // No special status, show initial event activity
-                        openEventInitialActivity();
+                        openEventInitialActivity(eventID);
                         break;
                 }
             }
@@ -66,28 +66,29 @@ public class EventActivityController {
             @Override
             public void onFailure(Exception e) {
                 // If the user is not affiliated with the event (no EventUserLink)
-                openEventInitialActivity();
+                openEventInitialActivity(eventID);
             }
         });
     }
 
-    private void openEventInitialActivity() {
+    private void openEventInitialActivity(int eventID) {
 //        Intent intent = new Intent(context, EventInitialActivity.class);
 //        context.startActivity(intent);
     }
 
-    private void openWaitListActivity() {
+    private void openWaitListActivity(int eventID) {
 //        Intent intent = new Intent(context, EventWaitListActivity.class);
 //        context.startActivity(intent);
     }
 
-    private void openSampledActivity() {
+    private void openSampledActivity(int eventID) {
 //        Intent intent = new Intent(context, EventSampledActivity.class);
 //        context.startActivity(intent);
     }
 
-    private void openOrganizerActivity() {
+    private void openOrganizerActivity(int eventID) {
         Intent intent = new Intent(context, EventInitialActivity.class);
+        intent.putExtra("event_id", eventID);
         context.startActivity(intent);
     }
 }

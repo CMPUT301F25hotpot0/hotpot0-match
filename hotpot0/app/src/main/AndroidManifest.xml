@@ -30,6 +30,7 @@
         <activity android:name=".section2.views.ProfileActivity"/>
         <activity android:name=".section2.views.NotificationsActivity"/>
         <activity android:name=".section2.views.SearchActivity"/>
+        <activity android:name=".section2.views.EventInitialActivity"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

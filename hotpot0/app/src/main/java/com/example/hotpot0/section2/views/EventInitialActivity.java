@@ -32,7 +32,7 @@ public class EventInitialActivity extends AppCompatActivity {
         setContentView(R.layout.section3_entranteventview_activity);
 
         int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
-        int eventID = 1; // Example event ID, you should replace this with actual event ID
+        int eventID = getIntent().getIntExtra("event_id", -1);
 
         eventImage = findViewById(R.id.eventImage);
         previewEventName = findViewById(R.id.previewEventName);
