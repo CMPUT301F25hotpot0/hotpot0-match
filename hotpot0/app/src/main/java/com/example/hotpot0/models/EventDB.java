@@ -322,6 +322,8 @@ public class EventDB {
                 eventRef.update("sampledIDs", sampled)
                         .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
                         .addOnFailureListener(callback::onFailure);
+
+
             }
 
             @Override

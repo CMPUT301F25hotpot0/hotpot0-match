@@ -149,6 +149,10 @@ public class OrganizerEventActivity extends AppCompatActivity {
             eventDB.sampleEvent(currentEvent, new EventDB.GetCallback<List<String>>() {
                 @Override
                 public void onSuccess(List<String> sampledUsers) {
+
+                    for (String id : sampledUsers) {
+                    }
+
                     Toast.makeText(OrganizerEventActivity.this,
                             "Sample generated successfully! Total: " + sampledUsers.size(),
                             Toast.LENGTH_SHORT).show();
