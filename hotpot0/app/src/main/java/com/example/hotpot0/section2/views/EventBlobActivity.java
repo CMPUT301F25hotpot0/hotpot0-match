@@ -15,7 +15,7 @@ public class EventBlobActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.events);
+        setContentView(R.layout.event_blob);
 
         eventName = findViewById(R.id.event_name);
         eventRole = findViewById(R.id.event_role);
