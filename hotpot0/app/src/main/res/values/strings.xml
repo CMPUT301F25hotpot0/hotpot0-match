@@ -38,6 +38,10 @@
     <string name="role">Role</string>
     <string name="current_invitations">Current Invitations</string>
     <string name="other_updates">Other Updates</string>
+    <string name="qr_text">Please position QR code in the box</string>
+    <string name="invitation_text">You have been invited to join!</string>
+    <string name="rejection_text">We’re sorry, you have not been selected to join. Do you want to remain in Wait List?</string>
+
 
     <!-- Section 3 -->
 
