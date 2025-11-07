@@ -42,70 +42,89 @@ public class EventActionHandler {
 
             @Override
             public void onFailure(Exception e) {
-                // If no EventUserLink was found, the user can join the waitlist.
-                // Create a new EventUserLink for the user with the default "inWaitList" status
-                EventUserLink newEventUserLink = new EventUserLink(userID, eventID);
-
-                // Add the new EventUserLink to Firestore
-                eventUserLinkDB.addEventUserLink(newEventUserLink, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
                     @Override
-                    public void onSuccess(EventUserLink eventUserLink) {
-                        // Successfully created a new EventUserLink, user is now on the waitlist
-                        profileDB.getUserByID(userID, new ProfileDB.GetCallback<com.example.hotpot0.models.UserProfile>() {
-                            @Override
-                            public void onSuccess(com.example.hotpot0.models.UserProfile userProfile) {
-                                // Update the user's profile with the new linkID
-                                profileDB.addLinkIDToUser(userProfile, eventUserLink.getLinkID(), new ProfileDB.GetCallback<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        // Successfully updated the user's profile
-                                        eventDB.getEventByID(eventID, new EventDB.GetCallback<com.example.hotpot0.models.Event>() {
-                                            @Override
-                                            public void onSuccess(com.example.hotpot0.models.Event eventObj) {
-                                                // Update the event with the new linkID
-                                                eventDB.addLinkIDToEvent(eventObj, eventUserLink.getLinkID(), new EventDB.GetCallback<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        // Successfully updated the event
-                                                        callback.onSuccess(0); // Success: User added to waitlist
-                                                    }
+                    public void onSuccess(Event eventObj) {
+                        int capacity = eventObj.getCapacity();
+                        int currentCount = eventObj.getTotalWaitlist();
+                        if (currentCount < capacity) {
+                            // There is space in the waitlist, proceed with adding the user
+                            // If no EventUserLink was found, the user can join the waitlist.
+                            // Create a new EventUserLink for the user with the default "inWaitList" status
+                            EventUserLink newEventUserLink = new EventUserLink(userID, eventID);
 
-                                                    @Override
-                                                    public void onFailure(Exception e) {
-                                                        // Failed to update the event
-                                                        callback.onFailure(e); // Failure to update event
-                                                    }
-                                                });
-                                            }
+                            // Add the new EventUserLink to Firestore
+                            eventUserLinkDB.addEventUserLink(newEventUserLink, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                                @Override
+                                public void onSuccess(EventUserLink eventUserLink) {
+                                    // Successfully created a new EventUserLink, user is now on the waitlist
+                                    profileDB.getUserByID(userID, new ProfileDB.GetCallback<com.example.hotpot0.models.UserProfile>() {
+                                        @Override
+                                        public void onSuccess(com.example.hotpot0.models.UserProfile userProfile) {
+                                            // Update the user's profile with the new linkID
+                                            profileDB.addLinkIDToUser(userProfile, eventUserLink.getLinkID(), new ProfileDB.GetCallback<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    // Successfully updated the user's profile
+                                                    eventDB.getEventByID(eventID, new EventDB.GetCallback<com.example.hotpot0.models.Event>() {
+                                                        @Override
+                                                        public void onSuccess(com.example.hotpot0.models.Event eventObj) {
+                                                            // Update the event with the new linkID
+                                                            eventDB.addLinkIDToEvent(eventObj, eventUserLink.getLinkID(), new EventDB.GetCallback<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    // Successfully updated the event
+                                                                    callback.onSuccess(0); // Success: User added to waitlist
+                                                                }
 
-                                            @Override
-                                            public void onFailure(Exception e) {
-                                                // Failed to retrieve the event
-                                                callback.onFailure(e); // Failure to retrieve event
-                                            }
-                                        });
-                                    }
+                                                                @Override
+                                                                public void onFailure(Exception e) {
+                                                                    // Failed to update the event
+                                                                    callback.onFailure(e); // Failure to update event
+                                                                }
+                                                            });
+                                                        }
 
-                                    @Override
-                                    public void onFailure(Exception e) {
-                                        // Failed to update the user's profile
-                                        callback.onFailure(e); // Failure to update user profile
-                                    }
-                                });
-                            }
+                                                        @Override
+                                                        public void onFailure(Exception e) {
+                                                            // Failed to retrieve the event
+                                                            callback.onFailure(e); // Failure to retrieve event
+                                                        }
+                                                    });
+                                                }
 
-                            @Override
-                            public void onFailure(Exception e) {
-                                // Failed to retrieve the user's profile
-                                callback.onFailure(e); // Failure to retrieve user profile
-                            }
-                        });
+                                                @Override
+                                                public void onFailure(Exception e) {
+                                                    // Failed to update the user's profile
+                                                    callback.onFailure(e); // Failure to update user profile
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            // Failed to retrieve the user's profile
+                                            callback.onFailure(e); // Failure to retrieve user profile
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    // Failed to create the new EventUserLink in Firestore
+                                    callback.onSuccess(1); // Failure to add user to waitlist
+                                }
+                            });
+                        } else {
+                            // Waitlist is full, cannot add the user
+                            callback.onSuccess(2); // Failure: Waitlist is full
+                        }
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        // Failed to create the new EventUserLink in Firestore
-                        callback.onSuccess(1); // Failure to add user to waitlist
+                        // Failed to retrieve the event
+                        callback.onFailure(e); // Failure to retrieve event
                     }
                 });
             }
