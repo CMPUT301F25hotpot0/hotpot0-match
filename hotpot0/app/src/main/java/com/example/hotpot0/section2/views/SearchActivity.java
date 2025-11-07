@@ -23,8 +23,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-public class SearchActivity extends AppCompatActivity {
 
+/**
+ * This view shows the Search tab where the user can search for a specific
+ * event by name or QR code. The user can also apply filters to refine their search.
+ */
+public class SearchActivity extends AppCompatActivity {
     private ListView listView;
     private SearchView searchView;
     private ImageButton filterButton, qrButton, infoButton;
@@ -74,7 +78,11 @@ public class SearchActivity extends AppCompatActivity {
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            // todo connect to that view
+//                Intent intent = new Intent(SearchActivity.this, Section3QrCodeSearchActivity.class);
+//                startActivity(intent);
+//                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                Toast.makeText(SearchActivity.this, "Open QR Scanner", Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -82,7 +90,8 @@ public class SearchActivity extends AppCompatActivity {
         infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            // todo connect to that view
+                Toast.makeText(SearchActivity.this, "Open Information Dialog", Toast.LENGTH_SHORT).show();
+
             }
         });
 

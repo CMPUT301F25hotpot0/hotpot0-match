@@ -17,16 +17,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
-public class NotificationsActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
-    private TextView titleView, currentInvitationsLabel, otherUpdatesLabel;
+/**
+ * This view shows the Notifications the user receives. It shows current invitations
+ * and other updates.
+ * */
+public class NotificationsActivity extends AppCompatActivity {
     private ListView currentInvitationsList, otherUpdatesList;
     private BottomNavigationView bottomNavigationView;
-
     private ArrayAdapter<String> currentInvitationsAdapter;
     private ArrayAdapter<String> otherUpdatesAdapter;
-
     private List<String> currentInvitations;
     private List<String> otherUpdates;
 
