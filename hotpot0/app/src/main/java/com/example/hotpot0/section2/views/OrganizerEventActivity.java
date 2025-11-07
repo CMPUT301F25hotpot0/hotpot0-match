@@ -24,6 +24,24 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 
+/**
+ * Activity that allows event organizers to view and manage their events.
+ * <p>
+ * Provides two layouts:
+ * <ul>
+ *     <li>Pre-draw layout: before any participants are sampled.</li>
+ *     <li>Post-draw layout: after a random sample of participants has been selected.</li>
+ * </ul>
+ * <p>
+ * Implements the following functionalities:
+ * <ul>
+ *     <li>Viewing event details</li>
+ *     <li>Viewing waitlist and entrants</li>
+ *     <li>Generating a random sample of participants</li>
+ *     <li>Confirming entrants and filling empty spots</li>
+ *     <li>Navigation via bottom navigation bar</li>
+ * </ul>
+ */
 public class OrganizerEventActivity extends AppCompatActivity {
 
     private EventDB eventDB = new EventDB();
@@ -214,6 +232,10 @@ public class OrganizerEventActivity extends AppCompatActivity {
     }
 
     // ------------------ POST-DRAW LAYOUT ------------------
+    /**
+     * Sets up the post-draw layout for organizers.
+     * Displays event details, sampled entrants, cancelled entrants, and allows confirming entrants or filling empty spots.
+     */
     private void setupPostDrawLayout() {
         // --- View bindings ---
         ImageView eventImage = findViewById(R.id.eventImage);
@@ -253,7 +275,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
         // --- Populate sampled entrants ---
         populateEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
 
-        // DEBUG
 
         populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
         populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
@@ -340,6 +361,12 @@ public class OrganizerEventActivity extends AppCompatActivity {
     }
 
     // ------------------ HELPER METHODS ------------------
+    /**
+     * Populates a LinearLayout with  profile blobs.
+     *
+     * @param container LinearLayout to populate
+     * @param linkIDs   List of event-user link IDs
+     */
     private void populateEntrants(LinearLayout container, List<String> linkIDs) {
         container.removeAllViews();
         if (linkIDs == null || linkIDs.isEmpty()) {
@@ -374,6 +401,9 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets up the bottom navigation bar with click listeners to navigate to other main activities.
+     */
     private void setupBottomNavigation() {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         if (bottomNav == null) return;

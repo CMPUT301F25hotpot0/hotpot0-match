@@ -19,6 +19,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Home activity that displays the user's events in three categories:
+ * confirmed, pending, and past. Also provides navigation to other
+ * main sections of the app via the bottom navigation bar.
+ */
 public class HomeActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
@@ -80,6 +85,10 @@ public class HomeActivity extends AppCompatActivity {
         loadUserEvents();
     }
 
+    /**
+     * Ensures the Home tab remains selected when returning
+     * to this activity.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -87,6 +96,11 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
     }
 
+    /**
+     * Loads all events from the database and sorts them into
+     * confirmed, pending, and past categories based on the
+     * user's EventUserLink status and whether the event is active.
+     */
     private void loadUserEvents() {
         eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
             @Override
@@ -155,6 +169,4 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
-
-
 }

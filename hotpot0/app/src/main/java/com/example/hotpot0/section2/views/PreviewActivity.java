@@ -11,6 +11,14 @@ import com.example.hotpot0.models.Event;
 import com.example.hotpot0.section2.controllers.CreateEventHandler;
 import com.example.hotpot0.models.EventDB;
 
+/**
+ * Activity that displays a preview of an event before it is officially created.
+ * <p>
+ * Shows all event details including name, description, guidelines, location, time, date,
+ * duration, price, capacity, registration period, and geolocation status.
+ * <p>
+ * Allows the user (organizer) to confirm the creation of the event or go back to the previous screen.
+ */
 public class PreviewActivity extends AppCompatActivity {
 
     private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft;
