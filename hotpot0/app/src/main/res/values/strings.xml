@@ -38,6 +38,21 @@
     <string name="role">Role</string>
     <string name="current_invitations">Current Invitations</string>
     <string name="other_updates">Other Updates</string>
+    <string name="fill_spots">Fill Spots</string>
+    <string name="sampled_entrants">Sampled Entrants</string>
+    <string name="cancelled_entrants">Cancelled Entrants</string>
+    <string name="all_entrants">All Entrants</string>
+    <string name="event_location">Location %1$s</string>
+    <string name="event_time">Time %1$s</string>
+    <string name="event_date">Date %1$s</string>
+    <string name="event_duration">Duration %1$s</string>
+    <string name="event_price">Price %1$s CAD</string>
+    <string name="event_capacity">Capacity: %1$s</string>
+    <string name="event_registration">Registration Period: %1$s</string>
+    <string name="event_geolocation">Geolocation for participants: %1$s</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="event_created_success">Event created successfully!</string>
 
     <!-- Section 3 -->
 
