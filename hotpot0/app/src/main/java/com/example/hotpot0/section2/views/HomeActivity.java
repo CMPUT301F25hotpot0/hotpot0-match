@@ -37,7 +37,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
-        Toast .makeText(this, "Welcome User #" + userID, Toast.LENGTH_SHORT).show();
         setContentView(R.layout.section2_userhome_activity);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
