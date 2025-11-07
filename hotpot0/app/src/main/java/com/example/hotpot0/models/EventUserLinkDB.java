@@ -134,4 +134,25 @@ public class EventUserLinkDB {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
+
+    public List<String> getWaitListUsers(List<String> linkIDs) {
+        List<String> waitListUsers = new ArrayList<>();
+        for (String linkID : linkIDs) {
+            getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink result) {
+                    if (result.getStatus().equals("inWaitList")) {
+                        waitListUsers.add(result.getLinkID());
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    // Handle failure (e.g., log the error)
+
+                }
+            });
+        }
+        return waitListUsers;
+    }
 }

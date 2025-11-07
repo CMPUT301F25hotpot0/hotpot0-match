@@ -1,7 +1,9 @@
 package com.example.hotpot0.section2.views;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -25,6 +27,7 @@ public class SearchActivity extends AppCompatActivity {
     private SearchView searchView;
     private EventDB eventDB;
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
+    private ImageButton infoButton;
     private int userID;
 
     @Override
@@ -36,8 +39,30 @@ public class SearchActivity extends AppCompatActivity {
         eventListView = findViewById(R.id.event_list_view);
         searchView = findViewById(R.id.searchView);
         bottomNav = findViewById(R.id.bottomNavigationView);
+        infoButton = findViewById(R.id.info_button);
 
         userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+
+        infoButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Welcome to Eventure!")
+                    .setMessage("How it Works:\n\n" +
+                            "• Use the bottom toolbar to navigate between pages.\n\n" +
+                            "• The Home page shows your confirmed events, pending events, and past events.\n\n" +
+                            "• Confirmed events are events that you have been selected for and you have accepted.\n\n" +
+                            "• Pending events are events that you are in waitlist for. You will receive a notification about the decision. " +
+                            "You will then be able to accept or decline the invitation. You are also able to leave the waitlist.\n\n" +
+                            "• Past events show your event history and their outcomes.\n\n" +
+                            "• If you are an organizer, use the Create Event option to create an event. You will be able pick the entrants and related options.\n\n" +
+                            "• Use the Search option to search for events. You can use the filter option to filter it to your interests. \n\n" +
+                            "• Entrants are randomly sampled to join the event, in a completely fair manner.\n\n" +
+                            "• Accept or Decline your invite if you are sampled.\n\n" +
+                            "• Even if you're not sampled, you can rely on your luck to get sampled again if another user declines.\n\n" +
+                            "• Notifications tab show the notifications you have received. This includes invitations and results. \n\n" +
+                            "• View your profile in the Profile Tab. ")
+                    .setPositiveButton("Ok", null)
+                    .show();
+        });
 
         eventDB = new EventDB();
 

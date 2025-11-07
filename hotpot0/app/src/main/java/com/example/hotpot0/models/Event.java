@@ -246,16 +246,16 @@ public class Event {
                 '}';
     }
 
-    public ArrayList<String> sampleParticipants() {
+    public ArrayList<String> sampleParticipants(List<String> waitListParticipants) {
         if (linkIDs == null || linkIDs.isEmpty()) {
             throw new IllegalStateException("No participants to sample from.");
         }
         int cap = this.capacity != null ? this.capacity : 0;
-        int sampleSize = Math.min(cap, linkIDs.size());
+        int sampleSize = Math.min(cap, waitListParticipants.size());
         ArrayList<String> randomized = new ArrayList<>();
-        Collections.shuffle(randomized);
+        Collections.shuffle(waitListParticipants);
 
-        List<String> sampled = randomized.subList(0, sampleSize);
+        List<String> sampled = waitListParticipants.subList(0, sampleSize);
         this.sampledIDs = new ArrayList<>(sampled);
         return this.sampledIDs;
     }

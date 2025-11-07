@@ -16,6 +16,7 @@ import java.util.List;
 public class EventDB {
     private final FirebaseFirestore db;
     private static final String EVENT_COLLECTION = "Events";
+    private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
 
     public EventDB() {
         db = FirebaseFirestore.getInstance();
@@ -272,7 +273,9 @@ public class EventDB {
 
     public void sampleEvent(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
         try {
-            ArrayList<String> sampled = event.sampleParticipants();
+            List<String> allLinkIDs = event.getLinkIDs();
+            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
+            ArrayList<String> sampled = event.sampleParticipants(waitListLinkIDs);
 
             DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                     .document(String.valueOf(event.getEventID()));
