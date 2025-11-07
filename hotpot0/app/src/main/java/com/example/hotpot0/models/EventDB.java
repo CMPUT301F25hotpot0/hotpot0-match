@@ -179,7 +179,7 @@ public class EventDB {
      */
     public void addLinkIDToEvent(@NonNull Event event, @NonNull String linkID, @NonNull GetCallback<Void> callback) {
         if (event.getLinkIDs() == null) event.setLinkIDs(new ArrayList<>());
-        if (!event.getLinkIDs().contains(linkID)) event.getLinkIDs().add(linkID);
+        if (!event.getLinkIDs().contains(linkID)) event.addLinkID(linkID);
 
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
@@ -192,7 +192,7 @@ public class EventDB {
      * Removes a linkID from an event's linkIDs array.
      */
     public void removeLinkIDFromEvent(@NonNull Event event, @NonNull String linkID, @NonNull GetCallback<Void> callback) {
-        if (event.getLinkIDs() != null) event.getLinkIDs().remove(linkID);
+        if (event.getLinkIDs() != null) event.removeLinkID(linkID);
 
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
