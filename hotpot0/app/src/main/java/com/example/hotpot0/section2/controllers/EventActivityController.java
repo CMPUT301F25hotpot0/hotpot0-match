@@ -10,6 +10,7 @@ import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.Status;
 import com.example.hotpot0.section2.views.EventInitialActivity;
+import com.example.hotpot0.section2.views.EventSampledActivity;
 import com.example.hotpot0.section2.views.OrganizerEventActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -44,7 +45,7 @@ public class EventActivityController {
                 switch (status) {
                     case "inWaitList":
                         // User is on the waitlist
-                        openOrganizerActivity(eventID);
+                        openEventInitialActivity(eventID);
                         break;
 
                     case "Sampled":
@@ -76,22 +77,19 @@ public class EventActivityController {
     }
 
     private void openEventInitialActivity(int eventID) {
-//        Intent intent = new Intent(context, EventInitialActivity.class);
-//        context.startActivity(intent);
-    }
-
-    private void openWaitListActivity(int eventID) {
-//        Intent intent = new Intent(context, EventWaitListActivity.class);
-//        context.startActivity(intent);
+        Intent intent = new Intent(context, EventInitialActivity.class);
+        intent.putExtra("event_id", eventID);
+        context.startActivity(intent);
     }
 
     private void openSampledActivity(int eventID) {
-//        Intent intent = new Intent(context, EventSampledActivity.class);
-//        context.startActivity(intent);
+        Intent intent = new Intent(context, EventSampledActivity.class);
+        intent.putExtra("event_id", eventID);
+        context.startActivity(intent);
     }
 
     private void openOrganizerActivity(int eventID) {
-        Intent intent = new Intent(context, EventInitialActivity.class);
+        Intent intent = new Intent(context, OrganizerEventActivity.class);
         intent.putExtra("event_id", eventID);
         context.startActivity(intent);
     }
