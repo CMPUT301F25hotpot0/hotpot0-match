@@ -110,20 +110,20 @@ public class CreateEventHandler {
                             @Override
                             public void onSuccess(UserProfile userProfile) {
                                 // Update the organizer's profile
-//                                profileDB.addLinkIDToUser(userProfile, new ProfileDB.ActionCallback() {
-//                                    @Override
-//                                    public void onSuccess() {
-//                                        // Successfully updated organizer profile
-//                                        callback.onSuccess(result);  // Call success after all actions complete
-//                                    }
-//
-//                                    @Override
-//                                    public void onFailure(Exception e) {
-//                                        // Log the error but do not fail the event creation
-//                                        e.printStackTrace();
-//                                        callback.onSuccess(result);  // Continue with success even if update fails
-//                                    }
-//                                });
+                                profileDB.addLinkIDToUser(userProfile, linkResult.getLinkID(), new ProfileDB.GetCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        // Successfully updated organizer profile
+                                        callback.onSuccess(result);  // Call success after all actions complete
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // Log the error but do not fail the event creation
+                                        e.printStackTrace();
+                                        callback.onSuccess(result);  // Continue with success even if update fails
+                                    }
+                                });
                                 eventDB.addLinkIDToEvent(event, linkResult.getLinkID(), new EventDB.GetCallback<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
