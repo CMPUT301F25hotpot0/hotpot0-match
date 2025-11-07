@@ -268,4 +268,17 @@ public class EventDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
+
+    public void saveSampledIDs(@NonNull Event event, @NonNull GetCallback<Void> callback) {
+        if (event.getEventID() == null) {
+            callback.onFailure(new IllegalArgumentException("Event ID cannot be null for update."));
+            return;
+        }
+
+        DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                .document(String.valueOf(event.getEventID()));
+        eventRef.update("sampledIDs", event.getSampledIDs())
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
 }
