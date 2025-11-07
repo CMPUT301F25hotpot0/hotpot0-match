@@ -63,6 +63,11 @@
     <string name="leave_waitlist">Leave</string>
     <string name="name">Name</string>
     <string name="geo_location">Geo-Location</string>
+    <string name="generate_sample">Generate Sample</string>
+    <string name="qr_code_scanner">QR Code Scanner</string>
+    <string name="map">Map</string>
+    <string name="attendees">Attendees</string>
+    <string name="export_csv">Export CSV</string>
 
     <!-- Section 3 -->
 
