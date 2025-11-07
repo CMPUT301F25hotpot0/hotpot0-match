@@ -40,6 +40,9 @@ public class NotificationsActivity extends AppCompatActivity {
         otherUpdatesList = findViewById(R.id.other_updates_list);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
+        currentInvitations = new ArrayList<>();
+        otherUpdates = new ArrayList<>();
+
         // Set adapters for ListViews
         currentInvitationsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, currentInvitations);
         currentInvitationsList.setAdapter(currentInvitationsAdapter);

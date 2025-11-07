@@ -3,12 +3,12 @@ package com.example.hotpot0.section2.views;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.Toast;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.ProfileDB;
@@ -26,7 +26,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class ProfileActivity extends AppCompatActivity{
     private TextInputEditText nameInput, emailInput, phoneInput;
     private MaterialButton saveProfileButton, deleteProfileButton;
-    private Switch notificationSwitch, locationSwitch;
+    private SwitchCompat notificationSwitch, locationSwitch;
     private BottomNavigationView bottomNavigationView;
     private ProfileEditHandler profileHandler = new ProfileEditHandler();
     private final ProfileDB profileDB = new ProfileDB();
@@ -37,7 +37,7 @@ public class ProfileActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.section2_profile_activity);
 
-        int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+        userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
         if (userID == -1) {
             Toast.makeText(this, "User not found.", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, StartupActivity.class));

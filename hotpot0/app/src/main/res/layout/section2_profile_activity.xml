@@ -160,6 +160,7 @@
         android:id="@+id/toggle_location"
         android:layout_width="273dp"
         android:layout_height="46dp"
+        android:text="@string/geo_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toggle_notif" />
