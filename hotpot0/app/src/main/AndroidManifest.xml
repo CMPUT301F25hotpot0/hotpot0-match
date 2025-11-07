@@ -31,6 +31,7 @@
         <activity android:name=".section2.views.NotificationsActivity"/>
         <activity android:name=".section2.views.SearchActivity"/>
         <activity android:name=".section2.views.EventInitialActivity"/>
+        <activity android:name=".section2.views.OrganizerEventActivity" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

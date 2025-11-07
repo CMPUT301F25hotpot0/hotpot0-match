@@ -271,39 +271,87 @@ public class EventDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
+//    public void sampleEvent(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
+//        try {
+//            List<String> allLinkIDs = event.getLinkIDs();
+//            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
+//            ArrayList<String> sampled = event.sampleParticipants(waitListLinkIDs);
+//
+//            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+//                    .document(String.valueOf(event.getEventID()));
+//
+//            eventRef.update("sampledIDs", sampled)
+//                    .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
+//                    .addOnFailureListener(callback::onFailure);
+//
+//        } catch (Exception e) {
+//            callback.onFailure(e);
+//        }
+//    }
+//
+//    public void fillEmptySampledSpots(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
+//        try {
+//            List<String> allLinkIDs = event.getLinkIDs();
+//            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
+//             ArrayList<String> newlySampled = event.fillSampledParticipants(waitListLinkIDs);
+//
+//            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+//                    .document(String.valueOf(event.getEventID()));
+//
+//            eventRef.update("sampledIDs", event.getSampledIDs())
+//                    .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
+//                    .addOnFailureListener(callback::onFailure);
+//
+//        } catch (Exception e) {
+//            callback.onFailure(e);
+//        }
+//    }
+
     public void sampleEvent(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
-        try {
-            List<String> allLinkIDs = event.getLinkIDs();
-            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
-            ArrayList<String> sampled = event.sampleParticipants(waitListLinkIDs);
+        List<String> allLinkIDs = event.getLinkIDs();
 
-            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
-                    .document(String.valueOf(event.getEventID()));
+        eventUserLinkDB.getWaitListUsers(allLinkIDs, new EventUserLinkDB.GetCallback<List<String>>() {
+            @Override
+            public void onSuccess(List<String> waitListLinkIDs) {
+                // Sample participants after waitlist is fetched
+                ArrayList<String> sampled = event.sampleParticipants(waitListLinkIDs);
 
-            eventRef.update("sampledIDs", sampled)
-                    .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
-                    .addOnFailureListener(callback::onFailure);
+                DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                        .document(String.valueOf(event.getEventID()));
 
-        } catch (Exception e) {
-            callback.onFailure(e);
-        }
+                eventRef.update("sampledIDs", sampled)
+                        .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
+                        .addOnFailureListener(callback::onFailure);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
     }
 
     public void fillEmptySampledSpots(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
-        try {
-            List<String> allLinkIDs = event.getLinkIDs();
-            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
-            ArrayList<String> newlySampled = event.fillSampledParticipants(waitListLinkIDs);
+        List<String> allLinkIDs = event.getLinkIDs();
 
-            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
-                    .document(String.valueOf(event.getEventID()));
+        eventUserLinkDB.getWaitListUsers(allLinkIDs, new EventUserLinkDB.GetCallback<List<String>>() {
+            @Override
+            public void onSuccess(List<String> waitListLinkIDs) {
+                // Fill empty spots after waitlist is fetched
+                ArrayList<String> newlySampled = event.fillSampledParticipants(waitListLinkIDs);
 
-            eventRef.update("sampledIDs", event.getSampledIDs())
-                    .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
-                    .addOnFailureListener(callback::onFailure);
+                DocumentReference eventRef = db.collection(EVENT_COLLECTION)
+                        .document(String.valueOf(event.getEventID()));
 
-        } catch (Exception e) {
-            callback.onFailure(e);
-        }
+                eventRef.update("sampledIDs", event.getSampledIDs())
+                        .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
+                        .addOnFailureListener(callback::onFailure);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
     }
 }

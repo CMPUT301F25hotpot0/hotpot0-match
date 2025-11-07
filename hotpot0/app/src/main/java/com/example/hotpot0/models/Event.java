@@ -246,47 +246,109 @@ public class Event {
                 '}';
     }
 
+//    public ArrayList<String> sampleParticipants(List<String> waitListParticipants) {
+//        if (linkIDs == null || linkIDs.isEmpty()) {
+//            throw new IllegalStateException("No participants to sample from.");
+//        }
+//        int cap = this.capacity != null ? this.capacity : 0;
+//        int sampleSize = Math.min(cap, waitListParticipants.size());
+//        ArrayList<String> randomized = new ArrayList<>();
+//        Collections.shuffle(waitListParticipants);
+//
+//        List<String> sampled = waitListParticipants.subList(0, sampleSize);
+//        this.sampledIDs = new ArrayList<>(sampled);
+//        return this.sampledIDs;
+//    }
+//
+//    public ArrayList<String> fillSampledParticipants(List<String> waitListParticipants) {
+//        if (linkIDs == null || linkIDs.isEmpty()) {
+//            throw new IllegalStateException("No participants to sample from.");
+//        }
+//        int cap = this.capacity != null ? this.capacity : 0;
+//        int currentSampledSize = this.sampledIDs != null ? this.sampledIDs.size() : 0;
+//        int spotsLeft = cap - currentSampledSize;
+//        if (spotsLeft <= 0) {
+//            return new ArrayList<>(); // No spots left to fill
+//        }
+//
+//        ArrayList<String> randomized = new ArrayList<>(waitListParticipants);
+//        Collections.shuffle(randomized);
+//
+//        ArrayList<String> newlySampled = new ArrayList<>();
+//        for (String participant : randomized) {
+//            if (newlySampled.size() >= spotsLeft) {
+//                break;
+//            }
+//            if (!this.sampledIDs.contains(participant)) {
+//                newlySampled.add(participant);
+//            }
+//        }
+//
+//        if (this.sampledIDs == null) {
+//            this.sampledIDs = new ArrayList<>();
+//        }
+//        this.sampledIDs.addAll(newlySampled);
+//        return newlySampled;
+//    }
+
+    /**
+     * Randomly samples participants from the provided waitlist.
+     * The number of samples is limited by the event's capacity.
+     */
     public ArrayList<String> sampleParticipants(List<String> waitListParticipants) {
-        if (linkIDs == null || linkIDs.isEmpty()) {
-            throw new IllegalStateException("No participants to sample from.");
+        if (waitListParticipants == null || waitListParticipants.isEmpty()) {
+            return new ArrayList<>(); // Nothing to sample
         }
+
         int cap = this.capacity != null ? this.capacity : 0;
         int sampleSize = Math.min(cap, waitListParticipants.size());
-        ArrayList<String> randomized = new ArrayList<>();
-        Collections.shuffle(waitListParticipants);
 
-        List<String> sampled = waitListParticipants.subList(0, sampleSize);
-        this.sampledIDs = new ArrayList<>(sampled);
+        // Shuffle the waitlist to randomize
+        List<String> shuffled = new ArrayList<>(waitListParticipants);
+        Collections.shuffle(shuffled);
+
+        // Take the first N participants as the sampled list
+        List<String> sampled = shuffled.subList(0, sampleSize);
+
+        if (this.sampledIDs == null) {
+            this.sampledIDs = new ArrayList<>();
+        }
+
+        this.sampledIDs.clear(); // Replace previous sample
+        this.sampledIDs.addAll(sampled);
+
         return this.sampledIDs;
     }
 
+    /**
+     * Fills remaining sampled spots with additional participants from the waitlist.
+     */
     public ArrayList<String> fillSampledParticipants(List<String> waitListParticipants) {
-        if (linkIDs == null || linkIDs.isEmpty()) {
-            throw new IllegalStateException("No participants to sample from.");
+        if (waitListParticipants == null || waitListParticipants.isEmpty()) {
+            return new ArrayList<>(); // Nothing to fill
         }
+
         int cap = this.capacity != null ? this.capacity : 0;
-        int currentSampledSize = this.sampledIDs != null ? this.sampledIDs.size() : 0;
-        int spotsLeft = cap - currentSampledSize;
+        if (this.sampledIDs == null) {
+            this.sampledIDs = new ArrayList<>();
+        }
+
+        int spotsLeft = cap - this.sampledIDs.size();
         if (spotsLeft <= 0) {
             return new ArrayList<>(); // No spots left to fill
         }
 
-        ArrayList<String> randomized = new ArrayList<>(waitListParticipants);
-        Collections.shuffle(randomized);
+        List<String> shuffled = new ArrayList<>(waitListParticipants);
+        Collections.shuffle(shuffled);
 
         ArrayList<String> newlySampled = new ArrayList<>();
-        for (String participant : randomized) {
-            if (newlySampled.size() >= spotsLeft) {
-                break;
-            }
+        for (String participant : shuffled) {
+            if (newlySampled.size() >= spotsLeft) break;
             if (!this.sampledIDs.contains(participant)) {
                 newlySampled.add(participant);
             }
         }
 
-        if (this.sampledIDs == null) {
-            this.sampledIDs = new ArrayList<>();
-        }
         this.sampledIDs.addAll(newlySampled);
         return newlySampled;
     }

@@ -286,59 +286,59 @@ public class EventActionHandler {
         });
     }
 
-    public void sampleUsers(Integer eventID, ProfileDB.GetCallback<Integer> callback) {
-        eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
-            @Override
-            public void onSuccess(Event eventObj) {
-                eventDB.sampleEvent(eventObj, new EventDB.GetCallback<List<String>>(){
-                    @Override
-                    public void onSuccess(List<String> result) {
-                        for (String linkID : result) {
-                            // For each sampled user, update their EventUserLink status to "Sampled"
-                            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
-                                @Override
-                                public void onSuccess(EventUserLink eventUserLink) {
-                                    eventUserLink.setStatus("Sampled");
-                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
-                                        @Override
-                                        public void onSuccess() {
-                                            // Successfully updated the user's status to "Sampled"
-                                            callback.onSuccess(0); // Success: Users sampled
-                                        }
-
-                                        @Override
-                                        public void onFailure(Exception e) {
-                                            // Failed to update the user's status
-                                            callback.onFailure(e); // Failure to update user status
-                                        }
-                                    });
-                                }
-
-                                @Override
-                                public void onFailure(Exception e) {
-                                    // Failed to retrieve the EventUserLink
-                                    callback.onFailure(e); // Failure to retrieve EventUserLink
-                                }
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        // Failed to sample users for the event
-                        callback.onFailure(e); // Failure to sample users
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                // Failed to retrieve the event
-                callback.onFailure(e); // Failure to retrieve event
-            }
-        });
-
-    }
+//    public void sampleUsers(Integer eventID, ProfileDB.GetCallback<Integer> callback) {
+//        eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
+//            @Override
+//            public void onSuccess(Event eventObj) {
+//                eventDB.sampleEvent(eventObj, new EventDB.GetCallback<List<String>>(){
+//                    @Override
+//                    public void onSuccess(List<String> result) {
+//                        for (String linkID : result) {
+//                            // For each sampled user, update their EventUserLink status to "Sampled"
+//                            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+//                                @Override
+//                                public void onSuccess(EventUserLink eventUserLink) {
+//                                    eventUserLink.setStatus("Sampled");
+//                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+//                                        @Override
+//                                        public void onSuccess() {
+//                                            // Successfully updated the user's status to "Sampled"
+//                                            callback.onSuccess(0); // Success: Users sampled
+//                                        }
+//
+//                                        @Override
+//                                        public void onFailure(Exception e) {
+//                                            // Failed to update the user's status
+//                                            callback.onFailure(e); // Failure to update user status
+//                                        }
+//                                    });
+//                                }
+//
+//                                @Override
+//                                public void onFailure(Exception e) {
+//                                    // Failed to retrieve the EventUserLink
+//                                    callback.onFailure(e); // Failure to retrieve EventUserLink
+//                                }
+//                            });
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Exception e) {
+//                        // Failed to sample users for the event
+//                        callback.onFailure(e); // Failure to sample users
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onFailure(Exception e) {
+//                // Failed to retrieve the event
+//                callback.onFailure(e); // Failure to retrieve event
+//            }
+//        });
+//
+//    }
 
     public void cancelUser(Integer userID, Integer eventID) {}
 

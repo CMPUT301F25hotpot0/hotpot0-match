@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <!-- Scrollable content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -25,7 +24,7 @@
                 android:layout_height="200dp"
                 android:layout_marginBottom="16dp"
                 android:background="#E0E0E0"
-                android:scaleType="centerCrop"/>
+                android:scaleType="centerCrop" />
 
             <!-- Event Details -->
             <TextView
@@ -107,7 +106,7 @@
                 android:gravity="center_horizontal"
                 android:layout_marginBottom="16dp" />
 
-            <!-- QR Code Image -->
+            <!-- QR Code -->
             <ImageView
                 android:id="@+id/qr_code_image"
                 android:layout_width="150dp"
@@ -117,31 +116,30 @@
                 android:layout_marginBottom="16dp"
                 android:contentDescription="@string/qr_code_scanner" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
-
-            <Button
-                android:id="@+id/generate_sample_button"
-                android:layout_width="wrap_content"
+            <!-- Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/text"
-                android:text="@string/generate_sample"
-                android:textColor="#FFFFFF" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
 
-        </LinearLayout>
+                <Button
+                    android:id="@+id/generate_sample_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/text"
+                    android:text="@string/generate_sample"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
 
-            <!-- Geolocation Map Placeholder -->
+            <!-- Map -->
             <ImageView
                 android:id="@+id/map_preview"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginVertical="16dp"
                 android:background="#D0D0D0"
-                android:contentDescription="@string/map"/>
+                android:contentDescription="@string/map" />
 
             <TextView
                 android:id="@+id/list_of_entrants_title"
@@ -154,24 +152,17 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp" />
 
-            <!-- Entrants List -->
             <LinearLayout
                 android:id="@+id/entrants_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="16dp">
-
-                <include layout="@layout/profile_blob" />
-                <include layout="@layout/profile_blob" />
-                <include layout="@layout/profile_blob" />
-
-            </LinearLayout>
+                android:layout_marginBottom="80dp" />
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Fixed Bottom Navigation -->
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
@@ -182,5 +173,4 @@
         app:itemTextColor="@color/nav_item_selector"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
-
 </LinearLayout>
