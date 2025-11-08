@@ -45,5 +45,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("com.google.android.material:material:1.12.x")
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
-
+    implementation(files("C:\\Users\\nmirf\\AppData\\LocalAndroid\\Sdk\\platforms\\android-36\\android.jar"))
 }
