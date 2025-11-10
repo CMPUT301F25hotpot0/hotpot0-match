@@ -13,6 +13,8 @@ import java.util.List;
  * </p>
  */
 public class Event {
+
+    // Event Attributes
     private Integer eventID;
     private Integer organizerID;
     private String name, description, guidelines, location, time, date,
@@ -32,10 +34,9 @@ public class Event {
      */
     public Event() {
         this.eventID = null; // Handled by Firestore in EventDB
-        this.linkIDs = new ArrayList<>();
-        this.sampledIDs = new ArrayList<>();
         this.isEventActive = true;
         this.geolocationRequired = false;
+        this.linkIDs = new ArrayList<>();
         this.sampledIDs = new ArrayList<>();
         this.cancelledIDs = new ArrayList<>();
     }
@@ -79,6 +80,9 @@ public class Event {
         this.sampledIDs = new ArrayList<>();
         this.cancelledIDs = new ArrayList<>();
     }
+
+    // Getters and Setters
+    // ==================
 
     /** @return the event ID assigned by Firestore
      */
@@ -261,6 +265,9 @@ public class Event {
         this.cancelledIDs = cancelledIDs;
     }
 
+    // Utility Methods
+    // ===============
+
     /**
      * Adds a participant ID to the list of registered participants.
      * @param linkID the unique participant ID
@@ -316,81 +323,6 @@ public class Event {
     public int getTotalWaitlist() {
         return getTotalLinks() - getTotalCancelled() - 1;
     }
-
-    /**
-     * Returns a human-readable summary of this event including core fields such as IDs,
-     * name, schedule, capacity, pricing, image URL, geolocation flag, active status,
-     * and the current registered/sampled participant IDs.
-     * @return a formatted string describing this {@code Event}
-     */
-    @Override
-    public String toString() {
-        return "Event{" +
-                "eventID=" + eventID +
-                ", organizerID=" + organizerID +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", guidelines='" + guidelines + '\'' +
-                ", location='" + location + '\'' +
-                ", time='" + time + '\'' +
-                ", date='" + date + '\'' +
-                ", duration='" + duration + '\'' +
-                ", registration_period='" + registration_period + '\'' +
-                ", capacity=" + capacity +
-                ", price=" + price +
-                ", imageURL='" + imageURL + '\'' +
-                ", geolocationRequired=" + geolocationRequired +
-                ", isEventActive=" + isEventActive +
-                ", linkIDs=" + linkIDs +
-                ", sampledIDs=" + sampledIDs +
-                '}';
-    }
-
-//    public ArrayList<String> sampleParticipants(List<String> waitListParticipants) {
-//        if (linkIDs == null || linkIDs.isEmpty()) {
-//            throw new IllegalStateException("No participants to sample from.");
-//        }
-//        int cap = this.capacity != null ? this.capacity : 0;
-//        int sampleSize = Math.min(cap, waitListParticipants.size());
-//        ArrayList<String> randomized = new ArrayList<>();
-//        Collections.shuffle(waitListParticipants);
-//
-//        List<String> sampled = waitListParticipants.subList(0, sampleSize);
-//        this.sampledIDs = new ArrayList<>(sampled);
-//        return this.sampledIDs;
-//    }
-//
-//    public ArrayList<String> fillSampledParticipants(List<String> waitListParticipants) {
-//        if (linkIDs == null || linkIDs.isEmpty()) {
-//            throw new IllegalStateException("No participants to sample from.");
-//        }
-//        int cap = this.capacity != null ? this.capacity : 0;
-//        int currentSampledSize = this.sampledIDs != null ? this.sampledIDs.size() : 0;
-//        int spotsLeft = cap - currentSampledSize;
-//        if (spotsLeft <= 0) {
-//            return new ArrayList<>(); // No spots left to fill
-//        }
-//
-//        ArrayList<String> randomized = new ArrayList<>(waitListParticipants);
-//        Collections.shuffle(randomized);
-//
-//        ArrayList<String> newlySampled = new ArrayList<>();
-//        for (String participant : randomized) {
-//            if (newlySampled.size() >= spotsLeft) {
-//                break;
-//            }
-//            if (!this.sampledIDs.contains(participant)) {
-//                newlySampled.add(participant);
-//            }
-//        }
-//
-//        if (this.sampledIDs == null) {
-//            this.sampledIDs = new ArrayList<>();
-//        }
-//        this.sampledIDs.addAll(newlySampled);
-//        return newlySampled;
-//    }
-
 
     /**
      * Randomly samples participants from a provided waitlist up to the event's capacity.
@@ -459,5 +391,34 @@ public class Event {
 
         this.sampledIDs.addAll(newlySampled);
         return newlySampled;
+    }
+
+    /**
+     * Returns a human-readable summary of this event including core fields such as IDs,
+     * name, schedule, capacity, pricing, image URL, geolocation flag, active status,
+     * and the current registered/sampled participant IDs.
+     * @return a formatted string describing this {@code Event}
+     */
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eventID=" + eventID +
+                ", organizerID=" + organizerID +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", guidelines='" + guidelines + '\'' +
+                ", location='" + location + '\'' +
+                ", time='" + time + '\'' +
+                ", date='" + date + '\'' +
+                ", duration='" + duration + '\'' +
+                ", registration_period='" + registration_period + '\'' +
+                ", capacity=" + capacity +
+                ", price=" + price +
+                ", imageURL='" + imageURL + '\'' +
+                ", geolocationRequired=" + geolocationRequired +
+                ", isEventActive=" + isEventActive +
+                ", linkIDs=" + linkIDs +
+                ", sampledIDs=" + sampledIDs +
+                '}';
     }
 }

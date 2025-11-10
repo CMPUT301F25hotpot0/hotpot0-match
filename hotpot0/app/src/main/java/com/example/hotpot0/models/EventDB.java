@@ -21,6 +21,8 @@ import java.util.List;
  * </p>
  */
 public class EventDB {
+
+    // EventDB Attributes
     private final FirebaseFirestore db;
     private static final String EVENT_COLLECTION = "Events";
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
@@ -38,6 +40,9 @@ public class EventDB {
         void onSuccess(T result);
         void onFailure(Exception e);
     }
+
+    // Utility Methods
+    // ===============
 
     /**
      * Adds a new event to Firestore and generates a unique event ID.
@@ -318,42 +323,6 @@ public class EventDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
-
-//    public void sampleEvent(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
-//        try {
-//            List<String> allLinkIDs = event.getLinkIDs();
-//            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
-//            ArrayList<String> sampled = event.sampleParticipants(waitListLinkIDs);
-//
-//            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
-//                    .document(String.valueOf(event.getEventID()));
-//
-//            eventRef.update("sampledIDs", sampled)
-//                    .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
-//                    .addOnFailureListener(callback::onFailure);
-//
-//        } catch (Exception e) {
-//            callback.onFailure(e);
-//        }
-//    }
-//
-//    public void fillEmptySampledSpots(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
-//        try {
-//            List<String> allLinkIDs = event.getLinkIDs();
-//            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
-//             ArrayList<String> newlySampled = event.fillSampledParticipants(waitListLinkIDs);
-//
-//            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
-//                    .document(String.valueOf(event.getEventID()));
-//
-//            eventRef.update("sampledIDs", event.getSampledIDs())
-//                    .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
-//                    .addOnFailureListener(callback::onFailure);
-//
-//        } catch (Exception e) {
-//            callback.onFailure(e);
-//        }
-//    }
 
     /**
      * Randomly samples new participants for an event based on its waitlist.
