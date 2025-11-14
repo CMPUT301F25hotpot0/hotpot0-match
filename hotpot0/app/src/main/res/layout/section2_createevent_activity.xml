@@ -1,218 +1,488 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
-            android:id="@+id/button_BackCreateEvent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:backgroundTint="@color/text"
-            android:text="@string/back"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:padding="6dp"
-            android:layout_gravity="start" />
-
-        <!-- Page Title -->
-        <TextView
-            android:id="@+id/title_create_event"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/create_event"
-            android:textColor="@color/text"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:paddingTop="10dp"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Upload Image Section -->
         <LinearLayout
-            android:id="@+id/upload_section"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:background="#F3F3F3"
-            android:layout_marginBottom="8dp"
-            android:padding="16dp"
-            android:layout_gravity="center"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true">
+            android:padding="24dp"
+            android:paddingBottom="100dp">
 
-            <ImageView
-                android:id="@+id/icon_upload"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_camera"
-                app:tint="@color/black"/>
-
-            <TextView
+            <!-- Page Title -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/title_create_event"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/upload_image"
-                android:textSize="16sp"
-                android:textColor="#000000"
+                android:text="@string/create_event"
+                android:textColor="@color/text"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="24dp"
                 android:layout_marginTop="8dp"/>
 
-            <!-- Delete icon -->
-            <ImageView
+            <!-- Upload Image Section -->
+<!--            <com.google.android.material.card.MaterialCardView-->
+<!--                android:id="@+id/upload_section"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="200dp"-->
+<!--                android:layout_marginBottom="8dp"-->
+<!--                app:cardCornerRadius="12dp"-->
+<!--                app:strokeColor="@android:color/transparent"-->
+<!--                app:strokeWidth="1dp"-->
+<!--                android:clickable="true"-->
+<!--                android:focusable="true"-->
+<!--                android:foreground="?attr/selectableItemBackground">-->
+
+
+<!--            <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:orientation="vertical"-->
+<!--                    android:gravity="center"-->
+<!--                    android:background="?attr/colorSurfaceVariant"-->
+<!--                    android:clickable="false"-->
+<!--                    android:focusable="false"-->
+<!--                    android:foreground="?attr/selectableItemBackground">-->
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/icon_upload"-->
+<!--                    android:layout_width="48dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:src="@drawable/ic_camera"-->
+<!--                    app:tint="?attr/colorOnSurfaceVariant"-->
+<!--                    android:scaleType="centerCrop" />-->
+
+<!--                <com.google.android.material.textview.MaterialTextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="@string/upload_image"-->
+<!--                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"-->
+<!--                        android:textColor="?attr/colorOnSurfaceVariant"-->
+<!--                        android:layout_marginTop="8dp"/>-->
+<!--                </LinearLayout>-->
+<!--                -->
+<!--            </com.google.android.material.card.MaterialCardView>-->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/upload_section"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="12dp"
+                app:strokeColor="@android:color/transparent"
+                app:strokeWidth="1dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <!-- Image view for showing uploaded image -->
+                    <ImageView
+                        android:id="@+id/event_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
+
+                    <!-- Upload prompt (shown when no image) -->
+                    <LinearLayout
+                        android:id="@+id/upload_prompt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="?attr/colorSurfaceVariant"
+                        android:clickable="false"
+                        android:focusable="false">
+
+                        <ImageView
+                            android:id="@+id/icon_upload"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_camera"
+                            app:tint="?attr/colorOnSurfaceVariant"
+                            android:scaleType="centerCrop" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/upload_image"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Input Fields -->
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/delete_image"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_delete"
-                app:tint="#A0A0A0"
-                android:visibility="gone" />
-        </LinearLayout>
-
-        <!-- Input Fields -->
-        <EditText
-            android:id="@+id/input_event_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/event_name"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/input_event_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/event_description"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="textMultiLine"/>
-
-        <EditText
-            android:id="@+id/input_event_guidelines"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/event_guidelines"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="textMultiLine"/>
-
-        <EditText
-            android:id="@+id/input_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/location"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/input_event_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/what_time_does_event_occur"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/input_event_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/when_does_event_occur"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="date"/>
-
-        <EditText
-            android:id="@+id/input_event_duration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/how_long_will_event_occur_dd_mm_yyyy_dd_mm_yyyy"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <EditText
-            android:id="@+id/input_price"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/price_of_event"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="numberDecimal"/>
-
-        <EditText
-            android:id="@+id/input_capacity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/number_of_people_you_can_accommodate"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="number"/>
-
-        <EditText
-            android:id="@+id/input_registration_period"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/registration_period_dd_mm_yyyy_dd_mm_yyyy"
-            android:background="@color/bar"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"/>
-
-        <!-- Geolocation Switch -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="16dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/geolocation_for_participants"
-                android:textColor="@color/text"
-                android:textSize="16sp"/>
-
-            <Switch
-                android:id="@+id/switch_geolocation"
+                style="@style/Widget.Material3.Button.Icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:thumbTint="@color/text"
-                android:trackTint="@color/bar"/>
-        </LinearLayout>
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                app:icon="@drawable/ic_delete"
+                android:text="Delete"
+                android:textColor="?attr/colorOnSurface"
+                android:visibility="gone"
+                app:backgroundTint="#A67B5B"
+                app:cornerRadius="50dp"
+                app:iconGravity="textStart" />
 
-        <!-- Preview Button -->
-        <Button
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/name_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:hintTextColor="?attr/colorOnSurfaceVariant">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/event_name"
+                    android:inputType="textCapWords"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/description_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/event_description"
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:maxLines="5" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/guidelines_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_guidelines"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/event_guidelines"
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:maxLines="5" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/location_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/location"
+                    android:inputType="text"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Time Picker Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/time_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/what_time_does_event_occur"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Event Date Fields -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/start_date_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_start_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Start Date"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/end_date_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_end_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="End Date (Optional)"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Duration Field (Optional - you might remove this if dates cover duration) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/duration_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_duration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/how_long_will_event_occur_dd_mm_yyyy_dd_mm_yyyy"
+                    android:inputType="text"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/price_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:prefixText="$">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/price_of_event"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/capacity_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:suffixText="people">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_capacity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/number_of_people_you_can_accommodate"
+                    android:inputType="number"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/waiting_capacity_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:suffixText="people">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_waiting_list_capacity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Optional Waiting List Cap"
+                    android:inputType="number"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+            <!-- Registration Period Fields -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/registration_start_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_registration_start_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Registration Start Date"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/registration_end_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_registration_end_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Registration End Date (Optional)"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Geolocation Switch -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@android:color/transparent"
+                app:cardBackgroundColor="#A67B5B">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/geolocation_for_participants"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                        android:textColor="?attr/colorOnSurface"/>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_geolocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_preview_event"
+            style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="@color/text"
+            android:layout_gravity="center_horizontal"
             android:text="@string/preview_event"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:padding="12dp"
-            android:layout_gravity="center" />
+            android:visibility="visible"
+            app:backgroundTint="@color/navbar"/>
+        </LinearLayout>
+    </ScrollView>
 
-    </LinearLayout>
-</ScrollView>
+    <!-- Bottom navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+    android:id="@+id/bottomNavigationView"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:background="@color/bar"
+    app:menu="@menu/bottom_nav_menu"
+    app:itemIconTint="@color/nav_item_selector"
+    app:itemTextColor="@color/nav_item_selector"
+    app:labelVisibilityMode="labeled"
+    app:itemIconSize="30dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>

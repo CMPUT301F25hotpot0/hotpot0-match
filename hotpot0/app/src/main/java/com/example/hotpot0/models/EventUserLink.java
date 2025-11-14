@@ -12,11 +12,13 @@ import java.util.List;
  * </p>
  */
 public class EventUserLink {
+
+    // EventUserLink attributes
     private Integer userID;
     private Integer eventID;
     private String linkID;
     private Status status = new Status();
-    private List<String> notifications;
+    private ArrayList<String> notifications;
 
     /**
      * Default constructor required for Firestore deserialization.
@@ -34,8 +36,9 @@ public class EventUserLink {
         this.userID = userID;
         this.eventID = eventID;
         this.status.setStatus(status);
-        this.notifications = new ArrayList<>();
+        this.notifications = new ArrayList<String>();
     }
+
     /**
      * Constructs a new {@code EventUserLink} with a default status of {@code "inWaitList"}.
      * @param userID  the user’s unique ID
@@ -49,13 +52,8 @@ public class EventUserLink {
         this.notifications = new ArrayList<>();
     }
 
-    /**
-     * Adds a new notification message to this event-user link.
-     * @param notification the notification message to add
-     */
-    public void addNotification(String notification) {
-        notifications.add(notification);
-    }
+    // Getters and Setters
+    // =================
 
     /**
      * Retrieves the link ID, which uniquely identifies the user-event association.
@@ -111,6 +109,17 @@ public class EventUserLink {
      */
     public List<String> getNotifications() {
         return notifications;
+    }
+
+    // Utility Methods
+    // ===============
+
+    /**
+     * Adds a new notification message to this event-user link.
+     * @param notification the notification message to add
+     */
+    public void addNotification(String notification) {
+        notifications.add(notification);
     }
 
     /**

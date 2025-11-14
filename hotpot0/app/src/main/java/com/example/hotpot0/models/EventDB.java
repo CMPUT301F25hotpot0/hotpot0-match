@@ -53,9 +53,16 @@ public class EventDB {
         generateNewID(new GetCallback<Integer>() {
             @Override
             public void onSuccess(Integer newEventID) {
+                // Set the generated ID
                 event.setEventID(newEventID);
+
+                // Generate QR value right here
+                event.setQrValue("event:" + newEventID);
+
+                // Initialize participant arrays if null
                 if (event.getLinkIDs() == null) event.setLinkIDs(new ArrayList<>());
                 if (event.getSampledIDs() == null) event.setSampledIDs(new ArrayList<>());
+                if (event.getCancelledIDs() == null) event.setCancelledIDs(new ArrayList<>());
 
                 db.collection(EVENT_COLLECTION).document(String.valueOf(newEventID))
                         .set(event)
@@ -84,19 +91,30 @@ public class EventDB {
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
         java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        updates.put("organizerID", event.getOrganizerID());
         updates.put("name", event.getName());
         updates.put("description", event.getDescription());
         updates.put("guidelines", event.getGuidelines());
         updates.put("location", event.getLocation());
         updates.put("time", event.getTime());
-        updates.put("date", event.getDate());
+        updates.put("startDate", event.getStartDate());
+        updates.put("endDate", event.getEndDate());
         updates.put("duration", event.getDuration());
+        updates.put("regStartDate", event.getRegistrationStart());
+        updates.put("regEndDate", event.getRegistrationEnd());
+
         updates.put("capacity", event.getCapacity());
         updates.put("price", event.getPrice());
-        updates.put("registration_period", event.getRegistration_period());
+        updates.put("waitingListCapacity", event.getWaitingListCapacity());
+
         updates.put("imageURL", event.getImageURL());
+        updates.put("qrValue", event.getQrValue());
         updates.put("geolocationRequired", event.getGeolocationRequired());
         updates.put("isEventActive", event.getIsEventActive());
+
+        updates.put("linkIDs", event.getLinkIDs());
+        updates.put("sampledIDs", event.getSampledIDs());
+        updates.put("cancelledIDs", event.getCancelledIDs());
 
         eventRef.update(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
@@ -391,5 +409,13 @@ public class EventDB {
                 callback.onFailure(e);
             }
         });
+    }
+
+    public void updateEventImageURL(Event event, String imageURL, GetCallback<Void> callback) {
+        db.collection(EVENT_COLLECTION)
+                .document(String.valueOf(event.getEventID()))
+                .update("imageURL", imageURL)
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
     }
 }

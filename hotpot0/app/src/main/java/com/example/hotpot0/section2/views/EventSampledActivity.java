@@ -104,11 +104,11 @@ public class EventSampledActivity extends AppCompatActivity {
         previewGuidelines.setText(currentEvent.getGuidelines());
         previewLocation.setText("Location: " + currentEvent.getLocation());
         previewTimeAndDay.setText("Time: " + currentEvent.getTime());
-        previewDateRange.setText("Date: " + currentEvent.getDate());
+        // previewDateRange.setText("Date: " + currentEvent.getDate());
         previewDuration.setText("Duration: " + currentEvent.getDuration());
         previewPrice.setText("Price: $" + currentEvent.getPrice());
         previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
-        previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
+        // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
         boolean geolocationEnabled = currentEvent.getGeolocationRequired();
         GeolocationStatus.setVisibility(View.VISIBLE);

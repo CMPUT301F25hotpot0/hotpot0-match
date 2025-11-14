@@ -20,10 +20,8 @@ import java.util.List;
  */
 public class EventUserLinkDB {
 
-    // Firestore instance
+    // EventUserLinkDB attributes
     private final FirebaseFirestore db;
-
-    // Collection name for EventUserLink
     private static final String EVENT_USER_LINK_COLLECTION = "EventUserLinks";
 
     /** Initializes a new {@code EventUserLinkDB} and connects to Firestore. */
@@ -63,6 +61,9 @@ public class EventUserLinkDB {
          */
         void onFailure(Exception e);
     }
+
+    // Utility Methods
+    // ===============
 
     /**
      * Adds a new EventUserLink and returns the created EventUserLink on success.
@@ -158,27 +159,6 @@ public class EventUserLinkDB {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
-
-//    public List<String> getWaitListUsers(List<String> linkIDs) {
-//        List<String> waitListUsers = new ArrayList<>();
-//        for (String linkID : linkIDs) {
-//            getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
-//                @Override
-//                public void onSuccess(EventUserLink result) {
-//                    if (result.getStatus().equals("inWaitList")) {
-//                        waitListUsers.add(result.getLinkID());
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Exception e) {
-//                    // Handle failure (e.g., log the error)
-//
-//                }
-//            });
-//        }
-//        return waitListUsers;
-//    }
 
     /**
      * Retrieves all user link IDs currently marked as {@code "inWaitList"}

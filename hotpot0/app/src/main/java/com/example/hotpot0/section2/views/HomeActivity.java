@@ -1,23 +1,18 @@
 package com.example.hotpot0.section2.views;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ListView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.hotpot0.R;
+import android.content.Intent;
+import android.widget.ListView;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
+import androidx.appcompat.app.AppCompatActivity;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
-import com.example.hotpot0.models.ProfileDB;
-import com.example.hotpot0.models.Status;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Home activity that displays the user's events in three categories:
@@ -26,21 +21,28 @@ import java.util.List;
  */
 public class HomeActivity extends AppCompatActivity {
 
-    private BottomNavigationView bottomNavigationView;
-    private ListView confirmedList, pendingList, pastList;
+    // Class Variables
+    private int userID;
     private EventDB eventDB;
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
-    private int userID;
+
+    // Android UI Elements
+    private ListView confirmedList, pendingList, pastList;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Retrieve userID from SharedPreferences
         userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
         setContentView(R.layout.section2_userhome_activity);
 
+        // Handling Bottom Navigation Bar
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
+        // Set default selected item
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        // Setting up listener for navigation item selection
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -48,6 +50,7 @@ public class HomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(HomeActivity.this, CreateEventActivity.class);
                 startActivity(intent);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 return true;
             }
 
@@ -55,6 +58,7 @@ public class HomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(HomeActivity.this, SearchActivity.class);
                 startActivity(intent);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 return true;
             }
 
@@ -62,6 +66,7 @@ public class HomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(HomeActivity.this, NotificationsActivity.class);
                 startActivity(intent);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 return true;
             }
 
@@ -69,30 +74,23 @@ public class HomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
                 startActivity(intent);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 return true;
             }
 
             return false;
         });
 
+        // Initialize ListViews
         confirmedList = findViewById(R.id.confirmed_list);
-        pendingList = findViewById(R.id.pending_list);
-        pastList = findViewById(R.id.past_list);
+        pendingList   = findViewById(R.id.pending_list);
+        pastList      = findViewById(R.id.past_list);
 
+        // Initialize EventDB
         eventDB = new EventDB();
 
+        // Load user events into the lists
         loadUserEvents();
-    }
-
-    /**
-     * Ensures the Home tab remains selected when returning
-     * to this activity.
-     */
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Ensures Home tab stays selected when coming back
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
     }
 
     /**
@@ -101,6 +99,8 @@ public class HomeActivity extends AppCompatActivity {
      * user's EventUserLink status and whether the event is active.
      */
     private void loadUserEvents() {
+
+        // Fetch all events from the database, Returns List of Event Objects
         eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
             @Override
             public void onSuccess(List<Event> allEvents) {
@@ -112,22 +112,30 @@ public class HomeActivity extends AppCompatActivity {
                 List<String> pendingStatuses = new ArrayList<>();
                 List<String> pastStatuses = new ArrayList<>();
 
+                // Handle case where no events are found
                 if (allEvents.isEmpty()) {
                     Toast.makeText(HomeActivity.this, "No events found", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                // Iterate through all events to categorize them
                 for (Event event : allEvents) {
-                    String linkID = event.getEventID() + "_" + userID;
 
+                    // Construct linkID using eventID and userID to find the relevant EventUserLink
+                    String linkID = event.getEventID() + "_" + userID;
+                    // Fetch the EventUserLink for the current event and user, Returns EventUserLink Object
                     eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+
                         @Override
                         public void onSuccess(EventUserLink link) {
-                            if (link == null || link.getStatus() == null) return;
 
+                            // If no link or status is found, skip this event
+                            if (link == null || link.getStatus() == null) return;
+                            // Determine the status and categorize the event accordingly
                             String status = link.getStatus();
                             boolean isActive = event.getIsEventActive() != null && event.getIsEventActive();
 
+                            // Categorize event based on status and activity
                             if (!isActive) {
                                 past.add(event);
                                 pastStatuses.add(status);
@@ -139,8 +147,8 @@ public class HomeActivity extends AppCompatActivity {
                                 pending.add(event);
                                 pendingStatuses.add(status);
                             }
-                            else if ((status.equals("Accepted") && !isActive) || status.equals("Declined") ||
-                                    status.equals("Cancelled") || (status.equals("Organizer") && !isActive)) {
+                            // Removed (status.equals("Accepted") && !isActive) & (status.equals("Organizer") && !isActive) - they are covered in the first if condition
+                            else if (status.equals("Declined") || status.equals("Cancelled")) {
                                 past.add(event);
                                 pastStatuses.add(status);
                             }
@@ -154,6 +162,7 @@ public class HomeActivity extends AppCompatActivity {
                             });
                         }
 
+                        // Handle failure to fetch EventUserLink from EventUserLinkDB
                         @Override
                         public void onFailure(Exception e) {
                             // No EventUserLink found — ignore quietly
@@ -162,10 +171,36 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
 
+            // Handle failure to fetch events from EventDB
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(HomeActivity.this, "Error loading events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Trying to ensure data is refreshed when returning to HomeActivity & Navigation Bar is updated
+    private void refreshData() {
+        // Clear existing lists and reload fresh data
+        if (confirmedList != null) confirmedList.setAdapter(null);
+        if (pendingList != null) pendingList.setAdapter(null);
+        if (pastList != null) pastList.setAdapter(null);
+
+        loadUserEvents(); // Your existing method
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data every time the activity comes to foreground
+        loadUserEvents();
+        // Refresh navigation state
+        bottomNavigationView.setSelectedItemId(R.id.nav_home); // Assuming you have a home nav item
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        // Refresh your data
+        refreshData();
     }
 }

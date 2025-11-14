@@ -40,9 +40,11 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.google.android.material:material:1.12.x")
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }

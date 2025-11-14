@@ -50,8 +50,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:dividerHeight="1dp"
-                android:layout_marginBottom="16dp" />
+                android:dividerHeight="12dp"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"
+                android:divider="@android:color/transparent" />
 
 
             <!-- Pending Section -->
@@ -71,7 +73,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="16dp"
-                android:dividerHeight="1dp"/>
+                android:dividerHeight="12dp"
+                android:background="@android:color/transparent"
+                android:divider="@android:color/transparent"/>
 
 
             <!-- Past Events Section -->
@@ -91,7 +95,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="16dp"
-                android:dividerHeight="1dp"/>
+                android:dividerHeight="12dp"
+                android:background="@android:color/transparent"
+                android:divider="@android:color/transparent" />
 
         </LinearLayout>
     </ScrollView>

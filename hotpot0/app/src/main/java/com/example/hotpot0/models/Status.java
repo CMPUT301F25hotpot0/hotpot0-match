@@ -24,10 +24,10 @@ public class Status {
         statuses.add("Accepted");
         statuses.add("Declined");
         statuses.add("Organizer");
-//        statuses.add("OrganizerPreSample");
         statuses.add("Sampled");
         statuses.add("Cancelled");
-//        statuses.add("OrganizerPostSample");
+        // statuses.add("OrganizerPreSample");
+        // statuses.add("OrganizerPostSample");
     }
 
     /**

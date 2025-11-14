@@ -81,11 +81,11 @@ public class EventInitialActivity extends AppCompatActivity {
                 previewGuidelines.setText(currentEvent.getGuidelines());
                 previewLocation.setText("Location: " + currentEvent.getLocation());
                 previewTimeAndDay.setText("Time: " + currentEvent.getTime());
-                previewDateRange.setText("Date: " + currentEvent.getDate());
+                // previewDateRange.setText("Date: " + currentEvent.getDate());
                 previewDuration.setText("Duration: " + currentEvent.getDuration());
                 previewPrice.setText("Price: $" + currentEvent.getPrice());
                 previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
-                previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
+                // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
                 // Handle geolocation status
                 boolean geolocationEnabled = currentEvent.getGeolocationRequired(); // Assuming you have this info in your event model

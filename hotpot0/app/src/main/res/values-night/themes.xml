@@ -3,5 +3,7 @@
     <style name="Base.Theme.Hotpot0" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:statusBarColor">@color/statusbar</item>
+        <item name="android:navigationBarColor">@color/navbar</item>
     </style>
 </resources>
