@@ -415,7 +415,7 @@ public class CreateEventActivity extends AppCompatActivity {
         intent.putExtra("registrationEnd", inputRegistrationEndDate.getText().toString().trim());
         intent.putExtra("geolocationEnabled", geolocationStatus.isChecked());
 
-        // ✅ Pass URI instead of bitmap
+        // Pass URI instead of bitmap
         if (eventImageUri != null) {
             intent.putExtra("imageUri", eventImageUri.toString());
         } else if (eventImageBitmap != null) {
@@ -431,6 +431,7 @@ public class CreateEventActivity extends AppCompatActivity {
      * Validates that all required fields are filled
      */
     private boolean validateRequiredFields() {
+
         if (TextUtils.isEmpty(name.getText().toString().trim())) {
             name.setError("Required");
             name.requestFocus();
@@ -485,11 +486,13 @@ public class CreateEventActivity extends AppCompatActivity {
             return false;
         }
 
-        if (TextUtils.isEmpty(inputEventEndDate.getText().toString().trim())) {
-            inputEventEndDate.setError("Required");
-            inputEventEndDate.requestFocus();
-            return false;
-        }
+        // Maybe we should keep Event End Date as optional
+
+//        if (TextUtils.isEmpty(inputEventEndDate.getText().toString().trim())) {
+//            inputEventEndDate.setError("Required");
+//            inputEventEndDate.requestFocus();
+//            return false;
+//        }
 
         if (TextUtils.isEmpty(inputRegistrationStartDate.getText().toString().trim())) {
             inputRegistrationStartDate.setError("Required");

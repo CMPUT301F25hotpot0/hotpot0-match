@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +15,8 @@ import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +33,14 @@ public class SearchActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
     private ListView eventListView;
-    private SearchView searchView;
+    private TextInputEditText searchEditText;
     private EventDB eventDB;
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
     private ImageButton infoButton;
+    private ImageButton scanQrButton;
+    private Chip interestsFilterChip;
+    private Chip fromDateFilterChip;
+    private Chip toDateFilterChip;
     private int userID;
 
     /**
@@ -51,12 +56,19 @@ public class SearchActivity extends AppCompatActivity {
 
         // Initialize UI elements
         eventListView = findViewById(R.id.event_list_view);
-        searchView = findViewById(R.id.searchView);
+        searchEditText = findViewById(R.id.searchEditText);
         bottomNav = findViewById(R.id.bottomNavigationView);
         infoButton = findViewById(R.id.info_button);
+        scanQrButton = findViewById(R.id.scan_qr_button);
+
+        // Initialize filter chips
+        interestsFilterChip = findViewById(R.id.interestsFilterChip);
+        fromDateFilterChip = findViewById(R.id.fromDateFilterChip);
+        toDateFilterChip = findViewById(R.id.toDateFilterChip);
 
         userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
 
+        // Info button functionality
         infoButton.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Welcome to Eventure!")
@@ -76,6 +88,28 @@ public class SearchActivity extends AppCompatActivity {
                             "• View your profile in the Profile Tab. ")
                     .setPositiveButton("Ok", null)
                     .show();
+        });
+
+        // QR Scan button functionality
+        scanQrButton.setOnClickListener(v -> {
+            // TODO: Implement QR scanning functionality
+            Toast.makeText(this, "QR Scanner functionality to be implemented", Toast.LENGTH_SHORT).show();
+        });
+
+        // Filter chips functionality
+        interestsFilterChip.setOnClickListener(v -> {
+            // TODO: Implement interests selection popup
+            Toast.makeText(this, "Interests filter to be implemented", Toast.LENGTH_SHORT).show();
+        });
+
+        fromDateFilterChip.setOnClickListener(v -> {
+            // TODO: Implement from date picker
+            Toast.makeText(this, "From date filter to be implemented", Toast.LENGTH_SHORT).show();
+        });
+
+        toDateFilterChip.setOnClickListener(v -> {
+            // TODO: Implement to date picker
+            Toast.makeText(this, "To date filter to be implemented", Toast.LENGTH_SHORT).show();
         });
 
         eventDB = new EventDB();
@@ -110,18 +144,25 @@ public class SearchActivity extends AppCompatActivity {
         loadAllEvents();
 
         // Search functionality
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchEditText.setOnClickListener(v -> {
+            // Clear the hint text when user clicks to type
+            if (searchEditText.getText().toString().isEmpty()) {
+                searchEditText.setHint("");
+            }
+        });
+
+        // Add text watcher for real-time search
+        searchEditText.addTextChangedListener(new android.text.TextWatcher() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterEvents(query);
-                return true;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterEvents(s.toString());
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                filterEvents(newText);
-                return true;
-            }
+            public void afterTextChanged(android.text.Editable s) {}
         });
     }
 

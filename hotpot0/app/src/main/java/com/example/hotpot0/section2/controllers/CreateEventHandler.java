@@ -70,7 +70,7 @@ public class CreateEventHandler {
 
         Uri imageUri = imageUriString != null ? Uri.parse(imageUriString) : null;
 
-        // 1. Create event object WITHOUT imageURL and qrValue
+        // Create event object
         Event event = new Event(
                 organizerID,
                 name,
@@ -87,7 +87,7 @@ public class CreateEventHandler {
                 regStart,
                 regEnd,
                 null,         // imageURL is null initially
-                null,         // qrValue is null initially
+                null,                  // qrValue is null initially
                 geolocationRequired
         );
 
