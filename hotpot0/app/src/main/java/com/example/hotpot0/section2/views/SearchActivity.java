@@ -31,6 +31,7 @@ import java.util.List;
  */
 public class SearchActivity extends AppCompatActivity {
 
+    private int userID;
     private BottomNavigationView bottomNav;
     private ListView eventListView;
     private TextInputEditText searchEditText;
@@ -41,7 +42,6 @@ public class SearchActivity extends AppCompatActivity {
     private Chip interestsFilterChip;
     private Chip fromDateFilterChip;
     private Chip toDateFilterChip;
-    private int userID;
 
     /**
      * Initializes the activity, sets up UI elements, bottom navigation,

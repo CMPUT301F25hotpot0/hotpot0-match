@@ -58,18 +58,16 @@ public class PreviewActivity extends AppCompatActivity {
         String imageUriString = intent.getStringExtra("imageUri");
 
         // Populate fields
-        populatePreviewFields(name, description, guidelines, location, time,
-                startDate, endDate, duration, price, capacity,
-                waitingList, registrationStart, registrationEnd,
-                geolocationEnabled, imageUriString);
+        populatePreviewFields(name, description, guidelines, location, time, startDate, endDate, duration, price, capacity,
+                waitingList, registrationStart, registrationEnd, geolocationEnabled, imageUriString);
 
         // Set up button listeners
-        setupButtonListeners(userID, name, description, guidelines, location, time,
-                startDate, endDate, duration, price, capacity, waitingList,
+        setupButtonListeners(userID, name, description, guidelines, location, time, startDate, endDate, duration, price, capacity, waitingList,
                 registrationStart, registrationEnd, geolocationEnabled, imageUriString);
     }
 
     private void initializeViews() {
+
         eventImage = findViewById(R.id.eventImage);
         previewEventName = findViewById(R.id.previewEventName);
         previewDescription = findViewById(R.id.previewDescription);
@@ -87,11 +85,8 @@ public class PreviewActivity extends AppCompatActivity {
         backButton = findViewById(R.id.button_BottomBackPreviewEvent);
     }
 
-    private void populatePreviewFields(String name, String description, String guidelines,
-                                       String location, String time, String startDate,
-                                       String endDate, String duration, String price,
-                                       String capacity, String waitingList,
-                                       String registrationStart, String registrationEnd,
+    private void populatePreviewFields(String name, String description, String guidelines, String location, String time, String startDate,
+                                       String endDate, String duration, String price, String capacity, String waitingList, String registrationStart, String registrationEnd,
                                        boolean geolocationEnabled, String imageUriString) {
 
         // Set text values
@@ -130,101 +125,11 @@ public class PreviewActivity extends AppCompatActivity {
         loadEventImage(imageUriString);
     }
 
-    private String buildDateRange(String startDate, String endDate) {
-        if (startDate != null && endDate != null) {
-            return startDate + " to " + endDate;
-        } else if (startDate != null) {
-            return startDate + " (Single day event)";
-        } else {
-            return "No dates specified";
-        }
-    }
+    private void setupButtonListeners(int userID, String name, String description, String guidelines, String location, String time,
+                                      String startDate, String endDate, String duration, String price, String capacity, String waitingList,
+                                      String registrationStart, String registrationEnd, boolean geolocationEnabled, String imageUriString) {
 
-    private String formatPrice(String price) {
-        if (price == null || price.isEmpty()) {
-            return "Free";
-        }
-
-        try {
-            double priceValue = Double.parseDouble(price);
-            if (priceValue == 0) {
-                return "Free";
-            } else {
-                return String.format("$%.2f CAD", priceValue);
-            }
-        } catch (NumberFormatException e) {
-            return "Invalid price";
-        }
-    }
-
-    private String formatCapacity(String capacity) {
-        if (capacity == null || capacity.isEmpty()) {
-            return "Capacity not specified";
-        }
-
-        try {
-            int capacityValue = Integer.parseInt(capacity);
-            return capacityValue + " spots";
-        } catch (NumberFormatException e) {
-            return "Invalid capacity";
-        }
-    }
-
-    private String formatWaitingList(String waitingList) {
-        if (waitingList == null || waitingList.isEmpty() || waitingList.equals("0")) {
-            return "No Cap on waiting list";
-        }
-
-        try {
-            int waitingListValue = Integer.parseInt(waitingList);
-            return waitingListValue + " waiting list spots";
-        } catch (NumberFormatException e) {
-            return "Invalid waiting list capacity";
-        }
-    }
-
-    private String buildRegistrationPeriod(String registrationStart, String registrationEnd) {
-        if (registrationStart != null && registrationEnd != null) {
-            return registrationStart + " to " + registrationEnd;
-        } else if (registrationStart != null) {
-            return "Starts: " + registrationStart;
-        } else {
-            return "Registration period not specified";
-        }
-    }
-
-    private void updateGeolocationStatus(boolean geolocationEnabled) {
-        if (geolocationEnabled) {
-            previewGeolocation.setText("NOTE: Geolocation tracking enabled");
-            previewGeolocation.setVisibility(View.VISIBLE);
-        } else {
-            previewGeolocation.setVisibility(View.GONE);
-        }
-    }
-
-    private void loadEventImage(String imageUriString) {
-        if (imageUriString != null && !imageUriString.isEmpty()) {
-            try {
-                Uri imageUri = Uri.parse(imageUriString);
-                eventImage.setImageURI(imageUri); // simple and direct
-            } catch (Exception e) {
-                e.printStackTrace();
-                eventImage.setImageResource(R.drawable.ic_camera);
-            }
-        } else {
-            eventImage.setImageResource(R.drawable.ic_camera);
-        }
-    }
-
-
-    private void setupButtonListeners(int userID, String name, String description,
-                                      String guidelines, String location, String time,
-                                      String startDate, String endDate, String duration,
-                                      String price, String capacity, String waitingList,
-                                      String registrationStart, String registrationEnd,
-                                      boolean geolocationEnabled, String imageUriString) {
-
-        // Confirm button → create event in database
+        // Confirm button --> create event in database
         confirmButton.setOnClickListener(v -> {
             confirmButton.setEnabled(false);
             confirmButton.setText("Creating Event...");
@@ -236,18 +141,15 @@ public class PreviewActivity extends AppCompatActivity {
                     geolocationEnabled, imageUriString);
         });
 
-        // Back button → return to CreateEventActivity
+        // Back button --> return to CreateEventActivity
         backButton.setOnClickListener(v -> {
             finish();
         });
     }
 
-    private void createEventWithValidation(int userID, String name, String description,
-                                           String guidelines, String location, String time,
-                                           String startDate, String endDate, String duration,
-                                           String price, String capacity, String waitingList,
-                                           String registrationStart, String registrationEnd,
-                                           boolean geolocationEnabled, String imageUriString) {
+    private void createEventWithValidation(int userID, String name, String description, String guidelines, String location, String time,
+                                           String startDate, String endDate, String duration, String price, String capacity, String waitingList,
+                                           String registrationStart, String registrationEnd, boolean geolocationEnabled, String imageUriString) {
 
         // Validate required fields
         if (!validateEventData(name, description, guidelines, location, time,
@@ -342,10 +244,10 @@ public class PreviewActivity extends AppCompatActivity {
         );
     }
 
-    private boolean validateEventData(String name, String description, String guidelines,
-                                      String location, String time, String startDate,
-                                      String duration, String price, String capacity,
-                                      String registrationStart) {
+    // Helper Methods
+
+    private boolean validateEventData(String name, String description, String guidelines, String location, String time, String startDate,
+                                      String duration, String price, String capacity, String registrationStart) {
 
         if (name == null || name.trim().isEmpty()) {
             Toast.makeText(this, "Event name is required", Toast.LENGTH_SHORT).show();
@@ -403,6 +305,92 @@ public class PreviewActivity extends AppCompatActivity {
     private void resetButtonState() {
         confirmButton.setEnabled(true);
         confirmButton.setText("Confirm");
+    }
+
+    private String buildDateRange(String startDate, String endDate) {
+        if (startDate != null && endDate != null) {
+            return startDate + " to " + endDate;
+        } else if (startDate != null) {
+            return startDate + " (Single day event)";
+        } else {
+            return "No dates specified";
+        }
+    }
+
+    private String formatPrice(String price) {
+        if (price == null || price.isEmpty()) {
+            return "Free";
+        }
+
+        try {
+            double priceValue = Double.parseDouble(price);
+            if (priceValue == 0) {
+                return "Free";
+            } else {
+                return String.format("$%.2f CAD", priceValue);
+            }
+        } catch (NumberFormatException e) {
+            return "Invalid price";
+        }
+    }
+
+    private String formatCapacity(String capacity) {
+        if (capacity == null || capacity.isEmpty()) {
+            return "Capacity not specified";
+        }
+
+        try {
+            int capacityValue = Integer.parseInt(capacity);
+            return capacityValue + " spots";
+        } catch (NumberFormatException e) {
+            return "Invalid capacity";
+        }
+    }
+
+    private String formatWaitingList(String waitingList) {
+        if (waitingList == null || waitingList.isEmpty() || waitingList.equals("0")) {
+            return "No Cap on waiting list";
+        }
+
+        try {
+            int waitingListValue = Integer.parseInt(waitingList);
+            return waitingListValue + " waiting list spots";
+        } catch (NumberFormatException e) {
+            return "Invalid waiting list capacity";
+        }
+    }
+
+    private String buildRegistrationPeriod(String registrationStart, String registrationEnd) {
+        if (registrationStart != null && registrationEnd != null) {
+            return registrationStart + " to " + registrationEnd;
+        } else if (registrationStart != null) {
+            return "Starts: " + registrationStart;
+        } else {
+            return "Registration period not specified";
+        }
+    }
+
+    private void updateGeolocationStatus(boolean geolocationEnabled) {
+        if (geolocationEnabled) {
+            previewGeolocation.setText("NOTE: Geolocation tracking enabled");
+            previewGeolocation.setVisibility(View.VISIBLE);
+        } else {
+            previewGeolocation.setVisibility(View.GONE);
+        }
+    }
+
+    private void loadEventImage(String imageUriString) {
+        if (imageUriString != null && !imageUriString.isEmpty()) {
+            try {
+                Uri imageUri = Uri.parse(imageUriString);
+                eventImage.setImageURI(imageUri); // simple and direct
+            } catch (Exception e) {
+                e.printStackTrace();
+                eventImage.setImageResource(R.drawable.ic_camera);
+            }
+        } else {
+            eventImage.setImageResource(R.drawable.ic_camera);
+        }
     }
 
     private Uri getSafeUriForUpload(Uri originalUri) {
