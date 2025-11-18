@@ -55,14 +55,11 @@ public class CreateEventActivity extends AppCompatActivity {
     private MaterialCardView uploadSection;
     private SwitchMaterial geolocationStatus;
     private TextInputEditText name, description, guidelines, location, duration, price, capacity, waitingListCapacity;
-
-    // New fields for date pickers
     private TextInputEditText inputEventTime;
     private TextInputEditText inputEventEndDate;
     private TextInputEditText inputEventStartDate;
     private TextInputEditText inputRegistrationEndDate;
     private TextInputEditText inputRegistrationStartDate;
-
     private Calendar calendar;
     private Calendar regStartCalendar, regEndCalendar;
     private Calendar eventStartCalendar, eventEndCalendar;

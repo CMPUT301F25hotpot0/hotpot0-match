@@ -418,4 +418,26 @@ public class EventDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
+
+    // Firestore lookup by qrValue
+    public void getEventByQrValue(String qrValue, GetCallback<Event> callback) {
+
+        db.collection("Events")
+                .whereEqualTo("qrValue", qrValue)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.isEmpty()) {
+                        // Indicate NOT FOUND by returning null
+                        callback.onSuccess(null);
+                        return;
+                    }
+
+                    Event event = snapshot.getDocuments()
+                            .get(0)
+                            .toObject(Event.class);
+
+                    callback.onSuccess(event);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
 }

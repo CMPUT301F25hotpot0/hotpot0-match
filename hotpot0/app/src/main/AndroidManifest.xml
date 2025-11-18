@@ -8,6 +8,7 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -40,6 +41,8 @@
         <activity android:name=".section2.views.EventInitialActivity"/>
         <activity android:name=".section2.views.OrganizerEventActivity" />
         <activity android:name=".section2.views.EventSampledActivity" />
+        <activity android:name=".section2.views.QRActivity" android:exported="false"/>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

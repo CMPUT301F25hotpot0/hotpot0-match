@@ -95,10 +95,11 @@ public class SearchActivity extends AppCompatActivity {
                     .show();
         });
 
-        // QR Scan button functionality
         scanQrButton.setOnClickListener(v -> {
-            // TODO: Implement QR scanning functionality
-            Toast.makeText(this, "QR Scanner functionality to be implemented", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Launching Camera", Toast.LENGTH_SHORT).show();
+            // Launch QRActivity
+            Intent intent = new Intent(SearchActivity.this, QRActivity.class);
+            startActivity(intent);
         });
 
         // Filter chips functionality

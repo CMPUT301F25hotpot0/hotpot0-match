@@ -2,47 +2,60 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#A8A8A8">
-    tools:context=".Section3QrCodeSearchActivity">
+    android:background="@drawable/gradient_background">
 
-
-    <Button
+    <!-- Back Button -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_BackQrCode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/back"
-        android:backgroundTint="@color/text"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text"
+        android:backgroundTint="@color/bar"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        app:icon="@drawable/ic_back"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="24dp"/>
+        app:layout_constraintStart_toStartOf="parent"/>
 
-
+    <!-- Instruction Text -->
     <TextView
         android:id="@+id/tvInstruction"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:text="@string/qr_text"
-        android:textColor="#000"
-        android:textSize="18sp"
+        android:textColor="@color/text"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/previewView"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="18sp"
+        android:layout_marginTop="24dp"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/button_BackQrCode"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_BackQrCode" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Camera Preview Box (centered) -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/previewView"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:background="@drawable/qr_box_border"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+    <!-- Camera Preview Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/previewCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="20dp"
+        app:cardElevation="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="@color/bar"
+        app:layout_constraintTop_toBottomOf="@id/tvInstruction"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Camera Preview View inside Card -->
+        <com.journeyapps.barcodescanner.CompoundBarcodeView
+            android:id="@+id/barcodeScannerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </com.google.android.material.card.MaterialCardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
