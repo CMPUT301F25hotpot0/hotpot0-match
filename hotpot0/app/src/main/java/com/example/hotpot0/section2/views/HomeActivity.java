@@ -1,6 +1,7 @@
 package com.example.hotpot0.section2.views;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 import com.example.hotpot0.R;
 import android.content.Intent;
@@ -40,46 +41,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Handling Bottom Navigation Bar
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        // Set default selected item
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
-        // Setting up listener for navigation item selection
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_events) {
-                Intent intent = new Intent(HomeActivity.this, CreateEventActivity.class);
-                startActivity(intent);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
-                return true;
-            }
-
-            if (id == R.id.nav_search) {
-                Intent intent = new Intent(HomeActivity.this, SearchActivity.class);
-                startActivity(intent);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
-                return true;
-            }
-
-            if (id == R.id.nav_notifications) {
-                Intent intent = new Intent(HomeActivity.this, NotificationsActivity.class);
-                startActivity(intent);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
-                return true;
-            }
-
-            if (id == R.id.nav_profile) {
-                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-                startActivity(intent);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
-                return true;
-            }
-
-            return false;
-        });
+        setupBottomNavigation();
 
         // Initialize ListViews
         confirmedList = findViewById(R.id.confirmed_list);
@@ -155,10 +117,17 @@ public class HomeActivity extends AppCompatActivity {
 
                             // Update adapters each time a new event's link is retrieved
                             runOnUiThread(() -> {
-                                // Pass the userID to the adapter
                                 confirmedList.setAdapter(new EventBlobAdapter(HomeActivity.this, confirmed, confirmedStatuses, userID));
+                                expandListView(confirmedList);
+                                fadeIn(confirmedList);
+
                                 pendingList.setAdapter(new EventBlobAdapter(HomeActivity.this, pending, pendingStatuses, userID));
+                                expandListView(pendingList);
+                                fadeIn(pendingList);
+
                                 pastList.setAdapter(new EventBlobAdapter(HomeActivity.this, past, pastStatuses, userID));
+                                expandListView(pastList);
+                                fadeIn(pastList);
                             });
                         }
 
@@ -202,5 +171,73 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
         // Refresh your data
         refreshData();
+    }
+
+    private void setupBottomNavigation() {
+        // Set default selected item
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        // Setting up listener for navigation item selection
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_events) {
+                Intent intent = new Intent(HomeActivity.this, CreateEventActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_search) {
+                Intent intent = new Intent(HomeActivity.this, SearchActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_notifications) {
+                Intent intent = new Intent(HomeActivity.this, NotificationsActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            return false;
+        });
+    }
+    // Expand ListView to show all items
+    private void expandListView(ListView listView) {
+        android.widget.ListAdapter adapter = listView.getAdapter();
+        if (adapter == null) return;
+
+        int totalHeight = 0;
+        for (int i = 0; i < adapter.getCount(); i++) {
+            android.view.View listItem = adapter.getView(i, null, listView);
+            listItem.measure(
+                    View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.UNSPECIFIED
+            );
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        android.view.ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (adapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+    }
+    // Animation
+    private void fadeIn(View view) {
+        view.setAlpha(0f);
+        view.animate().alpha(1f).setDuration(300).start();
     }
 }

@@ -383,13 +383,14 @@ public class PreviewActivity extends AppCompatActivity {
         if (imageUriString != null && !imageUriString.isEmpty()) {
             try {
                 Uri imageUri = Uri.parse(imageUriString);
-                eventImage.setImageURI(imageUri); // simple and direct
+                eventImage.setImageURI(imageUri);
+                eventImage.setVisibility(View.VISIBLE); // show if image exists
             } catch (Exception e) {
                 e.printStackTrace();
-                eventImage.setImageResource(R.drawable.ic_camera);
+                eventImage.setVisibility(View.GONE); // hide if error
             }
         } else {
-            eventImage.setImageResource(R.drawable.ic_camera);
+            eventImage.setVisibility(View.GONE); // hide if no image
         }
     }
 

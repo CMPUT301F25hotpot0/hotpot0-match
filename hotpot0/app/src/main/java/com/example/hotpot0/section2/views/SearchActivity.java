@@ -3,6 +3,7 @@ package com.example.hotpot0.section2.views;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -67,6 +68,10 @@ public class SearchActivity extends AppCompatActivity {
         toDateFilterChip = findViewById(R.id.toDateFilterChip);
 
         userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+
+        // Handling Bottom Navigation Bar
+        bottomNav = findViewById(R.id.bottomNavigationView);
+        setupBottomNavigation();
 
         // Info button functionality
         infoButton.setOnClickListener(v -> {
@@ -216,6 +221,7 @@ public class SearchActivity extends AppCompatActivity {
                             if (events.size() == allEvents.size()) {
                                 runOnUiThread(() -> {
                                     eventListView.setAdapter(new EventBlobAdapter(SearchActivity.this, events, statuses, userID));
+                                    fadeIn(eventListView);
                                 });
                             }
                         }
@@ -254,6 +260,7 @@ public class SearchActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     EventBlobAdapter adapter = new EventBlobAdapter(SearchActivity.this, filteredEvents, statuses, userID);
                     eventListView.setAdapter(adapter);
+                    fadeIn(eventListView);
                 });
             }
 
@@ -261,6 +268,54 @@ public class SearchActivity extends AppCompatActivity {
             public void onFailure(Exception e) {
                 Toast.makeText(SearchActivity.this, "Error filtering events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    private void fadeIn(View view) {
+        view.setAlpha(0f);
+        view.animate().alpha(1f).setDuration(300).start();
+    }
+
+    private void setupBottomNavigation() {
+        // Highlight the Search tab when entering this activity
+        bottomNav.setSelectedItemId(R.id.nav_search);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(SearchActivity.this, HomeActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_events) {
+                startActivity(new Intent(SearchActivity.this, CreateEventActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_search) {
+                return true;
+            }
+
+            if (id == R.id.nav_notifications) {
+                startActivity(new Intent(SearchActivity.this, NotificationsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                startActivity(new Intent(SearchActivity.this, ProfileActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            return false;
         });
     }
 }
