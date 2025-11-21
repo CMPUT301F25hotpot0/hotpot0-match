@@ -146,6 +146,24 @@ public class ProfileEditHandler {
             @Override
             public void onSuccess(UserProfile user) {
                 ArrayList<String> linkIDs = user.getLinkIDs();
+                if (linkIDs == null || linkIDs.isEmpty()) {
+                    // No links to delete, proceed to delete user profile
+                    profileDB.deleteUser(userID, new ProfileDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notify that the profile was successfully deleted
+                            callback.onSuccess();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Notify failure in deleting the profile
+                            callback.onFailure(e);
+                        }
+                    });
+                    return;
+                }
+
                 for (String linkID : linkIDs) {
                     int eventID = Integer.parseInt(linkID.split("_")[0]);
                     eventUserLinkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
