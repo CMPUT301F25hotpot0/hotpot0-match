@@ -1,10 +1,14 @@
 package com.example.hotpot0.section2.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,12 +22,16 @@ import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Activity that displays the details of a selected event and allows a user
  * to join or leave the waitlist based on their current status.
  */
 public class EventInitialActivity extends AppCompatActivity {
     private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft;
+
     private ImageView eventImage;
     private Button joinLeaveButton, backButton;
     private TextView GeolocationStatus;
@@ -64,6 +72,10 @@ public class EventInitialActivity extends AppCompatActivity {
         joinLeaveButton = findViewById(R.id.button_join_or_leave_waitlist);
         backButton = findViewById(R.id.button_BottomBackPreviewEvent);
 
+        Spinner eventDetailsSpinner = findViewById(R.id.EventDetailsSpinner);
+        Context spinnerContext = this;
+
+
         // Fetch the event details from EventDB
         eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
             @Override
@@ -79,12 +91,12 @@ public class EventInitialActivity extends AppCompatActivity {
                 previewEventName.setText(currentEvent.getName());
                 previewDescription.setText(currentEvent.getDescription());
                 previewGuidelines.setText(currentEvent.getGuidelines());
-                previewLocation.setText("Location: " + currentEvent.getLocation());
-                previewTimeAndDay.setText("Time: " + currentEvent.getTime());
+                previewLocation.setText(currentEvent.getLocation());
+                previewTimeAndDay.setText(currentEvent.getTime());
                 // previewDateRange.setText("Date: " + currentEvent.getDate());
-                previewDuration.setText("Duration: " + currentEvent.getDuration());
-                previewPrice.setText("Price: $" + currentEvent.getPrice());
-                previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
+                previewDuration.setText(currentEvent.getDuration());
+                previewPrice.setText("$" + currentEvent.getPrice());
+                previewSpotsOpen.setText(currentEvent.getCapacity().toString());
                 // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
                 // Handle geolocation status
@@ -94,6 +106,79 @@ public class EventInitialActivity extends AppCompatActivity {
 
                 // Now handle the join/leave button based on the user's status
                 String linkID = eventID + "_" + userID;
+
+                eventDetailsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        String selectedOption = parent.getItemAtPosition(position).toString();
+                        switch (selectedOption) {
+                            case "Guidelines":
+                                previewGuidelines.setVisibility(View.VISIBLE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Location":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.VISIBLE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Time":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.VISIBLE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Dates":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.VISIBLE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Duration":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.VISIBLE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Price":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.VISIBLE);
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // Do nothing
+                    }
+                });
+
+                ArrayList<String> spinnerOptions = Arrays.asList("Guidelines", "Location", "Time", "Dates", "Duration", "Price") instanceof ArrayList ? (ArrayList<String>) Arrays.asList("Guidelines", "Location", "Time", "Dates", "Duration", "Price") : new ArrayList<>(Arrays.asList("Guidelines", "Location", "Time", "Dates", "Duration", "Price"));
+//                spinnerOptions.add("Guidelines");
+//                spinnerOptions.add("Location");
+//                spinnerOptions.add("Time");
+//                spinnerOptions.add("Dates");
+//                spinnerOptions.add("Duration");
+//                spinnerOptions.add("Price");
+                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(spinnerContext, R.layout.spinner_selected_item, spinnerOptions);
+                spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                eventDetailsSpinner.setAdapter(spinnerAdapter);
 
                 // Fetch EventUserLink to determine if user is already in the waitlist
                 eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
