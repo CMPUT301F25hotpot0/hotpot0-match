@@ -186,6 +186,35 @@
             android:layout_marginBottom="12dp"
             android:textSize="15sp" />
 
+        <!-- Registration Period & Days left -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Registration Period"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/previewDaysLeft"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="16dp"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/GeolocationStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Geolocation Enabled"
+            android:gravity="center"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone" />
+
 
         <!-- Confirm and Decline Buttons Row - Keeping entrant's structure -->
         <LinearLayout

@@ -111,7 +111,10 @@ public class EventInitialActivity extends AppCompatActivity {
                 // previewDateRange.setText("Date: " + currentEvent.getDate());
                 previewDuration.setText(currentEvent.getDuration());
                 previewPrice.setText("$" + currentEvent.getPrice());
-                previewSpotsOpen.setText(currentEvent.getCapacity().toString());
+                String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                        ? "All spots are filled!"
+                        : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+                previewSpotsOpen.setText(spotsOpen);
                 // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
                 // Handle geolocation status
@@ -184,13 +187,13 @@ public class EventInitialActivity extends AppCompatActivity {
                     }
                 });
 
-                ArrayList<String> spinnerOptions = Arrays.asList("Guidelines", "Location", "Time", "Dates", "Duration", "Price") instanceof ArrayList ? (ArrayList<String>) Arrays.asList("Guidelines", "Location", "Time", "Dates", "Duration", "Price") : new ArrayList<>(Arrays.asList("Guidelines", "Location", "Time", "Dates", "Duration", "Price"));
-//                spinnerOptions.add("Guidelines");
-//                spinnerOptions.add("Location");
-//                spinnerOptions.add("Time");
-//                spinnerOptions.add("Dates");
-//                spinnerOptions.add("Duration");
-//                spinnerOptions.add("Price");
+                ArrayList<String> spinnerOptions = new ArrayList<>();
+                spinnerOptions.add("Guidelines");
+                spinnerOptions.add("Location");
+                spinnerOptions.add("Time");
+                spinnerOptions.add("Dates");
+                spinnerOptions.add("Duration");
+                spinnerOptions.add("Price");
                 ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(activityContext, R.layout.spinner_selected_item, spinnerOptions);
                 spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
                 eventDetailsSpinner.setAdapter(spinnerAdapter);
