@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
@@ -73,7 +74,7 @@ public class EventInitialActivity extends AppCompatActivity {
         backButton = findViewById(R.id.button_BottomBackPreviewEvent);
 
         Spinner eventDetailsSpinner = findViewById(R.id.EventDetailsSpinner);
-        Context spinnerContext = this;
+        Context activityContext = this;
 
 
         // Fetch the event details from EventDB
@@ -88,6 +89,20 @@ public class EventInitialActivity extends AppCompatActivity {
                 currentEvent = event;
 
                 // Populate the UI with the event details
+                String imageURL = currentEvent.getImageURL();
+                if (imageURL == null || imageURL.isEmpty()) {
+                    // Hide the ImageView if no image is available
+                    eventImage.setVisibility(View.GONE);
+                } else {
+                    // Show the ImageView
+                    eventImage.setVisibility(View.VISIBLE);
+                    // Load image using Glide
+                    Glide.with(activityContext)
+                            .load(imageURL)
+                            .placeholder(R.drawable.placeholder_image) // optional placeholder
+                            .into(eventImage);
+                }
+
                 previewEventName.setText(currentEvent.getName());
                 previewDescription.setText(currentEvent.getDescription());
                 previewGuidelines.setText(currentEvent.getGuidelines());
@@ -176,7 +191,7 @@ public class EventInitialActivity extends AppCompatActivity {
 //                spinnerOptions.add("Dates");
 //                spinnerOptions.add("Duration");
 //                spinnerOptions.add("Price");
-                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(spinnerContext, R.layout.spinner_selected_item, spinnerOptions);
+                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(activityContext, R.layout.spinner_selected_item, spinnerOptions);
                 spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
                 eventDetailsSpinner.setAdapter(spinnerAdapter);
 
