@@ -321,17 +321,17 @@ public class Event {
     }
 
     /** @return the total number of registered participants */
-    public int getTotalLinks() {
+    public Integer getTotalLinks() {
         return (linkIDs != null) ? linkIDs.size() : 0;
     }
 
     /** @return the total number of sampled participants */
-    public int getTotalSampled() {
+    public Integer getTotalSampled() {
         return (sampledIDs != null) ? sampledIDs.size() : 0;
     }
 
     /** @return the total number of cancelled participants */
-    public int getTotalCancelled() {
+    public Integer getTotalCancelled() {
         return (cancelledIDs != null) ? cancelledIDs.size() : 0;
     }
 
@@ -339,7 +339,7 @@ public class Event {
      * Calculates the number of participants currently on the waitlist.
      * @return the total number of waitlisted participants
      */
-    public int getTotalWaitlist() {
+    public Integer getTotalWaitlist() {
         return getTotalLinks() - getTotalCancelled() - 1;
     }
 
