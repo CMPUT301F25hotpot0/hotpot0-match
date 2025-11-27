@@ -1,19 +1,43 @@
 package com.example.hotpot0.section2.views;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.*;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import android.Manifest;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.Locale;
+import java.util.Calendar;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 /**
  * Activity for creating a new event. Users can input event details, upload an image,
@@ -21,16 +45,68 @@ import java.io.IOException;
  */
 public class CreateEventActivity extends AppCompatActivity {
 
-    private static final int PICK_IMAGE_REQUEST = 1;
-
-    private ImageView iconUpload, deleteImage;
-    private LinearLayout uploadSection;
+    private ImageView iconUpload;
+    private ImageView eventImage;
+    private LinearLayout uploadPrompt;
+    private Uri eventImageUri;
     private Bitmap eventImageBitmap;
+    private MaterialButton deleteImage;
+    private MaterialButton previewButton;
+    private MaterialCardView uploadSection;
+    private SwitchMaterial geolocationStatus;
+    private TextInputEditText name, description, guidelines, location, duration, price, capacity, waitingListCapacity;
+    private TextInputEditText inputEventTime;
+    private TextInputEditText inputEventEndDate;
+    private TextInputEditText inputEventStartDate;
+    private TextInputEditText inputRegistrationEndDate;
+    private TextInputEditText inputRegistrationStartDate;
+    private Calendar calendar;
+    private Calendar regStartCalendar, regEndCalendar;
+    private Calendar eventStartCalendar, eventEndCalendar;
+    private SimpleDateFormat dateFormatter;
+    private SimpleDateFormat timeFormatter;
 
-    private EditText name, description, guidelines, location, time, date, duration, price, capacity, registrationPeriod;
-    private Switch GeolocationStatus;
-    private Button backButtonCreateEvents;
-    private Button previewButton;
+    // Activity result launcher for image picker
+    private final ActivityResultLauncher<Intent> imagePickerLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            Uri imageUri = result.getData().getData();
+                            eventImageUri = imageUri;
+
+                            try {
+                                Bitmap originalBitmap;
+                                if (Build.VERSION.SDK_INT >= 28) {
+                                    ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), imageUri);
+                                    originalBitmap = ImageDecoder.decodeBitmap(source);
+                                } else {
+                                    originalBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                                }
+
+                                eventImageBitmap = scaleBitmap(originalBitmap, 800, 800);
+
+                                // Show the image and hide upload prompt
+                                eventImage.setImageBitmap(eventImageBitmap);
+                                eventImage.setVisibility(View.VISIBLE);
+                                uploadPrompt.setVisibility(View.GONE);
+                                deleteImage.setVisibility(View.VISIBLE);
+
+                                // Recycle the original bitmap to free memory
+                                if (originalBitmap != eventImageBitmap) {
+                                    originalBitmap.recycle();
+                                }
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                Toast.makeText(this, "Image load failed", Toast.LENGTH_SHORT).show();
+                            } catch (OutOfMemoryError e) {
+                                e.printStackTrace();
+                                Toast.makeText(this, "Image too large to load", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+            );
 
     /**
      * Called when the activity is first created. Initializes all views, sets click listeners
@@ -41,13 +117,33 @@ public class CreateEventActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
         setContentView(R.layout.section2_createevent_activity);
 
+        // Initialize formatters and calendar
+        calendar = Calendar.getInstance();
+        eventStartCalendar = Calendar.getInstance();
+        eventEndCalendar = Calendar.getInstance();
+        regStartCalendar = Calendar.getInstance();
+        regEndCalendar = Calendar.getInstance();
+        dateFormatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        timeFormatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+
         // Initialize Views
+        initializeViews();
+        setupBottomNavigation();
+        setupClickListeners();
+        setupDateAndTimePickers();
+        setupFieldWatchers();
+        checkRequiredFields();
+    }
+
+    /**
+     * Initialize all view components
+     */
+    private void initializeViews() {
         iconUpload = findViewById(R.id.icon_upload);
+        eventImage = findViewById(R.id.event_image); // The new ImageView
+        uploadPrompt = findViewById(R.id.upload_prompt); // The upload prompt layout
         deleteImage = findViewById(R.id.delete_image);
         uploadSection = findViewById(R.id.upload_section);
 
@@ -55,100 +151,495 @@ public class CreateEventActivity extends AppCompatActivity {
         description = findViewById(R.id.input_event_description);
         guidelines = findViewById(R.id.input_event_guidelines);
         location = findViewById(R.id.input_location);
-        time = findViewById(R.id.input_event_time);
-        date = findViewById(R.id.input_event_date);
         duration = findViewById(R.id.input_event_duration);
         price = findViewById(R.id.input_price);
         capacity = findViewById(R.id.input_capacity);
-        registrationPeriod = findViewById(R.id.input_registration_period);
-        GeolocationStatus = findViewById(R.id.switch_geolocation);
-        backButtonCreateEvents = findViewById(R.id.button_BackCreateEvent);
+        waitingListCapacity = findViewById(R.id.input_waiting_list_capacity);
+        geolocationStatus = findViewById(R.id.switch_geolocation);
         previewButton = findViewById(R.id.button_preview_event);
 
+        // Initialize date and time picker fields
+        inputEventTime = findViewById(R.id.input_event_time);
+        inputEventStartDate = findViewById(R.id.input_event_start_date);
+        inputEventEndDate = findViewById(R.id.input_event_end_date);
+        inputRegistrationStartDate = findViewById(R.id.input_registration_start_date);
+        inputRegistrationEndDate = findViewById(R.id.input_registration_end_date);
+    }
+
+    /**
+     * Setup bottom navigation
+     */
+    private void setupBottomNavigation() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_events);
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                Intent intent = new Intent(CreateEventActivity.this, HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_search) {
+                Intent intent = new Intent(CreateEventActivity.this, SearchActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_notifications) {
+                Intent intent = new Intent(CreateEventActivity.this, NotificationsActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                Intent intent = new Intent(CreateEventActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Setup click listeners for buttons and image upload
+     */
+    private void setupClickListeners() {
         // Image upload click
         uploadSection.setOnClickListener(v -> openImagePicker());
 
         // Delete image click
         deleteImage.setOnClickListener(v -> {
             eventImageBitmap = null;
-            iconUpload.setImageResource(R.drawable.ic_camera);
+            eventImageUri = null;
+            eventImage.setVisibility(View.GONE);
+            uploadPrompt.setVisibility(View.VISIBLE);
             deleteImage.setVisibility(View.GONE);
             Toast.makeText(this, "Image removed", Toast.LENGTH_SHORT).show();
         });
 
         // Preview button
         previewButton.setOnClickListener(v -> openPreview());
+    }
 
-        backButtonCreateEvents.setOnClickListener(v -> {
-            Intent intent = new Intent(CreateEventActivity.this, HomeActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-            finish();
+    /**
+     * Setup date and time pickers for relevant fields
+     */
+    private void setupDateAndTimePickers() {
+        // Time Picker for Event Time
+        inputEventTime.setOnClickListener(v -> showTimePicker(inputEventTime));
+
+        // Event Start Date
+        inputEventStartDate.setOnClickListener(v -> showDatePicker(
+                inputEventStartDate,
+                "Select Event Start Date",
+                (view, year, month, day) -> {
+                    eventStartCalendar.set(year, month, day);
+                    inputEventStartDate.setText(dateFormatter.format(eventStartCalendar.getTime()));
+                }
+        ));
+
+        // Event End Date (should be >= start)
+        inputEventEndDate.setOnClickListener(v -> {
+            DatePickerDialog endPicker = new DatePickerDialog(
+                    this,
+                    (view, year, month, day) -> {
+                        eventEndCalendar.set(year, month, day);
+                        inputEventEndDate.setText(dateFormatter.format(eventEndCalendar.getTime()));
+                    },
+                    eventEndCalendar.get(Calendar.YEAR),
+                    eventEndCalendar.get(Calendar.MONTH),
+                    eventEndCalendar.get(Calendar.DAY_OF_MONTH)
+            );
+
+            endPicker.setTitle("Select Event End Date");
+            // Prevent selecting before start date
+            if (eventStartCalendar != null)
+                endPicker.getDatePicker().setMinDate(eventStartCalendar.getTimeInMillis());
+            endPicker.show();
         });
+
+        // Registration Start Date
+        inputRegistrationStartDate.setOnClickListener(v -> showDatePicker(
+                inputRegistrationStartDate,
+                "Select Registration Start Date",
+                (view, year, month, day) -> {
+                    regStartCalendar.set(year, month, day);
+                    inputRegistrationStartDate.setText(dateFormatter.format(regStartCalendar.getTime()));
+                }
+        ));
+
+        // Registration End Date (must be >= start)
+        inputRegistrationEndDate.setOnClickListener(v -> {
+            DatePickerDialog regEndPicker = new DatePickerDialog(
+                    this,
+                    (view, year, month, day) -> {
+                        regEndCalendar.set(year, month, day);
+                        inputRegistrationEndDate.setText(dateFormatter.format(regEndCalendar.getTime()));
+                    },
+                    regEndCalendar.get(Calendar.YEAR),
+                    regEndCalendar.get(Calendar.MONTH),
+                    regEndCalendar.get(Calendar.DAY_OF_MONTH)
+            );
+
+            regEndPicker.setTitle("Select Registration End Date");
+            // Prevent selecting before registration start
+            if (regStartCalendar != null)
+                regEndPicker.getDatePicker().setMinDate(regStartCalendar.getTimeInMillis());
+            regEndPicker.show();
+        });
+
     }
 
     /**
-     * Opens the image picker so the user can select an image from their gallery.
+     * Shows a TimePickerDialog and sets the selected time to the EditText
      */
+    private void showTimePicker(TextInputEditText editText) {
+        Calendar currentTime = Calendar.getInstance();
+        int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = currentTime.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                this,
+                (view, selectedHour, selectedMinute) -> {
+                    calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+                    calendar.set(Calendar.MINUTE, selectedMinute);
+                    editText.setText(timeFormatter.format(calendar.getTime()));
+                },
+                hour,
+                minute,
+                false // 24-hour format set to false for AM/PM format
+        );
+
+        timePickerDialog.setTitle("Select Event Time");
+        timePickerDialog.show();
+    }
+
+    /**
+     * Shows a DatePickerDialog and sets the selected date to the EditText
+     */
+    private void showDatePicker(TextInputEditText editText, String title, DatePickerDialog.OnDateSetListener onDateSetListener) {
+        Calendar currentDate = Calendar.getInstance();
+        int year = currentDate.get(Calendar.YEAR);
+        int month = currentDate.get(Calendar.MONTH);
+        int day = currentDate.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                onDateSetListener,
+                year,
+                month,
+                day
+        );
+
+        datePickerDialog.setTitle(title);
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.show();
+    }
+
     private void openImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // For Android 13+, no permission needed for image picker
+            launchImagePicker();
+        } else {
+            // For older versions, request READ_EXTERNAL_STORAGE
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                launchImagePicker();
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        1001);
+            }
+        }
     }
 
-    /**
-     * Handles the result of the image picker activity.
-     * Loads the selected image into the ImageView and stores it as a Bitmap.
-     *
-     * @param requestCode The integer request code originally supplied to startActivityForResult().
-     * @param resultCode  The integer result code returned by the child activity.
-     * @param data        The intent returned by the child activity, containing image URI.
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private void launchImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        imagePickerLauncher.launch(intent);
+    }
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            Uri imageUri = data.getData();
-            try {
-                eventImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                iconUpload.setImageBitmap(eventImageBitmap);
-                deleteImage.setVisibility(View.VISIBLE);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Image load failed", Toast.LENGTH_SHORT).show();
+    // Handle permission result
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1001) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchImagePicker();
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     /**
      * Opens the preview activity, passing all entered event details as extras.
-     * Validates that required fields (event name and description) are filled.
+     * Validates that required fields are filled.
      */
     private void openPreview() {
-        // Collect data
-        String eventName = name.getText().toString().trim();
-        String desc = description.getText().toString().trim();
-
-        if (eventName.isEmpty() || desc.isEmpty()) {
-            Toast.makeText(this, "Please fill out event name and description", Toast.LENGTH_SHORT).show();
+        // Validate required fields
+        if (!validateRequiredFields()) {
             return;
         }
 
         Intent intent = new Intent(this, PreviewActivity.class);
-        intent.putExtra("name", eventName);
-        intent.putExtra("description", desc);
+
+        // Pass all data to preview activity
+        intent.putExtra("name", name.getText().toString().trim());
+        intent.putExtra("description", description.getText().toString().trim());
         intent.putExtra("guidelines", guidelines.getText().toString().trim());
         intent.putExtra("location", location.getText().toString().trim());
-        intent.putExtra("time", time.getText().toString().trim());
-        intent.putExtra("date", date.getText().toString().trim());
+        intent.putExtra("time", inputEventTime.getText().toString().trim());
+        intent.putExtra("startDate", inputEventStartDate.getText().toString().trim());
+        intent.putExtra("endDate", inputEventEndDate.getText().toString().trim());
         intent.putExtra("duration", duration.getText().toString().trim());
         intent.putExtra("price", price.getText().toString().trim());
         intent.putExtra("capacity", capacity.getText().toString().trim());
-        intent.putExtra("registration", registrationPeriod.getText().toString().trim());
-        intent.putExtra("geolocationEnabled", GeolocationStatus.isChecked());
+        intent.putExtra("waitingListCapacity", waitingListCapacity.getText().toString().trim());
+        intent.putExtra("registrationStart", inputRegistrationStartDate.getText().toString().trim());
+        intent.putExtra("registrationEnd", inputRegistrationEndDate.getText().toString().trim());
+        intent.putExtra("geolocationEnabled", geolocationStatus.isChecked());
+
+        // Pass URI instead of bitmap
+        if (eventImageUri != null) {
+            intent.putExtra("imageUri", eventImageUri.toString());
+        } else if (eventImageBitmap != null) {
+            // You might want to compress the bitmap or pass as URI instead
+            // For now, we'll pass it as extra (be careful with size limits)
+            intent.putExtra("imageBitmap", eventImageBitmap);
+        }
 
         startActivity(intent);
     }
-}
 
+    /**
+     * Validates that all required fields are filled
+     */
+    private boolean validateRequiredFields() {
+
+        if (TextUtils.isEmpty(name.getText().toString().trim())) {
+            name.setError("Required");
+            name.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(description.getText().toString().trim())) {
+            description.setError("Required");
+            description.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(guidelines.getText().toString().trim())) {
+            guidelines.setError("Required");
+            guidelines.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(location.getText().toString().trim())) {
+            location.setError("Required");
+            location.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(duration.getText().toString().trim())) {
+            duration.setError("Required");
+            duration.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(price.getText().toString().trim())) {
+            price.setError("Required");
+            price.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(capacity.getText().toString().trim())) {
+            capacity.setError("Required");
+            capacity.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(inputEventTime.getText().toString().trim())) {
+            inputEventTime.setError("Required");
+            inputEventTime.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(inputEventStartDate.getText().toString().trim())) {
+            inputEventStartDate.setError("Required");
+            inputEventStartDate.requestFocus();
+            return false;
+        }
+
+        // Maybe we should keep Event End Date as optional
+
+//        if (TextUtils.isEmpty(inputEventEndDate.getText().toString().trim())) {
+//            inputEventEndDate.setError("Required");
+//            inputEventEndDate.requestFocus();
+//            return false;
+//        }
+
+        if (TextUtils.isEmpty(inputRegistrationStartDate.getText().toString().trim())) {
+            inputRegistrationStartDate.setError("Required");
+            inputRegistrationStartDate.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(inputRegistrationEndDate.getText().toString().trim())) {
+            inputRegistrationEndDate.setError("Required");
+            inputRegistrationEndDate.requestFocus();
+            return false;
+        }
+
+        // Price validation
+        String priceStr = price.getText().toString().trim();
+        if (TextUtils.isEmpty(priceStr)) {
+            price.setError("Required");
+            price.requestFocus();
+            return false;
+        }
+        try {
+            double priceValue = Double.parseDouble(priceStr);
+            if (priceValue < 0) {
+                price.setError("Must be positive");
+                price.requestFocus();
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            price.setError("Must be a number");
+            price.requestFocus();
+            return false;
+        }
+
+        // Capacity validation
+        String capacityStr = capacity.getText().toString().trim();
+        if (TextUtils.isEmpty(capacityStr)) {
+            capacity.setError("Required");
+            capacity.requestFocus();
+            return false;
+        }
+        try {
+            int capacityValue = Integer.parseInt(capacityStr);
+            if (capacityValue <= 0) {
+                capacity.setError("Must be positive");
+                capacity.requestFocus();
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            capacity.setError("Must be a number");
+            capacity.requestFocus();
+            return false;
+        }
+
+        // Waiting list capacity validation (optional, same as above)
+        String waitingListStr = waitingListCapacity.getText().toString().trim();
+        if (!TextUtils.isEmpty(waitingListStr)) {
+            try {
+                int waitingListValue = Integer.parseInt(waitingListStr);
+                if (waitingListValue < 0) {
+                    waitingListCapacity.setError("Must be zero or positive");
+                    waitingListCapacity.requestFocus();
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                waitingListCapacity.setError("Must be a number");
+                waitingListCapacity.requestFocus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Enable/disable preview button based on required fields
+    private void setupFieldWatchers() {
+        TextWatcher watcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                checkRequiredFields();
+            }
+        };
+
+        // Add watcher to all required fields
+        name.addTextChangedListener(watcher);
+        description.addTextChangedListener(watcher);
+        guidelines.addTextChangedListener(watcher);
+        location.addTextChangedListener(watcher);
+        duration.addTextChangedListener(watcher);
+        price.addTextChangedListener(watcher);
+        capacity.addTextChangedListener(watcher);
+        inputEventTime.addTextChangedListener(watcher);
+        inputEventStartDate.addTextChangedListener(watcher);
+        inputRegistrationStartDate.addTextChangedListener(watcher);
+        inputRegistrationEndDate.addTextChangedListener(watcher);
+    }
+    private void checkRequiredFields() {
+        boolean allFilled = !TextUtils.isEmpty(name.getText().toString().trim())
+                && !TextUtils.isEmpty(description.getText().toString().trim())
+                && !TextUtils.isEmpty(guidelines.getText().toString().trim())
+                && !TextUtils.isEmpty(location.getText().toString().trim())
+                && !TextUtils.isEmpty(duration.getText().toString().trim())
+                && !TextUtils.isEmpty(price.getText().toString().trim())
+                && !TextUtils.isEmpty(capacity.getText().toString().trim())
+                && !TextUtils.isEmpty(inputEventTime.getText().toString().trim())
+                && !TextUtils.isEmpty(inputEventStartDate.getText().toString().trim())
+                && !TextUtils.isEmpty(inputRegistrationStartDate.getText().toString().trim())
+                && !TextUtils.isEmpty(inputRegistrationEndDate.getText().toString().trim());
+
+        previewButton.setEnabled(allFilled);
+    }
+
+    // Utility method to scale bitmap to make sure app can handle large images
+    private Bitmap scaleBitmap(Bitmap original, int maxWidth, int maxHeight) {
+        try {
+            int originalWidth = original.getWidth();
+            int originalHeight = original.getHeight();
+
+            // Calculate aspect ratio
+            float aspectRatio = (float) originalWidth / originalHeight;
+
+            int finalWidth = maxWidth;
+            int finalHeight = maxHeight;
+
+            if (originalWidth > originalHeight) {
+                // Landscape
+                finalHeight = (int) (maxWidth / aspectRatio);
+            } else {
+                // Portrait or square
+                finalWidth = (int) (maxHeight * aspectRatio);
+            }
+
+            // Ensure dimensions don't exceed max values
+            if (finalWidth > maxWidth) {
+                finalWidth = maxWidth;
+                finalHeight = (int) (finalWidth / aspectRatio);
+            }
+            if (finalHeight > maxHeight) {
+                finalHeight = maxHeight;
+                finalWidth = (int) (finalHeight * aspectRatio);
+            }
+
+            return Bitmap.createScaledBitmap(original, finalWidth, finalHeight, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return original;
+        }
+    }
+}

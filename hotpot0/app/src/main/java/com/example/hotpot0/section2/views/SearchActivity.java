@@ -3,9 +3,9 @@ package com.example.hotpot0.section2.views;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +16,8 @@ import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +32,17 @@ import java.util.List;
  */
 public class SearchActivity extends AppCompatActivity {
 
+    private int userID;
     private BottomNavigationView bottomNav;
     private ListView eventListView;
-    private SearchView searchView;
+    private TextInputEditText searchEditText;
     private EventDB eventDB;
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
     private ImageButton infoButton;
-    private int userID;
+    private ImageButton scanQrButton;
+    private Chip interestsFilterChip;
+    private Chip fromDateFilterChip;
+    private Chip toDateFilterChip;
 
     /**
      * Initializes the activity, sets up UI elements, bottom navigation,
@@ -51,12 +57,23 @@ public class SearchActivity extends AppCompatActivity {
 
         // Initialize UI elements
         eventListView = findViewById(R.id.event_list_view);
-        searchView = findViewById(R.id.searchView);
+        searchEditText = findViewById(R.id.searchEditText);
         bottomNav = findViewById(R.id.bottomNavigationView);
         infoButton = findViewById(R.id.info_button);
+        scanQrButton = findViewById(R.id.scan_qr_button);
+
+        // Initialize filter chips
+        interestsFilterChip = findViewById(R.id.interestsFilterChip);
+        fromDateFilterChip = findViewById(R.id.fromDateFilterChip);
+        toDateFilterChip = findViewById(R.id.toDateFilterChip);
 
         userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
 
+        // Handling Bottom Navigation Bar
+        bottomNav = findViewById(R.id.bottomNavigationView);
+        setupBottomNavigation();
+
+        // Info button functionality
         infoButton.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Welcome to Eventure!")
@@ -76,6 +93,29 @@ public class SearchActivity extends AppCompatActivity {
                             "• View your profile in the Profile Tab. ")
                     .setPositiveButton("Ok", null)
                     .show();
+        });
+
+        scanQrButton.setOnClickListener(v -> {
+            Toast.makeText(this, "Launching Camera", Toast.LENGTH_SHORT).show();
+            // Launch QRActivity
+            Intent intent = new Intent(SearchActivity.this, QRActivity.class);
+            startActivity(intent);
+        });
+
+        // Filter chips functionality
+        interestsFilterChip.setOnClickListener(v -> {
+            // TODO: Implement interests selection popup
+            Toast.makeText(this, "Interests filter to be implemented", Toast.LENGTH_SHORT).show();
+        });
+
+        fromDateFilterChip.setOnClickListener(v -> {
+            // TODO: Implement from date picker
+            Toast.makeText(this, "From date filter to be implemented", Toast.LENGTH_SHORT).show();
+        });
+
+        toDateFilterChip.setOnClickListener(v -> {
+            // TODO: Implement to date picker
+            Toast.makeText(this, "To date filter to be implemented", Toast.LENGTH_SHORT).show();
         });
 
         eventDB = new EventDB();
@@ -127,18 +167,25 @@ public class SearchActivity extends AppCompatActivity {
         loadAllEvents();
 
         // Search functionality
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchEditText.setOnClickListener(v -> {
+            // Clear the hint text when user clicks to type
+            if (searchEditText.getText().toString().isEmpty()) {
+                searchEditText.setHint("");
+            }
+        });
+
+        // Add text watcher for real-time search
+        searchEditText.addTextChangedListener(new android.text.TextWatcher() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterEvents(query);
-                return true;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterEvents(s.toString());
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                filterEvents(newText);
-                return true;
-            }
+            public void afterTextChanged(android.text.Editable s) {}
         });
     }
 
@@ -192,6 +239,7 @@ public class SearchActivity extends AppCompatActivity {
                             if (events.size() == allEvents.size()) {
                                 runOnUiThread(() -> {
                                     eventListView.setAdapter(new EventBlobAdapter(SearchActivity.this, events, statuses, userID));
+                                    fadeIn(eventListView);
                                 });
                             }
                         }
@@ -230,6 +278,7 @@ public class SearchActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     EventBlobAdapter adapter = new EventBlobAdapter(SearchActivity.this, filteredEvents, statuses, userID);
                     eventListView.setAdapter(adapter);
+                    fadeIn(eventListView);
                 });
             }
 
@@ -237,6 +286,54 @@ public class SearchActivity extends AppCompatActivity {
             public void onFailure(Exception e) {
                 Toast.makeText(SearchActivity.this, "Error filtering events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    private void fadeIn(View view) {
+        view.setAlpha(0f);
+        view.animate().alpha(1f).setDuration(300).start();
+    }
+
+    private void setupBottomNavigation() {
+        // Highlight the Search tab when entering this activity
+        bottomNav.setSelectedItemId(R.id.nav_search);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(SearchActivity.this, HomeActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_events) {
+                startActivity(new Intent(SearchActivity.this, CreateEventActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_search) {
+                return true;
+            }
+
+            if (id == R.id.nav_notifications) {
+                startActivity(new Intent(SearchActivity.this, NotificationsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                startActivity(new Intent(SearchActivity.this, ProfileActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            return false;
         });
     }
 }

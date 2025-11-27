@@ -46,8 +46,7 @@ public class StartupActivity extends AppCompatActivity {
                 // Start UserSignUpActivity
                 Intent intent = new Intent(StartupActivity.this, UserSignupActivity.class);
                 startActivity(intent);
-                // optionally finish() if you don't want StartupActivity on the back stack:
-                // finish();
+                // finish() if StartupActivity on the back stack not required
             }
         });
 
