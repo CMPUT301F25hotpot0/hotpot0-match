@@ -79,6 +79,23 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         eventDB = new EventDB();
+        // Info Button
+        infoButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("How the app works!")
+                    .setMessage("• Use the bottom toolbar to navigate between pages.\n\n" +
+                            "• The Home page shows your confirmed events, pending events, and past events.\n\n" +
+                            "• Confirmed events are events that you have been selected for and you have accepted.\n\n" +
+                            "• Pending events are events that you are in waitlist for. You will receive a notification about the decision. " +
+                            "You will then be able to accept or decline the invitation. You are also able to leave the waitlist.\n\n" +
+                            "• Past events show your event history and their outcomes.\n\n" +
+                            "• If you are an organizer, use the Create Event option to create an event. You will be able pick the entrants and related options.\n\n" +
+                            "• Use the Search option to search for events. You can use the filter option to filter it to your interests. \n\n" +
+                            "• Notifications tab show the notifications you have received. This includes invitations and results. \n\n" +
+                            "• View your profile in the Profile Tab. ")
+                    .setPositiveButton("Ok", null)
+                    .show();
+        });
 
         // Handle bottom navigation clicks
         bottomNav.setOnItemSelectedListener(item -> {
