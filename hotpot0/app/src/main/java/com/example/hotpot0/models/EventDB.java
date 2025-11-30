@@ -6,8 +6,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Handles all Firestore database operations related to {@link Event}.
@@ -21,6 +25,8 @@ import java.util.List;
  * </p>
  */
 public class EventDB {
+
+    // EventDB Attributes
     private final FirebaseFirestore db;
     private static final String EVENT_COLLECTION = "Events";
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
@@ -39,6 +45,9 @@ public class EventDB {
         void onFailure(Exception e);
     }
 
+    // Utility Methods
+    // ===============
+
     /**
      * Adds a new event to Firestore and generates a unique event ID.
      * @param event Event object to add.
@@ -48,9 +57,16 @@ public class EventDB {
         generateNewID(new GetCallback<Integer>() {
             @Override
             public void onSuccess(Integer newEventID) {
+                // Set the generated ID
                 event.setEventID(newEventID);
+
+                // Generate QR value right here
+                event.setQrValue("event:" + newEventID);
+
+                // Initialize participant arrays if null
                 if (event.getLinkIDs() == null) event.setLinkIDs(new ArrayList<>());
                 if (event.getSampledIDs() == null) event.setSampledIDs(new ArrayList<>());
+                if (event.getCancelledIDs() == null) event.setCancelledIDs(new ArrayList<>());
 
                 db.collection(EVENT_COLLECTION).document(String.valueOf(newEventID))
                         .set(event)
@@ -79,19 +95,30 @@ public class EventDB {
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
         java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        updates.put("organizerID", event.getOrganizerID());
         updates.put("name", event.getName());
         updates.put("description", event.getDescription());
         updates.put("guidelines", event.getGuidelines());
         updates.put("location", event.getLocation());
         updates.put("time", event.getTime());
-        updates.put("date", event.getDate());
+        updates.put("startDate", event.getStartDate());
+        updates.put("endDate", event.getEndDate());
         updates.put("duration", event.getDuration());
+        updates.put("regStartDate", event.getRegistrationStart());
+        updates.put("regEndDate", event.getRegistrationEnd());
+
         updates.put("capacity", event.getCapacity());
         updates.put("price", event.getPrice());
-        updates.put("registration_period", event.getRegistration_period());
+        updates.put("waitingListCapacity", event.getWaitingListCapacity());
+
         updates.put("imageURL", event.getImageURL());
+        updates.put("qrValue", event.getQrValue());
         updates.put("geolocationRequired", event.getGeolocationRequired());
         updates.put("isEventActive", event.getIsEventActive());
+
+        updates.put("linkIDs", event.getLinkIDs());
+        updates.put("sampledIDs", event.getSampledIDs());
+        updates.put("cancelledIDs", event.getCancelledIDs());
 
         eventRef.update(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
@@ -319,42 +346,6 @@ public class EventDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
-//    public void sampleEvent(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
-//        try {
-//            List<String> allLinkIDs = event.getLinkIDs();
-//            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
-//            ArrayList<String> sampled = event.sampleParticipants(waitListLinkIDs);
-//
-//            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
-//                    .document(String.valueOf(event.getEventID()));
-//
-//            eventRef.update("sampledIDs", sampled)
-//                    .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
-//                    .addOnFailureListener(callback::onFailure);
-//
-//        } catch (Exception e) {
-//            callback.onFailure(e);
-//        }
-//    }
-//
-//    public void fillEmptySampledSpots(@NonNull Event event, @NonNull GetCallback<List<String>> callback) {
-//        try {
-//            List<String> allLinkIDs = event.getLinkIDs();
-//            List<String> waitListLinkIDs = eventUserLinkDB.getWaitListUsers(allLinkIDs);
-//             ArrayList<String> newlySampled = event.fillSampledParticipants(waitListLinkIDs);
-//
-//            DocumentReference eventRef = db.collection(EVENT_COLLECTION)
-//                    .document(String.valueOf(event.getEventID()));
-//
-//            eventRef.update("sampledIDs", event.getSampledIDs())
-//                    .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
-//                    .addOnFailureListener(callback::onFailure);
-//
-//        } catch (Exception e) {
-//            callback.onFailure(e);
-//        }
-//    }
-
     /**
      * Randomly samples new participants for an event based on its waitlist.
      * <p>
@@ -384,7 +375,49 @@ public class EventDB {
                         .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
                         .addOnFailureListener(callback::onFailure);
 
+                for (String linkID : allLinkIDs) {
+                    String userID = linkID.split("_")[1]; // Extract userID from linkID
+                    if (sampled.contains(linkID)) {
+                        Status status = new Status();
+                        status.setStatus("Sampled");
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date date = new Date();
+                        String now = formatter.format(date);
+                        Notification notif = new Notification(now, status, true, event.getName());
+                        eventUserLinkDB.addSampledNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Notification added successfully
+                            }
 
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Handle failure to add notification
+                            }
+                        });
+                    } else if (event.getOrganizerID().toString() == userID) {
+                        // Skip organizer
+                    } else {
+                        // Else inWaitList
+                        Status status = new Status();
+                        status.setStatus("inWaitList");
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date date = new Date();
+                        String now = formatter.format(date);
+                        Notification notif = new Notification(now, status, event.getName());
+                        eventUserLinkDB.addWaitlistNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Notification added successfully
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Handle failure to add notification
+                            }
+                        });
+                    }
+                }
             }
 
             @Override
@@ -415,6 +448,26 @@ public class EventDB {
                 eventRef.update("sampledIDs", event.getSampledIDs())
                         .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
                         .addOnFailureListener(callback::onFailure);
+
+                for (String linkID : newlySampled) {
+                    Status status = new Status();
+                    status.setStatus("Sampled");
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    Date date = new Date();
+                    String now = formatter.format(date);
+                    Notification notif = new Notification(now, status, true, event.getName());
+                    eventUserLinkDB.addSampledNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notification added successfully
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Handle failure to add notification
+                        }
+                    });
+                }
             }
 
             @Override
@@ -422,5 +475,35 @@ public class EventDB {
                 callback.onFailure(e);
             }
         });
+    }
+
+    public void updateEventImageURL(Event event, String imageURL, GetCallback<Void> callback) {
+        db.collection(EVENT_COLLECTION)
+                .document(String.valueOf(event.getEventID()))
+                .update("imageURL", imageURL)
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    // Firestore lookup by qrValue
+    public void getEventByQrValue(String qrValue, GetCallback<Event> callback) {
+
+        db.collection("Events")
+                .whereEqualTo("qrValue", qrValue)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.isEmpty()) {
+                        // Indicate NOT FOUND by returning null
+                        callback.onSuccess(null);
+                        return;
+                    }
+
+                    Event event = snapshot.getDocuments()
+                            .get(0)
+                            .toObject(Event.class);
+
+                    callback.onSuccess(event);
+                })
+                .addOnFailureListener(callback::onFailure);
     }
 }

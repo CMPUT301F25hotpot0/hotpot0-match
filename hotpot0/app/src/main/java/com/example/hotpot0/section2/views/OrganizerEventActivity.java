@@ -135,11 +135,11 @@ public class OrganizerEventActivity extends AppCompatActivity {
         previewGuidelines.setText(currentEvent.getGuidelines());
         previewLocation.setText("Location: " + currentEvent.getLocation());
         previewTimeAndDay.setText("Time: " + currentEvent.getTime());
-        previewDateRange.setText("Date: " + currentEvent.getDate());
+        previewDateRange.setText("Date: " + currentEvent.getStartDate());
         previewDuration.setText("Duration: " + currentEvent.getDuration());
         previewPrice.setText("Price: $" + currentEvent.getPrice());
         previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
-        previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
+        previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistrationEnd());
 
         // --- Load waitlist users ---
         eventUserLinkDB.getWaitListUsers(currentEvent.getLinkIDs(), new EventUserLinkDB.GetCallback<List<String>>() {
@@ -266,11 +266,11 @@ public class OrganizerEventActivity extends AppCompatActivity {
         previewGuidelines.setText(currentEvent.getGuidelines());
         previewLocation.setText("Location: " + currentEvent.getLocation());
         previewTimeAndDay.setText("Time: " + currentEvent.getTime());
-        previewDateRange.setText("Date: " + currentEvent.getDate());
+        previewDateRange.setText("Date: " + currentEvent.getStartDate());
         previewDuration.setText("Duration: " + currentEvent.getDuration());
         previewPrice.setText("Price: $" + currentEvent.getPrice());
         previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
-        previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
+        previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistrationEnd());
 
         // --- Populate sampled entrants ---
         populateEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
