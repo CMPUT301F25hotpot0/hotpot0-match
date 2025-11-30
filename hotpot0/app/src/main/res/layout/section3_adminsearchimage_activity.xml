@@ -56,6 +56,7 @@
 
             <!-- Search Bar -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -70,7 +71,7 @@
                     android:id="@+id/searchEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Search by Event Name / Profile"
+                    android:hint="Search by Event Name"
                     android:textColor="@color/text"
                     android:textColorHint="@color/text"
                     android:padding="16dp" />
