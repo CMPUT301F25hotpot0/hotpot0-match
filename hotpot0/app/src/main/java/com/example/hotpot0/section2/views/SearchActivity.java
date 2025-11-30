@@ -109,7 +109,7 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         scanQrButton.setOnClickListener(v -> {
-            Toast.makeText(this, "Launching Camera", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "Launching Camera", Toast.LENGTH_SHORT).show();
             // Launch QRActivity
             Intent intent = new Intent(SearchActivity.this, QRActivity.class);
             startActivity(intent);
