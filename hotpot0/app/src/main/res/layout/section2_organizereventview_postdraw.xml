@@ -31,7 +31,7 @@
                 android:layout_gravity="start"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Event Image (same style as first XML) -->
+            <!-- Event Image -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/eventImageCard"
                 android:layout_width="match_parent"
@@ -255,6 +255,23 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
+            <!-- ===== INTERACTIVE MAP ===== -->
+            <TextView
+                android:id="@+id/GeolocationHeading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Entrants Geolocation"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp" />
+
+            <FrameLayout
+                android:id="@+id/map_container"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="20dp" />
+
             <!-- ===== ALL ENTRANTS ===== -->
             <TextView
                 android:id="@+id/AllEntrantsLabel"
@@ -272,22 +289,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
-
-            <!-- ===== INTERACTIVE MAP ===== -->
-            <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Entrants Geolocation"
-            android:textColor="@color/text"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
-
-            <FrameLayout
-                android:id="@+id/map_container"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="20dp" />
 
         </LinearLayout>
     </ScrollView>

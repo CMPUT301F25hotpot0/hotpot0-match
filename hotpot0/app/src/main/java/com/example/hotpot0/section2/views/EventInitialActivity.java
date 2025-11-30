@@ -8,6 +8,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Looper;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
@@ -33,6 +46,10 @@ public class EventInitialActivity extends AppCompatActivity {
     private int eventID;
     private Event currentEvent;
 
+    private FusedLocationProviderClient fusedLocationClient;
+    private Double latitude = null;
+    private Double longitude = null;
+
     /**
      * Called when the activity is first created.
      * Initializes UI elements, fetches event details, and sets up the
@@ -47,6 +64,8 @@ public class EventInitialActivity extends AppCompatActivity {
 
         int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
         eventID = getIntent().getIntExtra("event_id", -1); // Get event ID from Intent
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fetchCurrentLocation();
 
         // Initialize UI elements
         eventImage = findViewById(R.id.eventImage);
@@ -117,8 +136,13 @@ public class EventInitialActivity extends AppCompatActivity {
                             });
                         } else {
                             joinLeaveButton.setText(getString(R.string.join_waitlist));
+                            if (latitude == null || longitude == null) {
+                                latitude = 0.0;
+                                longitude = 0.0;
+                                return;
+                            }
                             joinLeaveButton.setOnClickListener(v -> {
-                                eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                                eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
                                     @Override
                                     public void onSuccess(Integer result) {
                                         switch (result) {
@@ -149,8 +173,13 @@ public class EventInitialActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Exception e) {
                         joinLeaveButton.setText(getString(R.string.join_waitlist));
+                        if (latitude == null || longitude == null) {
+                            latitude = 0.0;
+                            longitude = 0.0;
+                            return;
+                        }
                         joinLeaveButton.setOnClickListener(v -> {
-                            eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                            eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
                                 @Override
                                 public void onSuccess(Integer result) {
                                     Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
@@ -184,5 +213,42 @@ public class EventInitialActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
+    }
+
+    private void fetchCurrentLocation() {
+        // Check for location permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    101);
+            return;
+        }
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            } else {
+                // If last location is null, request location updates
+                fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        if (locationResult == null) return;
+                        Location loc = locationResult.getLastLocation();
+                        if (loc != null) {
+                            latitude = loc.getLatitude();
+                            longitude = loc.getLongitude();
+                            fusedLocationClient.removeLocationUpdates(this); // Stop updates after first fix
+                        }
+                    }
+                }, Looper.getMainLooper());
+            }
+        });
     }
 }
