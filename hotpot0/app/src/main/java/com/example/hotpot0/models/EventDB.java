@@ -1,5 +1,7 @@
 package com.example.hotpot0.models;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentReference;
@@ -395,8 +397,8 @@ public class EventDB {
                                 // Handle failure to add notification
                             }
                         });
-                    } else if (event.getOrganizerID().toString() == userID) {
-                        // Skip organizer
+                    } else if (event.getOrganizerID().toString().equals(userID)) {
+                        Log.d("EventDB", "User is organizer, no notification sent for linkID: " + linkID);
                     } else {
                         // Else inWaitList
                         Status status = new Status();
