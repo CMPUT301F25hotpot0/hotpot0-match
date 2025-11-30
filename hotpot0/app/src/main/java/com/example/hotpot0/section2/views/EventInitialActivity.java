@@ -79,12 +79,15 @@ public class EventInitialActivity extends AppCompatActivity {
                 previewEventName.setText(currentEvent.getName());
                 previewDescription.setText(currentEvent.getDescription());
                 previewGuidelines.setText(currentEvent.getGuidelines());
-                previewLocation.setText("Location: " + currentEvent.getLocation());
-                previewTimeAndDay.setText("Time: " + currentEvent.getTime());
+                previewLocation.setText(currentEvent.getLocation());
+                previewTimeAndDay.setText(currentEvent.getTime());
                 // previewDateRange.setText("Date: " + currentEvent.getDate());
-                previewDuration.setText("Duration: " + currentEvent.getDuration());
-                previewPrice.setText("Price: $" + currentEvent.getPrice());
-                previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
+                previewDuration.setText(currentEvent.getDuration());
+                previewPrice.setText("$" + currentEvent.getPrice());
+                String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                        ? "All spots are filled!"
+                        : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+                previewSpotsOpen.setText(spotsOpen);
                 // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
                 // Handle geolocation status
@@ -153,8 +156,20 @@ public class EventInitialActivity extends AppCompatActivity {
                             eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
                                 @Override
                                 public void onSuccess(Integer result) {
-                                    Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
-                                    navigateHome();
+                                    switch (result) {
+                                        case 0: // Successfully added to waitlist
+                                            Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                                            navigateHome();
+                                            break;
+                                        case 1:
+                                            Toast.makeText(EventInitialActivity.this, "You are already affiliated with this event.", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        case 2: // Waitlist full
+                                            Toast.makeText(EventInitialActivity.this, "Waitlist is full, cannot join!", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        default:
+                                            Toast.makeText(EventInitialActivity.this, "Unknown status: " + result, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
 
                                 @Override

@@ -3,9 +3,12 @@ package com.example.hotpot0.section2.controllers;
 import android.content.Context;
 import android.util.Patterns;
 
+import com.example.hotpot0.models.EventDB;
+import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
 
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -18,6 +21,8 @@ import java.util.regex.Pattern;
 public class ProfileEditHandler {
 
     private ProfileDB profileDB;
+    private EventUserLinkDB eventUserLinkDB;
+    private EventDB eventDB;
 
     /**
      * Constructs a new {@code ProfileEditHandler}.
@@ -27,6 +32,8 @@ public class ProfileEditHandler {
      */
     public ProfileEditHandler() {
         profileDB = new ProfileDB(); // Initialize ProfileDB to interact with Firestore
+        eventUserLinkDB = new EventUserLinkDB();
+        eventDB = new EventDB();
     }
 
     /**
@@ -133,19 +140,95 @@ public class ProfileEditHandler {
      * @param callback A callback interface to notify success or failure
      */
     public void deleteUserProfile(int userID, ProfileDB.ActionCallback callback) {
-        profileDB.deleteUser(userID, new ProfileDB.ActionCallback() {
+        // Call the ProfileDB method to delete all the EventUserLinks associated with the user and then delete the user profile
+        profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
             @Override
-            public void onSuccess() {
-                // Notify that the profile was successfully deleted
-                callback.onSuccess();
-            }
+            public void onSuccess(UserProfile user) {
+                ArrayList<String> linkIDs = user.getLinkIDs();
+                if (linkIDs == null || linkIDs.isEmpty()) {
+                    // No links to delete, proceed to delete user profile
+                    profileDB.deleteUser(userID, new ProfileDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notify that the profile was successfully deleted
+                            callback.onSuccess();
+                        }
 
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Notify failure in deleting the profile
+                            callback.onFailure(e);
+                        }
+                    });
+                    return;
+                }
+
+                for (String linkID : linkIDs) {
+                    int eventID = Integer.parseInt(linkID.split("_")[0]);
+                    eventUserLinkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Successfully deleted the EventUserLink
+                            eventDB.getEventByID(eventID, new EventDB.GetCallback<com.example.hotpot0.models.Event>() {
+                                @Override
+                                public void onSuccess(com.example.hotpot0.models.Event event) {
+                                    eventDB.removeLinkIDFromEvent(event, linkID, new EventDB.GetCallback<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // Successfully removed the linkID from the event
+                                            profileDB.removeLinkIDFromUser(user, linkID, new ProfileDB.GetCallback<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    // Successfully removed the linkID from the user
+                                                    profileDB.deleteUser(userID, new ProfileDB.ActionCallback() {
+                                                        @Override
+                                                        public void onSuccess() {
+                                                            // Notify that the profile was successfully deleted
+                                                            callback.onSuccess();
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Exception e) {
+                                                            // Notify failure in deleting the profile
+                                                            callback.onFailure(e);
+                                                        }
+                                                    });
+                                                }
+
+                                                @Override
+                                                public void onFailure(Exception e) {
+                                                    // Log the failure but continue
+                                                    e.printStackTrace();
+                                                }
+                                            });
+                                        }
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            // Log the failure but continue
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                }
+                                @Override
+                                public void onFailure(Exception e) {
+                                    // Log the failure but continue
+                                    e.printStackTrace();
+                                }
+                            });
+                        }
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Log the failure but continue
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            }
             @Override
             public void onFailure(Exception e) {
-                // Notify failure in deleting the profile
-                callback.onFailure(e);
+                // Log the failure but continue with deletion of user profile
+                e.printStackTrace();
             }
         });
     }
 }
-
