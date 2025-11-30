@@ -1,10 +1,14 @@
 package com.example.hotpot0.section2.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +27,7 @@ import com.google.android.gms.location.LocationServices;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
@@ -31,12 +36,16 @@ import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Activity that displays the details of a selected event and allows a user
  * to join or leave the waitlist based on their current status.
  */
 public class EventInitialActivity extends AppCompatActivity {
     private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft;
+
     private ImageView eventImage;
     private Button joinLeaveButton, backButton;
     private TextView GeolocationStatus;
@@ -83,6 +92,9 @@ public class EventInitialActivity extends AppCompatActivity {
         joinLeaveButton = findViewById(R.id.button_join_or_leave_waitlist);
         backButton = findViewById(R.id.button_BottomBackPreviewEvent);
 
+        Spinner eventDetailsSpinner = findViewById(R.id.EventDetailsSpinner);
+        Context activityContext = this;
+
         // Fetch the event details from EventDB
         eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
             @Override
@@ -95,15 +107,32 @@ public class EventInitialActivity extends AppCompatActivity {
                 currentEvent = event;
 
                 // Populate the UI with the event details
+                String imageURL = currentEvent.getImageURL();
+                if (imageURL == null || imageURL.isEmpty()) {
+                    // Hide the ImageView if no image is available
+                    eventImage.setVisibility(View.GONE);
+                } else {
+                    // Show the ImageView
+                    eventImage.setVisibility(View.VISIBLE);
+                    // Load image using Glide
+                    Glide.with(activityContext)
+                            .load(imageURL)
+                            .placeholder(R.drawable.placeholder_image) // optional placeholder
+                            .into(eventImage);
+                }
+
                 previewEventName.setText(currentEvent.getName());
                 previewDescription.setText(currentEvent.getDescription());
                 previewGuidelines.setText(currentEvent.getGuidelines());
-                previewLocation.setText("Location: " + currentEvent.getLocation());
-                previewTimeAndDay.setText("Time: " + currentEvent.getTime());
+                previewLocation.setText(currentEvent.getLocation());
+                previewTimeAndDay.setText(currentEvent.getTime());
                 // previewDateRange.setText("Date: " + currentEvent.getDate());
-                previewDuration.setText("Duration: " + currentEvent.getDuration());
-                previewPrice.setText("Price: $" + currentEvent.getPrice());
-                previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
+                previewDuration.setText(currentEvent.getDuration());
+                previewPrice.setText("$" + currentEvent.getPrice());
+                String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                        ? "All spots are filled!"
+                        : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+                previewSpotsOpen.setText(spotsOpen);
                 // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
                 // Handle geolocation status
@@ -113,6 +142,79 @@ public class EventInitialActivity extends AppCompatActivity {
 
                 // Now handle the join/leave button based on the user's status
                 String linkID = eventID + "_" + userID;
+
+                eventDetailsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        String selectedOption = parent.getItemAtPosition(position).toString();
+                        switch (selectedOption) {
+                            case "Guidelines":
+                                previewGuidelines.setVisibility(View.VISIBLE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Location":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.VISIBLE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Time":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.VISIBLE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Dates":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.VISIBLE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Duration":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.VISIBLE);
+                                previewPrice.setVisibility(View.GONE);
+                                break;
+                            case "Price":
+                                previewGuidelines.setVisibility(View.GONE);
+                                previewLocation.setVisibility(View.GONE);
+                                previewTimeAndDay.setVisibility(View.GONE);
+                                previewDateRange.setVisibility(View.GONE);
+                                previewDuration.setVisibility(View.GONE);
+                                previewPrice.setVisibility(View.VISIBLE);
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // Do nothing
+                    }
+                });
+
+                ArrayList<String> spinnerOptions = new ArrayList<>();
+                spinnerOptions.add("Guidelines");
+                spinnerOptions.add("Location");
+                spinnerOptions.add("Time");
+                spinnerOptions.add("Dates");
+                spinnerOptions.add("Duration");
+                spinnerOptions.add("Price");
+                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(activityContext, R.layout.spinner_selected_item, spinnerOptions);
+                spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                eventDetailsSpinner.setAdapter(spinnerAdapter);
 
                 // Fetch EventUserLink to determine if user is already in the waitlist
                 eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
@@ -182,8 +284,20 @@ public class EventInitialActivity extends AppCompatActivity {
                             eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
                                 @Override
                                 public void onSuccess(Integer result) {
-                                    Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
-                                    navigateHome();
+                                    switch (result) {
+                                        case 0: // Successfully added to waitlist
+                                            Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                                            navigateHome();
+                                            break;
+                                        case 1:
+                                            Toast.makeText(EventInitialActivity.this, "You are already affiliated with this event.", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        case 2: // Waitlist full
+                                            Toast.makeText(EventInitialActivity.this, "Waitlist is full, cannot join!", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        default:
+                                            Toast.makeText(EventInitialActivity.this, "Unknown status: " + result, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
 
                                 @Override

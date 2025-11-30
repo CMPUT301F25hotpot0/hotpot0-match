@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
@@ -99,15 +100,31 @@ public class EventSampledActivity extends AppCompatActivity {
      * Populates the UI elements with the current event's details.
      */
     private void populateUI() {
+        String imageURL = currentEvent.getImageURL();
+        if (imageURL == null || imageURL.isEmpty()) {
+            // Hide the ImageView if no image is available
+            eventImage.setVisibility(View.GONE);
+        } else {
+            // Show the ImageView
+            eventImage.setVisibility(View.VISIBLE);
+            // Load image using Glide
+            Glide.with(this)
+                    .load(imageURL)
+                    .placeholder(R.drawable.placeholder_image) // optional placeholder
+                    .into(eventImage);
+        }
         previewEventName.setText(currentEvent.getName());
         previewDescription.setText(currentEvent.getDescription());
         previewGuidelines.setText(currentEvent.getGuidelines());
-        previewLocation.setText("Location: " + currentEvent.getLocation());
-        previewTimeAndDay.setText("Time: " + currentEvent.getTime());
+        previewLocation.setText(currentEvent.getLocation());
+        previewTimeAndDay.setText(currentEvent.getTime());
         // previewDateRange.setText("Date: " + currentEvent.getDate());
-        previewDuration.setText("Duration: " + currentEvent.getDuration());
-        previewPrice.setText("Price: $" + currentEvent.getPrice());
-        previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
+        previewDuration.setText(currentEvent.getDuration());
+        previewPrice.setText("$" + currentEvent.getPrice());
+        String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                ? "All spots are filled!"
+                : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+        previewSpotsOpen.setText(spotsOpen);
         // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
         boolean geolocationEnabled = currentEvent.getGeolocationRequired();
