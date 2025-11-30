@@ -54,14 +54,14 @@ public class AdminHomeActivity extends AppCompatActivity {
                 startActivity(searchIntent);
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 return true;
-//            } else if (id == R.id.admin_images) {
-//                startActivity(new Intent(AdminHomeActivity.this, AdminSearchActivity.class));
-//                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-//                return true;
-//            } else if (id == R.id.admin_settings) {
+            } else if (id == R.id.admin_images) {
+                startActivity(new Intent(AdminHomeActivity.this, AdminImageActivity.class));
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                return true;
+            } else if (id == R.id.admin_settings) {
 //                startActivity(new Intent(AdminHomeActivity.this, AdminSettingsActivity.class));
 //                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-//                return true;
+                return true;
             }
             return false;
         });
