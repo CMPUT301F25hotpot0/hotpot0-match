@@ -44,26 +44,26 @@ public class AdminHomeActivity extends AppCompatActivity {
         // Optional: highlight "Home" as selected initially
         bottomNav.setSelectedItemId(R.id.admin_home);
 
-//        bottomNav.setOnItemSelectedListener(item -> {
-//            int id = item.getItemId();
-//            if (id == R.id.admin_home) {
-//                // Already on home
-//                return true;
-//            } else if (id == R.id.admin_search) {
-//                Intent searchIntent = new Intent(AdminHomeActivity.this, AdminSearchActivity.class);
-//                startActivity(searchIntent);
-//                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-//                return true;
-//            } else if (id == R.id.admin_images) {
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.admin_home) {
+                // Already on home
+                return true;
+            } else if (id == R.id.admin_search) {
+                Intent searchIntent = new Intent(AdminHomeActivity.this, AdminSearchActivity.class);
+                startActivity(searchIntent);
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                return true;
+            } else if (id == R.id.admin_images) {
 //                startActivity(new Intent(AdminHomeActivity.this, AdminSearchImageActivity.class));
 //                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-//                return true;
-//            } else if (id == R.id.admin_settings) {
+                return true;
+            } else if (id == R.id.admin_settings) {
 //                startActivity(new Intent(AdminHomeActivity.this, AdminSettingsActivity.class));
 //                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-//                return true;
-//            }
-//            return false;
-//        });
+                return true;
+            }
+            return false;
+        });
     }
 }
