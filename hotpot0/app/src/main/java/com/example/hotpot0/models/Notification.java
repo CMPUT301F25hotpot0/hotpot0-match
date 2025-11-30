@@ -98,4 +98,51 @@ public class Notification {
         return base.replace("[Event Name]", eventName);
     }
 
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public boolean isCustomNotif() {
+        return customNotif;
+    }
+
+    public void setCustomNotif(boolean customNotif) {
+        this.customNotif = customNotif;
+    }
+
+    public boolean isResampledNotif() {
+        return isResampledNotif;
+    }
+
+    public void setResampledNotif(boolean resampledNotif) {
+        isResampledNotif = resampledNotif;
+    }
 }

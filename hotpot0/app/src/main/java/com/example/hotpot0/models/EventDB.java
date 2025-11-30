@@ -376,6 +376,7 @@ public class EventDB {
                         .addOnFailureListener(callback::onFailure);
 
                 for (String linkID : allLinkIDs) {
+                    String userID = linkID.split("_")[1]; // Extract userID from linkID
                     if (sampled.contains(linkID)) {
                         Status status = new Status();
                         status.setStatus("Sampled");
@@ -394,6 +395,8 @@ public class EventDB {
                                 // Handle failure to add notification
                             }
                         });
+                    } else if (event.getOrganizerID().toString() == userID) {
+                        // Skip organizer
                     } else {
                         // Else inWaitList
                         Status status = new Status();
@@ -445,6 +448,26 @@ public class EventDB {
                 eventRef.update("sampledIDs", event.getSampledIDs())
                         .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
                         .addOnFailureListener(callback::onFailure);
+
+                for (String linkID : newlySampled) {
+                    Status status = new Status();
+                    status.setStatus("Sampled");
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    Date date = new Date();
+                    String now = formatter.format(date);
+                    Notification notif = new Notification(now, status, true, event.getName());
+                    eventUserLinkDB.addSampledNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notification added successfully
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Handle failure to add notification
+                        }
+                    });
+                }
             }
 
             @Override
