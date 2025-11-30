@@ -26,9 +26,9 @@
     <string name="event_description">Event Description</string>
     <string name="event_guidelines">Event Guidelines</string>
     <string name="location">Location</string>
-    <string name="what_time_does_event_occur">What time does event occur?</string>
+    <string name="what_time_does_event_occur">Event Start Time</string>
     <string name="when_does_event_occur">When does event occur? YYYY-MM-DD</string>
-    <string name="price_of_event">Price of event</string>
+    <string name="price_of_event">Event Price</string>
     <string name="number_of_people_you_can_accommodate">Event Total Capacity</string>
     <string name="preview_event">Preview Event</string>
     <string name="how_long_will_event_occur_dd_mm_yyyy_dd_mm_yyyy">How long will event occur?</string>

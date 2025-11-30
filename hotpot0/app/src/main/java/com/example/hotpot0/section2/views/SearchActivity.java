@@ -1,7 +1,9 @@
 package com.example.hotpot0.section2.views;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -19,8 +21,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Activity that allows users to search and view active events.
@@ -40,9 +46,16 @@ public class SearchActivity extends AppCompatActivity {
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
     private ImageButton infoButton;
     private ImageButton scanQrButton;
-    private Chip interestsFilterChip;
+    private Chip regFilterChip;
     private Chip fromDateFilterChip;
     private Chip toDateFilterChip;
+
+    private Date fromDateFilter = null;
+    private Date toDateFilter = null;
+    private final SimpleDateFormat EVENT_DATE_FORMATTER = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+
+    private enum RegStatus { ALL, ACTIVE, OPENING_SOON }
+    private RegStatus regStatusFilter = RegStatus.ALL;
 
     /**
      * Initializes the activity, sets up UI elements, bottom navigation,
@@ -63,7 +76,7 @@ public class SearchActivity extends AppCompatActivity {
         scanQrButton = findViewById(R.id.scan_qr_button);
 
         // Initialize filter chips
-        interestsFilterChip = findViewById(R.id.interestsFilterChip);
+        regFilterChip = findViewById(R.id.regFilterChip);
         fromDateFilterChip = findViewById(R.id.fromDateFilterChip);
         toDateFilterChip = findViewById(R.id.toDateFilterChip);
 
@@ -102,20 +115,50 @@ public class SearchActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Filter chips functionality
-        interestsFilterChip.setOnClickListener(v -> {
-            // TODO: Implement interests selection popup
-            Toast.makeText(this, "Interests filter to be implemented", Toast.LENGTH_SHORT).show();
+        // Registration Status Filter Chip
+        regFilterChip.setText("All"); // Default
+        regFilterChip.setText("All"); // Default
+        regFilterChip.setOnClickListener(v -> {
+            // Cycle through enum
+            switch (regStatusFilter) {
+                case ALL:
+                    regStatusFilter = RegStatus.ACTIVE;
+                    regFilterChip.setText("Reg. Active");
+                    break;
+                case ACTIVE:
+                    regStatusFilter = RegStatus.OPENING_SOON;
+                    regFilterChip.setText("Reg. Soon");
+                    break;
+                case OPENING_SOON:
+                    regStatusFilter = RegStatus.ALL;
+                    regFilterChip.setText("All");
+                    break;
+            }
+            applyCombinedFilters();
         });
 
+        // Date Filter Chips
         fromDateFilterChip.setOnClickListener(v -> {
-            // TODO: Implement from date picker
-            Toast.makeText(this, "From date filter to be implemented", Toast.LENGTH_SHORT).show();
+            showDatePicker(true);
         });
 
         toDateFilterChip.setOnClickListener(v -> {
-            // TODO: Implement to date picker
-            Toast.makeText(this, "To date filter to be implemented", Toast.LENGTH_SHORT).show();
+            showDatePicker(false);
+        });
+
+        // Long Press to clear chips
+        fromDateFilterChip.setOnLongClickListener(v -> {
+            fromDateFilter = null;
+            fromDateFilterChip.setText("From");
+            applyCombinedFilters();
+            return true; // indicate the event is consumed
+        });
+
+        toDateFilterChip.setOnLongClickListener(v -> {
+            toDateFilter = null;
+            toDateFilterChip.setText("To");
+            applyCombinedFilters();
+            return true;
         });
 
         eventDB = new EventDB();
@@ -164,7 +207,8 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterEvents(s.toString());
+                // filterEvents(s.toString());
+                applyCombinedFilters();
             }
 
             @Override
@@ -319,4 +363,152 @@ public class SearchActivity extends AppCompatActivity {
             return false;
         });
     }
+
+    // Date Filtering
+
+    private void showDatePicker(boolean isFromDate) {
+
+        final Calendar calendar = Calendar.getInstance();
+        Date preselected = isFromDate ? fromDateFilter : toDateFilter;
+
+        if (preselected != null) {
+            calendar.setTime(preselected);
+        }
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePicker = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    Calendar selectedCal = Calendar.getInstance();
+                    selectedCal.set(selectedYear, selectedMonth, selectedDay, 0, 0, 0);
+                    Date selectedDate = selectedCal.getTime();
+
+                    if (isFromDate) {
+                        fromDateFilter = selectedDate;
+                        fromDateFilterChip.setText("From: " + EVENT_DATE_FORMATTER.format(selectedDate));
+                    } else {
+                        toDateFilter = selectedDate;
+                        toDateFilterChip.setText("To: " + EVENT_DATE_FORMATTER.format(selectedDate));
+                    }
+
+                    applyCombinedFilters();
+                },
+                year, month, day
+        );
+
+        datePicker.show();
+    }
+
+    private List<Event> filterByDateRange(List<Event> events) {
+        List<Event> result = new ArrayList<>();
+
+        for (Event event : events) {
+            Date eventStart = parseEventDate(event.getStartDate());
+            Date eventEnd = parseEventDate(event.getEndDate());
+
+            if (eventStart == null) continue;
+            if (eventEnd == null) eventEnd = eventStart;
+
+            boolean matches = true;
+
+            if (fromDateFilter != null) {
+                matches &= !eventStart.before(fromDateFilter); // Event starts on/after From
+            }
+
+            if (toDateFilter != null) {
+                matches &= !eventEnd.after(toDateFilter);     // Event ends on/before To
+            }
+
+            if (matches) result.add(event);
+        }
+
+        return result;
+    }
+
+    private void applyCombinedFilters() {
+        String query = searchEditText.getText().toString().toLowerCase();
+
+        eventDB.getAllActiveEvents(new EventDB.GetCallback<List<Event>>() {
+            @Override
+            public void onSuccess(List<Event> allEvents) {
+
+                List<Event> filtered = new ArrayList<>();
+
+                for (Event event : allEvents) {
+                    // Filter by name
+                    if (!event.getName().toLowerCase().contains(query)) continue;
+
+                    // Filter by registration status
+                    if (!matchesRegStatus(event)) continue;
+
+                    filtered.add(event);
+                }
+
+                filtered = filterByDateRange(filtered);
+
+                List<String> statuses = new ArrayList<>();
+                for (int i = 0; i < filtered.size(); i++) statuses.add("");
+
+                List<Event> finalFiltered = filtered;
+                runOnUiThread(() -> {
+                    eventListView.setAdapter(new EventBlobAdapter(SearchActivity.this, finalFiltered, statuses, userID));
+                    fadeIn(eventListView);
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(SearchActivity.this, "Failed to apply filters", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private Date parseEventDate(String dateString) {
+        if (dateString == null || dateString.trim().isEmpty()) return null;
+
+        try {
+            return EVENT_DATE_FORMATTER.parse(dateString);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // Registration Status Filter
+
+    private Date parseRegDate(String dateString) {
+        if (dateString == null || dateString.trim().isEmpty()) return null;
+        try {
+            return EVENT_DATE_FORMATTER.parse(dateString);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean matchesRegStatus(Event event) {
+        if (!Boolean.TRUE.equals(event.getIsEventActive())) return false; // Only active events
+
+        Date now = new Date();
+        Date regStart = parseRegDate(event.getRegistrationStart());
+        Date regEnd = parseRegDate(event.getRegistrationEnd());
+
+        switch (regStatusFilter) {
+            case ALL:
+                return true;
+            case ACTIVE:
+                if (regStart != null && regEnd != null) {
+                    return !now.before(regStart) && !now.after(regEnd);
+                }
+                return false;
+            case OPENING_SOON:
+                if (regStart != null) {
+                    return now.before(regStart);
+                }
+                return false;
+        }
+        return true;
+    }
+
 }
