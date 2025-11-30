@@ -169,8 +169,8 @@
             <!-- Results List -->
             <ListView
                 android:id="@+id/searchResultsListView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="416dp"
                 android:dividerHeight="1dp" />
         </LinearLayout>
     </ScrollView>
