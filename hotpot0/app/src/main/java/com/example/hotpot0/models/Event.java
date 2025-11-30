@@ -51,6 +51,7 @@ public class Event {
         this.linkIDs = new ArrayList<>();
         this.sampledIDs = new ArrayList<>();
         this.cancelledIDs = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     public Event(Integer organizerID, String name, String description, String guidelines, String location, String time, String startDate, String endDate,
@@ -77,6 +78,7 @@ public class Event {
         this.linkIDs = new ArrayList<>();
         this.sampledIDs = new ArrayList<>();
         this.cancelledIDs = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -289,6 +291,14 @@ public class Event {
 
     public void setQrValue(String qrValue) {
         this.qrValue = qrValue;
+    }
+
+    public ArrayList<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(ArrayList<Notification> notifications) {
+        this.notifications = notifications;
     }
 
     // Utility Methods
