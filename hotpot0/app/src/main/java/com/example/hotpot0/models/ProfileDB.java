@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * ProfileDB handles all Firestore operations for UserProfile and AdminProfile.
@@ -21,7 +22,6 @@ public class ProfileDB {
 
     // Firestore instance
     private final FirebaseFirestore db;
-
     // Collection names
     private static final String USERS_COLLECTION = "UserProfiles";
     private static final String ADMINS_COLLECTION = "AdminProfiles";
@@ -47,6 +47,9 @@ public class ProfileDB {
         void onSuccess();
         void onFailure(Exception e);
     }
+
+    // UTILITY METHODS
+    // ===============
 
     /**
      * Utility method to convert an ArrayList<String> of linkIDs in UserProfile
@@ -83,11 +86,23 @@ public class ProfileDB {
             }
 
             // Get the array of IDs already in use
-            ArrayList<Long> idsInUseLong = (ArrayList<Long>) documentSnapshot.get("idsInUse");
+//            ArrayList<Long> idsInUseLong = (ArrayList<Long>) documentSnapshot.get("idsInUse");
+//            ArrayList<Integer> idsInUse = new ArrayList<>();
+//            if (idsInUseLong != null) {
+//                for (Long id : idsInUseLong) {
+//                    idsInUse.add(id.intValue());
+//                }
+//            }
+
+            // Safer Method of retrieving IDs in use
+            List<Object> idsInUseObjects = (List<Object>) documentSnapshot.get("idsInUse");
             ArrayList<Integer> idsInUse = new ArrayList<>();
-            if (idsInUseLong != null) {
-                for (Long id : idsInUseLong) {
-                    idsInUse.add(id.intValue());
+
+            if (idsInUseObjects != null) {
+                for (Object obj : idsInUseObjects) {
+                    if (obj instanceof Number) {
+                        idsInUse.add(((Number) obj).intValue());
+                    }
                 }
             }
 
@@ -229,7 +244,6 @@ public class ProfileDB {
             }
         });
     }
-
 
     /**
      * Updates an existing UserProfile in Firestore.

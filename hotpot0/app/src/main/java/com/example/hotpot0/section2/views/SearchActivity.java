@@ -1,11 +1,13 @@
 package com.example.hotpot0.section2.views;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,9 +18,15 @@ import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.textfield.TextInputEditText;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Activity that allows users to search and view active events.
@@ -30,13 +38,24 @@ import java.util.List;
  */
 public class SearchActivity extends AppCompatActivity {
 
+    private int userID;
     private BottomNavigationView bottomNav;
     private ListView eventListView;
-    private SearchView searchView;
+    private TextInputEditText searchEditText;
     private EventDB eventDB;
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
     private ImageButton infoButton;
-    private int userID;
+    private ImageButton scanQrButton;
+    private Chip regFilterChip;
+    private Chip fromDateFilterChip;
+    private Chip toDateFilterChip;
+
+    private Date fromDateFilter = null;
+    private Date toDateFilter = null;
+    private final SimpleDateFormat EVENT_DATE_FORMATTER = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+
+    private enum RegStatus { ALL, ACTIVE, OPENING_SOON }
+    private RegStatus regStatusFilter = RegStatus.ALL;
 
     /**
      * Initializes the activity, sets up UI elements, bottom navigation,
@@ -51,12 +70,23 @@ public class SearchActivity extends AppCompatActivity {
 
         // Initialize UI elements
         eventListView = findViewById(R.id.event_list_view);
-        searchView = findViewById(R.id.searchView);
+        searchEditText = findViewById(R.id.searchEditText);
         bottomNav = findViewById(R.id.bottomNavigationView);
         infoButton = findViewById(R.id.info_button);
+        scanQrButton = findViewById(R.id.scan_qr_button);
+
+        // Initialize filter chips
+        regFilterChip = findViewById(R.id.regFilterChip);
+        fromDateFilterChip = findViewById(R.id.fromDateFilterChip);
+        toDateFilterChip = findViewById(R.id.toDateFilterChip);
 
         userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
 
+        // Handling Bottom Navigation Bar
+        bottomNav = findViewById(R.id.bottomNavigationView);
+        setupBottomNavigation();
+
+        // Info button functionality
         infoButton.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Welcome to Eventure!")
@@ -76,6 +106,59 @@ public class SearchActivity extends AppCompatActivity {
                             "• View your profile in the Profile Tab. ")
                     .setPositiveButton("Ok", null)
                     .show();
+        });
+
+        scanQrButton.setOnClickListener(v -> {
+            // Toast.makeText(this, "Launching Camera", Toast.LENGTH_SHORT).show();
+            // Launch QRActivity
+            Intent intent = new Intent(SearchActivity.this, QRActivity.class);
+            startActivity(intent);
+        });
+
+        // Registration Status Filter Chip
+        regFilterChip.setText("All"); // Default
+        regFilterChip.setText("All"); // Default
+        regFilterChip.setOnClickListener(v -> {
+            // Cycle through enum
+            switch (regStatusFilter) {
+                case ALL:
+                    regStatusFilter = RegStatus.ACTIVE;
+                    regFilterChip.setText("Reg. Active");
+                    break;
+                case ACTIVE:
+                    regStatusFilter = RegStatus.OPENING_SOON;
+                    regFilterChip.setText("Reg. Soon");
+                    break;
+                case OPENING_SOON:
+                    regStatusFilter = RegStatus.ALL;
+                    regFilterChip.setText("All");
+                    break;
+            }
+            applyCombinedFilters();
+        });
+
+        // Date Filter Chips
+        fromDateFilterChip.setOnClickListener(v -> {
+            showDatePicker(true);
+        });
+
+        toDateFilterChip.setOnClickListener(v -> {
+            showDatePicker(false);
+        });
+
+        // Long Press to clear chips
+        fromDateFilterChip.setOnLongClickListener(v -> {
+            fromDateFilter = null;
+            fromDateFilterChip.setText("From");
+            applyCombinedFilters();
+            return true; // indicate the event is consumed
+        });
+
+        toDateFilterChip.setOnLongClickListener(v -> {
+            toDateFilter = null;
+            toDateFilterChip.setText("To");
+            applyCombinedFilters();
+            return true;
         });
 
         eventDB = new EventDB();
@@ -110,18 +193,26 @@ public class SearchActivity extends AppCompatActivity {
         loadAllEvents();
 
         // Search functionality
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchEditText.setOnClickListener(v -> {
+            // Clear the hint text when user clicks to type
+            if (searchEditText.getText().toString().isEmpty()) {
+                searchEditText.setHint("");
+            }
+        });
+
+        // Add text watcher for real-time search
+        searchEditText.addTextChangedListener(new android.text.TextWatcher() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterEvents(query);
-                return true;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // filterEvents(s.toString());
+                applyCombinedFilters();
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                filterEvents(newText);
-                return true;
-            }
+            public void afterTextChanged(android.text.Editable s) {}
         });
     }
 
@@ -175,6 +266,7 @@ public class SearchActivity extends AppCompatActivity {
                             if (events.size() == allEvents.size()) {
                                 runOnUiThread(() -> {
                                     eventListView.setAdapter(new EventBlobAdapter(SearchActivity.this, events, statuses, userID));
+                                    fadeIn(eventListView);
                                 });
                             }
                         }
@@ -213,6 +305,7 @@ public class SearchActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     EventBlobAdapter adapter = new EventBlobAdapter(SearchActivity.this, filteredEvents, statuses, userID);
                     eventListView.setAdapter(adapter);
+                    fadeIn(eventListView);
                 });
             }
 
@@ -222,4 +315,200 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void fadeIn(View view) {
+        view.setAlpha(0f);
+        view.animate().alpha(1f).setDuration(300).start();
+    }
+
+    private void setupBottomNavigation() {
+        // Highlight the Search tab when entering this activity
+        bottomNav.setSelectedItemId(R.id.nav_search);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(SearchActivity.this, HomeActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_events) {
+                startActivity(new Intent(SearchActivity.this, CreateEventActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_search) {
+                return true;
+            }
+
+            if (id == R.id.nav_notifications) {
+                startActivity(new Intent(SearchActivity.this, NotificationsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                startActivity(new Intent(SearchActivity.this, ProfileActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    // Date Filtering
+
+    private void showDatePicker(boolean isFromDate) {
+
+        final Calendar calendar = Calendar.getInstance();
+        Date preselected = isFromDate ? fromDateFilter : toDateFilter;
+
+        if (preselected != null) {
+            calendar.setTime(preselected);
+        }
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePicker = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    Calendar selectedCal = Calendar.getInstance();
+                    selectedCal.set(selectedYear, selectedMonth, selectedDay, 0, 0, 0);
+                    Date selectedDate = selectedCal.getTime();
+
+                    if (isFromDate) {
+                        fromDateFilter = selectedDate;
+                        fromDateFilterChip.setText("From: " + EVENT_DATE_FORMATTER.format(selectedDate));
+                    } else {
+                        toDateFilter = selectedDate;
+                        toDateFilterChip.setText("To: " + EVENT_DATE_FORMATTER.format(selectedDate));
+                    }
+
+                    applyCombinedFilters();
+                },
+                year, month, day
+        );
+
+        datePicker.show();
+    }
+
+    private List<Event> filterByDateRange(List<Event> events) {
+        List<Event> result = new ArrayList<>();
+
+        for (Event event : events) {
+            Date eventStart = parseEventDate(event.getStartDate());
+            Date eventEnd = parseEventDate(event.getEndDate());
+
+            if (eventStart == null) continue;
+            if (eventEnd == null) eventEnd = eventStart;
+
+            boolean matches = true;
+
+            if (fromDateFilter != null) {
+                matches &= !eventStart.before(fromDateFilter); // Event starts on/after From
+            }
+
+            if (toDateFilter != null) {
+                matches &= !eventEnd.after(toDateFilter);     // Event ends on/before To
+            }
+
+            if (matches) result.add(event);
+        }
+
+        return result;
+    }
+
+    private void applyCombinedFilters() {
+        String query = searchEditText.getText().toString().toLowerCase();
+
+        eventDB.getAllActiveEvents(new EventDB.GetCallback<List<Event>>() {
+            @Override
+            public void onSuccess(List<Event> allEvents) {
+
+                List<Event> filtered = new ArrayList<>();
+
+                for (Event event : allEvents) {
+                    // Filter by name
+                    if (!event.getName().toLowerCase().contains(query)) continue;
+
+                    // Filter by registration status
+                    if (!matchesRegStatus(event)) continue;
+
+                    filtered.add(event);
+                }
+
+                filtered = filterByDateRange(filtered);
+
+                List<String> statuses = new ArrayList<>();
+                for (int i = 0; i < filtered.size(); i++) statuses.add("");
+
+                List<Event> finalFiltered = filtered;
+                runOnUiThread(() -> {
+                    eventListView.setAdapter(new EventBlobAdapter(SearchActivity.this, finalFiltered, statuses, userID));
+                    fadeIn(eventListView);
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(SearchActivity.this, "Failed to apply filters", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private Date parseEventDate(String dateString) {
+        if (dateString == null || dateString.trim().isEmpty()) return null;
+
+        try {
+            return EVENT_DATE_FORMATTER.parse(dateString);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // Registration Status Filter
+
+    private Date parseRegDate(String dateString) {
+        if (dateString == null || dateString.trim().isEmpty()) return null;
+        try {
+            return EVENT_DATE_FORMATTER.parse(dateString);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean matchesRegStatus(Event event) {
+        if (!Boolean.TRUE.equals(event.getIsEventActive())) return false; // Only active events
+
+        Date now = new Date();
+        Date regStart = parseRegDate(event.getRegistrationStart());
+        Date regEnd = parseRegDate(event.getRegistrationEnd());
+
+        switch (regStatusFilter) {
+            case ALL:
+                return true;
+            case ACTIVE:
+                if (regStart != null && regEnd != null) {
+                    return !now.before(regStart) && !now.after(regEnd);
+                }
+                return false;
+            case OPENING_SOON:
+                if (regStart != null) {
+                    return now.before(regStart);
+                }
+                return false;
+        }
+        return true;
+    }
+
 }

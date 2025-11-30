@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
@@ -8,101 +9,232 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <!-- Uploaded Image Placeholder -->
-        <ImageView
-            android:id="@+id/eventImage"
+        <!-- Event Image - Updated to MaterialCardView -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginBottom="16dp"
-            android:background="#E0E0E0"
-            android:scaleType="centerCrop"/>
+            android:layout_height="230dp"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true">
 
-        <!-- Dynamic Event Info -->
+            <ImageView
+                android:id="@+id/eventImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:maxHeight="400dp"
+                android:contentDescription="Event Poster" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Event Name -->
         <TextView
             android:id="@+id/previewEventName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:text="Event Name"
+            android:textColor="@color/text"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:gravity="center"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Description -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <!-- Guidelines -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Guidelines"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewGuidelines"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <!-- Location -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <!-- Time and Date -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewTimeAndDay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Event Dates"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewDateRange"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <!-- Duration -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Duration"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewDuration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <!-- Price -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Price"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <!-- Capacity -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Total Spots Open"
+            android:textColor="@color/text"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/previewSpotsOpen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <!-- Currently in Waiting List -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Currently in Waiting List"
+            android:textColor="@color/text"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/previewWaitingList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:textSize="15sp" />
+
+        <!-- Registration Period & Days left -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Registration Period"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewDaysLeft"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="24dp" />
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="16dp"
+            android:textSize="15sp" />
 
+        <!-- Geolocation -->
         <TextView
             android:id="@+id/GeolocationStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="24dp"
+            android:text="Geolocation Enabled"
+            android:gravity="center"
             android:textColor="@color/text"
             android:textStyle="bold"
-            android:visibility="gone"/>
+            android:layout_marginBottom="24dp"
+            android:visibility="gone" />
 
-        <!-- Confirm and Back Buttons -->
+        <!-- Join/Leave Waitlist and Back Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

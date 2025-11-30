@@ -29,7 +29,10 @@ public class UserProfile {
 
     /**
      * Required empty constructor for Firestore deserialization.*/
-    public UserProfile() {}
+    public UserProfile() {
+        this.deviceID = "Default Constructor cannot initialize Device ID";
+        this.linkIDs = new ArrayList<>();
+    }
 
     /**
      * Constructs a new UserProfile using provided user details and
@@ -203,7 +206,7 @@ public class UserProfile {
      *
      * @param linkID index or value to remove from the list
      */
-    public void removeLinkID(int linkID) {
+    public void removeLinkID(String linkID) {
         linkIDs.remove(linkID);
     }
 

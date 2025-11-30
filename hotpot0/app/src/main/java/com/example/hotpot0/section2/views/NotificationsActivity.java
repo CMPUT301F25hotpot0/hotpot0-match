@@ -39,6 +39,7 @@ public class NotificationsActivity extends AppCompatActivity {
         currentInvitationsList = findViewById(R.id.current_invitations_list);
         otherUpdatesList = findViewById(R.id.other_updates_list);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        setupBottomNavigation();
 
         currentInvitations = new ArrayList<>();
         otherUpdates = new ArrayList<>();
@@ -95,4 +96,46 @@ public class NotificationsActivity extends AppCompatActivity {
         });
     }
 
+    private void setupBottomNavigation() {
+        bottomNavigationView.setSelectedItemId(R.id.nav_notifications);
+        // Handling Bottom Navigation Bar
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(NotificationsActivity.this, HomeActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_search) {
+                startActivity(new Intent(NotificationsActivity.this, SearchActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_events) {
+                startActivity(new Intent(NotificationsActivity.this, CreateEventActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                startActivity(new Intent(NotificationsActivity.this, ProfileActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_notifications) {
+                // Already on this activity, do nothing
+                return true;
+            }
+
+            return false;
+        });
+    }
 }
