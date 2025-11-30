@@ -127,6 +127,21 @@
                 android:padding="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Hint Text below Search Bar -->
+        <TextView
+            android:id="@+id/filterHintText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="* Long press start/end filter to clear input"
+            android:textSize="12sp"
+            android:textColor="@color/text"
+            android:layout_marginBottom="8dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:ellipsize="none"
+            android:scrollHorizontally="false"
+            android:singleLine="false" />
+
         <!-- Filter Chips -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/filterChipGroup"
@@ -135,12 +150,12 @@
             android:layout_marginBottom="16dp"
             app:singleSelection="false">
 
-            <!-- Interests Filter Chip -->
+            <!-- Reg. Status Filter Chip (Old Interest Chip) -->
             <com.google.android.material.chip.Chip
-                android:id="@+id/interestsFilterChip"
+                android:id="@+id/regFilterChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Interests"
+                android:text="All"
                 app:chipBackgroundColor="@color/bar"
                 app:chipStrokeColor="@color/text"
                 app:checkedIconVisible="false"
@@ -152,7 +167,7 @@
                 android:id="@+id/fromDateFilterChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="From Date"
+                android:text="From"
                 app:chipBackgroundColor="@color/bar"
                 app:chipStrokeColor="@color/text"
                 app:checkedIconVisible="false"
@@ -164,7 +179,7 @@
                 android:id="@+id/toDateFilterChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="To Date"
+                android:text="To"
                 app:chipBackgroundColor="@color/bar"
                 app:chipStrokeColor="@color/text"
                 app:checkedIconVisible="false"

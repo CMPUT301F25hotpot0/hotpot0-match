@@ -157,6 +157,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:endIconMode="clear_text"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -175,6 +176,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/description_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -196,6 +198,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/guidelines_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -217,6 +220,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/location_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -238,6 +242,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/time_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -256,53 +261,11 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Event Date Fields -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/start_date_layout"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_event_start_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Start Date"
-                    android:inputType="none"
-                    android:focusable="false"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/end_date_layout"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusBottomEnd="12dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_event_end_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="End Date (Optional)"
-                    android:inputType="none"
-                    android:focusable="false"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Duration Field (Optional - you might remove this if dates cover duration) -->
+            <!-- Duration Field -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/duration_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -323,6 +286,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/price_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -344,6 +308,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/capacity_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -365,6 +330,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/waiting_capacity_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -378,15 +344,17 @@
                     android:id="@+id/input_waiting_list_capacity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Optional Waiting List Cap"
+                    android:hint="Wating List Capacity (Optional)"
                     android:inputType="number"
                     android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
             <!-- Registration Period Fields -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registration_start_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -408,6 +376,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registration_end_layout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -420,7 +389,52 @@
                     android:id="@+id/input_registration_end_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Registration End Date (Optional)"
+                    android:hint="Registration End Date"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Event Date Fields -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/start_date_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_start_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Event Start Date"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/end_date_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_event_end_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Event End Date (Optional)"
                     android:inputType="none"
                     android:focusable="false"
                     android:maxLines="1" />

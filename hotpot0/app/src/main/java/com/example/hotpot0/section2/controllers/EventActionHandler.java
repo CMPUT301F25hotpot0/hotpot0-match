@@ -67,7 +67,7 @@ public class EventActionHandler {
      *                     <li>{@code onFailure(e)} – failure during database operation</li>
      *                 </ul>
      */
-    public void joinWaitList(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
+    public void joinWaitList(Integer userID, Integer eventID, Double latitude, Double longitude, ProfileDB.GetCallback<Integer> callback) {
         // Construct the linkID
         String linkID = generateLinkID(userID, eventID);
 
@@ -94,7 +94,7 @@ public class EventActionHandler {
                             // There is space in the waitlist, proceed with adding the user
                             // If no EventUserLink was found, the user can join the waitlist.
                             // Create a new EventUserLink for the user with the default "inWaitList" status
-                            EventUserLink newEventUserLink = new EventUserLink(userID, eventID);
+                            EventUserLink newEventUserLink = new EventUserLink(userID, eventID, latitude, longitude);
 
                             // Add the new EventUserLink to Firestore
                             eventUserLinkDB.addEventUserLink(newEventUserLink, new EventUserLinkDB.GetCallback<EventUserLink>() {

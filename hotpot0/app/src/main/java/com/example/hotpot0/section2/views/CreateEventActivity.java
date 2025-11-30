@@ -242,17 +242,43 @@ public class CreateEventActivity extends AppCompatActivity {
         inputEventTime.setOnClickListener(v -> showTimePicker(inputEventTime));
 
         // Event Start Date
-        inputEventStartDate.setOnClickListener(v -> showDatePicker(
-                inputEventStartDate,
-                "Select Event Start Date",
-                (view, year, month, day) -> {
-                    eventStartCalendar.set(year, month, day);
-                    inputEventStartDate.setText(dateFormatter.format(eventStartCalendar.getTime()));
-                }
-        ));
+//        inputEventStartDate.setOnClickListener(v -> showDatePicker(
+//                inputEventStartDate,
+//                "Select Event Start Date",
+//                (view, year, month, day) -> {
+//                    eventStartCalendar.set(year, month, day);
+//                    inputEventStartDate.setText(dateFormatter.format(eventStartCalendar.getTime()));
+//                }
+//        ));
+        inputEventStartDate.setOnClickListener(v -> {
+            // Ensure registration end date is selected first
+            if (TextUtils.isEmpty(inputRegistrationEndDate.getText())) {
+                Toast.makeText(this, "Select Registration End Date first", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            DatePickerDialog eventStartPicker = new DatePickerDialog(
+                    this,
+                    (view, year, month, day) -> {
+                        eventStartCalendar.set(year, month, day);
+                        inputEventStartDate.setText(dateFormatter.format(eventStartCalendar.getTime()));
+                    },
+                    eventStartCalendar.get(Calendar.YEAR),
+                    eventStartCalendar.get(Calendar.MONTH),
+                    eventStartCalendar.get(Calendar.DAY_OF_MONTH)
+            );
+
+            // enforce: eventStart ≥ registrationEnd
+            long oneDay = 24L * 60 * 60 * 1000;
+            eventStartPicker.getDatePicker().setMinDate(regEndCalendar.getTimeInMillis() + oneDay);
+
+            eventStartPicker.setTitle("Select Event Start Date");
+            eventStartPicker.show();
+        });
 
         // Event End Date (should be >= start)
         inputEventEndDate.setOnClickListener(v -> {
+            inputEventEndDate.setText("");
             DatePickerDialog endPicker = new DatePickerDialog(
                     this,
                     (view, year, month, day) -> {
@@ -266,8 +292,10 @@ public class CreateEventActivity extends AppCompatActivity {
 
             endPicker.setTitle("Select Event End Date");
             // Prevent selecting before start date
-            if (eventStartCalendar != null)
-                endPicker.getDatePicker().setMinDate(eventStartCalendar.getTimeInMillis());
+            if (eventStartCalendar != null) {
+                long oneDay = 24L * 60 * 60 * 1000;
+                endPicker.getDatePicker().setMinDate(eventStartCalendar.getTimeInMillis() + oneDay);
+            }
             endPicker.show();
         });
 
@@ -429,6 +457,44 @@ public class CreateEventActivity extends AppCompatActivity {
      */
     private boolean validateRequiredFields() {
 
+        // Convert to timestamps for comparison
+        long today = toDateOnlyMillis(Calendar.getInstance());
+        long regStart = toDateOnlyMillis(regStartCalendar);
+        long regEnd = toDateOnlyMillis(regEndCalendar);
+        long eventStart = toDateOnlyMillis(eventStartCalendar);
+        long eventEnd = toDateOnlyMillis(eventEndCalendar);
+
+        // Registration Start Date ≥ Today ---
+        if (regStart < today) {
+            inputRegistrationStartDate.setError("Registration start cannot be in the past");
+            inputRegistrationStartDate.requestFocus();
+            return false;
+        }
+
+        // Registration End Date ≥ Registration Start Date ---
+        if (regEnd < regStart) {
+            inputRegistrationEndDate.setError("Registration end must be after registration start");
+            inputRegistrationEndDate.requestFocus();
+            return false;
+        }
+
+        // Event Start Date ≥ Registration End Date + 1 day ---
+        long minEventStart = regEnd + 24 * 60 * 60 * 1000; // +1 day
+        if (eventStart < minEventStart) {
+            inputEventStartDate.setError("Event must start at least 1 day after registration ends");
+            inputEventStartDate.requestFocus();
+            return false;
+        }
+
+        // Event End Date ≥ Event Start Date (if end date provided) ---
+        if (!TextUtils.isEmpty(inputEventEndDate.getText().toString().trim())) {
+            if (eventEnd < eventStart) {
+                inputEventEndDate.setError("Event end must be after event start");
+                inputEventEndDate.requestFocus();
+                return false;
+            }
+        }
+
         if (TextUtils.isEmpty(name.getText().toString().trim())) {
             name.setError("Required");
             name.requestFocus();
@@ -530,8 +596,9 @@ public class CreateEventActivity extends AppCompatActivity {
             capacity.requestFocus();
             return false;
         }
+        int capacityValue;
         try {
-            int capacityValue = Integer.parseInt(capacityStr);
+            capacityValue = Integer.parseInt(capacityStr);
             if (capacityValue <= 0) {
                 capacity.setError("Must be positive");
                 capacity.requestFocus();
@@ -545,11 +612,17 @@ public class CreateEventActivity extends AppCompatActivity {
 
         // Waiting list capacity validation (optional, same as above)
         String waitingListStr = waitingListCapacity.getText().toString().trim();
+        capacityValue = Integer.parseInt(capacityStr);
         if (!TextUtils.isEmpty(waitingListStr)) {
             try {
                 int waitingListValue = Integer.parseInt(waitingListStr);
                 if (waitingListValue < 0) {
                     waitingListCapacity.setError("Must be zero or positive");
+                    waitingListCapacity.requestFocus();
+                    return false;
+                }
+                if (waitingListValue < capacityValue) {
+                    waitingListCapacity.setError("Waiting list must be ≥ capacity");
                     waitingListCapacity.requestFocus();
                     return false;
                 }
@@ -560,6 +633,13 @@ public class CreateEventActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+    private long toDateOnlyMillis(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
     }
 
     // Enable/disable preview button based on required fields

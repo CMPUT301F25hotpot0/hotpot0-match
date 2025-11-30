@@ -308,10 +308,12 @@ public class PreviewActivity extends AppCompatActivity {
     }
 
     private String buildDateRange(String startDate, String endDate) {
-        if (startDate != null && endDate != null) {
+        if (startDate != null && startDate.equals(endDate)) {
+            return startDate;
+        } else if (startDate != null && endDate != null && !endDate.isEmpty()) {
             return startDate + " to " + endDate;
         } else if (startDate != null) {
-            return startDate + " (Single day event)";
+            return startDate;
         } else {
             return "No dates specified";
         }
@@ -361,7 +363,9 @@ public class PreviewActivity extends AppCompatActivity {
     }
 
     private String buildRegistrationPeriod(String registrationStart, String registrationEnd) {
-        if (registrationStart != null && registrationEnd != null) {
+        if (registrationStart != null && registrationStart.equals(registrationEnd)) {
+            return registrationStart;
+        } else if (registrationStart != null && registrationEnd != null && !registrationEnd.isEmpty()) {
             return registrationStart + " to " + registrationEnd;
         } else if (registrationStart != null) {
             return "Starts: " + registrationStart;
