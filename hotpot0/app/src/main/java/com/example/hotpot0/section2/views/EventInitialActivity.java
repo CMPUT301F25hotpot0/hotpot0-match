@@ -84,9 +84,9 @@ public class EventInitialActivity extends AppCompatActivity {
                 // previewDateRange.setText("Date: " + currentEvent.getDate());
                 previewDuration.setText(currentEvent.getDuration());
                 previewPrice.setText("$" + currentEvent.getPrice());
-                String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                String spotsOpen = (currentEvent.getWaitingListCapacity() - currentEvent.getTotalWaitlist()) == 0
                         ? "All spots are filled!"
-                        : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+                        : Integer.toString(currentEvent.getWaitingListCapacity() - currentEvent.getTotalWaitlist());
                 previewSpotsOpen.setText(spotsOpen);
                 // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
