@@ -88,7 +88,7 @@ public class EventActionHandler {
                 eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
                     @Override
                     public void onSuccess(Event eventObj) {
-                        int capacity = eventObj.getCapacity();
+                        int capacity = eventObj.getWaitingListCapacity();
                         int currentCount = eventObj.getTotalWaitlist();
                         if (currentCount < capacity) {
                             // There is space in the waitlist, proceed with adding the user
