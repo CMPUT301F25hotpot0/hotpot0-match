@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -26,10 +25,8 @@ public class AdminSearchActivity extends AppCompatActivity {
     private ListView listView;
     private EditText searchBar;
     private ChipGroup chipGroup;
-
     private List<Event> allEvents = new ArrayList<>();
     private List<Event> filteredEvents = new ArrayList<>();
-
     private AdminEventAdapter adapter;
 
     @Override
