@@ -15,6 +15,7 @@ import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.section3.adapters.AdminEventAdapter;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
@@ -46,6 +47,34 @@ public class AdminSearchActivity extends AppCompatActivity {
         loadEvents();
         setupSearchFilter();
         setupItemClick();
+
+        // Set Home as selected by default
+        BottomNavigationView bottomNav = findViewById(R.id.adminBottomNavigationView);
+
+        // Optional: highlight "Home" as selected initially
+        bottomNav.setSelectedItemId(R.id.admin_home);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.admin_search) {
+                // Already on search
+                return true;
+            } else if (id == R.id.admin_home) {
+                Intent searchIntent = new Intent(AdminSearchActivity.this, AdminHomeActivity.class);
+                startActivity(searchIntent);
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                return true;
+            } else if (id == R.id.admin_images) {
+                startActivity(new Intent(AdminSearchActivity.this, AdminImageActivity.class));
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                return true;
+            } else if (id == R.id.admin_settings) {
+//                startActivity(new Intent(AdminSearchActivity.this, AdminSettingsActivity.class));
+//                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                return true;
+            }
+            return false;
+        });
     }
 
     private void loadEvents() {
