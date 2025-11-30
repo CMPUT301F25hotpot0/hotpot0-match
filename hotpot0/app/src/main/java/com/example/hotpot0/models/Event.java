@@ -33,6 +33,8 @@ public class Event {
     private ArrayList<String> sampledIDs;
     private ArrayList<String> cancelledIDs;
 
+    private ArrayList<Notification> notifications;
+
     /**
      * Default constructor used by Firestore for deserialization.
      * Initializes empty participant lists and default values.
@@ -373,6 +375,7 @@ public class Event {
         this.sampledIDs.clear(); // Replace previous sample
         this.sampledIDs.addAll(sampled);
 
+
         return this.sampledIDs;
     }
 
@@ -410,6 +413,16 @@ public class Event {
 
         this.sampledIDs.addAll(newlySampled);
         return newlySampled;
+    }
+
+    /** Adds a notification to the event's notification list.
+     * @param notification the notification to add
+     */
+    public void addNotification(Notification notification) {
+        if (this.notifications == null) {
+            this.notifications = new ArrayList<>();
+        }
+        this.notifications.add(notification);
     }
 
     /**
