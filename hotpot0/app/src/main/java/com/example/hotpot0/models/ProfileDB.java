@@ -412,4 +412,22 @@ public class ProfileDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
+
+    public void getAllUserProfiles(@NonNull GetCallback<List<UserProfile>> callback) {
+
+        db.collection(USERS_COLLECTION)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+
+                    List<UserProfile> list = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        UserProfile user = doc.toObject(UserProfile.class);
+                        if (user != null) list.add(user);
+                    }
+
+                    callback.onSuccess(list);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
 }

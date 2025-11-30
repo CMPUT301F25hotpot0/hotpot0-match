@@ -35,6 +35,7 @@
         <activity android:name=".section2.views.CreateEventActivity" />
         <activity android:name=".section2.views.PreviewActivity" />
         <activity android:name=".section3.views.AdminHomeActivity" />
+        <activity android:name=".section3.views.AdminOrganizerViewActivity" />
         <activity android:name=".section3.views.AdminSearchActivity" />
         <activity android:name=".section3.views.ManageEventActivity" />
         <activity android:name=".section2.views.ProfileActivity"/>
