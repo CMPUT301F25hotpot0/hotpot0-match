@@ -206,4 +206,34 @@ public class EventUserLinkDB {
             });
         }
     }
+
+    public void addSampledNotification(String linkID, Notification notification, @NonNull ActionCallback callback) {
+        getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink eventUserLink) {
+                eventUserLink.addNotification(notification);
+                updateEventUserLink(eventUserLink, callback);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    public void addWaitlistNotification(String linkID, Notification notification, @NonNull ActionCallback callback) {
+        getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink eventUserLink) {
+                eventUserLink.addNotification(notification);
+                updateEventUserLink(eventUserLink, callback);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
 }

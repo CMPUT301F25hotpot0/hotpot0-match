@@ -6,8 +6,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Handles all Firestore database operations related to {@link Event}.
@@ -371,7 +375,46 @@ public class EventDB {
                         .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
                         .addOnFailureListener(callback::onFailure);
 
+                for (String linkID : allLinkIDs) {
+                    if (sampled.contains(linkID)) {
+                        Status status = new Status();
+                        status.setStatus("Sampled");
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date date = new Date();
+                        String now = formatter.format(date);
+                        Notification notif = new Notification(now, status, true, event.getName());
+                        eventUserLinkDB.addSampledNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Notification added successfully
+                            }
 
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Handle failure to add notification
+                            }
+                        });
+                    } else {
+                        // Else inWaitList
+                        Status status = new Status();
+                        status.setStatus("inWaitList");
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date date = new Date();
+                        String now = formatter.format(date);
+                        Notification notif = new Notification(now, status, event.getName());
+                        eventUserLinkDB.addWaitlistNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Notification added successfully
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Handle failure to add notification
+                            }
+                        });
+                    }
+                }
             }
 
             @Override

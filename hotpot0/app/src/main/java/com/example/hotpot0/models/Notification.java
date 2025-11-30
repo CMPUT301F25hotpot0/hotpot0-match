@@ -1,6 +1,5 @@
 package com.example.hotpot0.models;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,11 +25,14 @@ public class Notification {
     }
 
     private String eventName;
-    private LocalDateTime dateTime;
+    private String dateTime;
     private Status status;  // You already have this
     private String text;
     private boolean customNotif;
     private boolean isResampledNotif;
+
+    /** Empty constructor */
+    public Notification() {}
 
     /** Automatic Notification
      *
@@ -38,7 +40,7 @@ public class Notification {
      * @param status
      * @param eventName
      */
-    public Notification(LocalDateTime dateTime, Status status, String eventName) {
+    public Notification(String dateTime, Status status, String eventName) {
         this.eventName = eventName;
         this.dateTime = dateTime;
         this.status = status;
@@ -57,7 +59,7 @@ public class Notification {
      * @param eventName
      * @param customNotif
      */
-    public Notification(LocalDateTime dateTime, Status status, String text, String eventName, boolean customNotif) {
+    public Notification(String dateTime, Status status, String text, String eventName, boolean customNotif) {
         this.eventName = eventName;
         this.dateTime = dateTime;
         this.status = status;
@@ -73,7 +75,7 @@ public class Notification {
      * @param isResampledNotif
      * @param eventName
      */
-    public Notification(LocalDateTime dateTime, Status status, boolean isResampledNotif, String eventName) {
+    public Notification(String dateTime, Status status, boolean isResampledNotif, String eventName) {
         this.eventName = eventName;
         this.dateTime = dateTime;
         this.status = status;

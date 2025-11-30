@@ -1,8 +1,13 @@
 package com.example.hotpot0.models;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Represents an event managed by an organizer and stored in Firestore.
@@ -375,6 +380,9 @@ public class Event {
         this.sampledIDs.clear(); // Replace previous sample
         this.sampledIDs.addAll(sampled);
 
+        Status status = new Status();
+        status.setStatus("Sampled");
+        addSampleNotification(status, this.sampledIDs);
 
         return this.sampledIDs;
     }
@@ -411,18 +419,52 @@ public class Event {
             }
         }
 
+        Status status = new Status();
+        status.setStatus("Sampled");
+        addSampleNotification(status, newlySampled);
+
         this.sampledIDs.addAll(newlySampled);
         return newlySampled;
     }
 
-    /** Adds a notification to the event's notification list.
-     * @param notification the notification to add
+    /**
+     * Adds a notification for this event with the specified status.
+     * @param status the status of the notification
+     * @param participantIDs list of participant IDs relevant to the notification
      */
-    public void addNotification(Notification notification) {
-        if (this.notifications == null) {
-            this.notifications = new ArrayList<>();
-        }
-        this.notifications.add(notification);
+    public void addNotification(Status status, ArrayList<String> participantIDs) {
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = new Date();
+        String now = formatter.format(date);
+        Notification notif = new Notification(now, status, this.name);
+        this.notifications.add(notif);
+    }
+
+    /**
+     * Adds a notification for this event with the specified status.
+     * @param status the status of the notification
+     * @param participantIDs list of participant IDs relevant to the notification
+     */
+    public void addSampleNotification(Status status, ArrayList<String> participantIDs) {
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = new Date();
+        String now = formatter.format(date);
+        Notification notif = new Notification(now, status, true, this.name);
+        this.notifications.add(notif);
+    }
+
+    /**
+     * Adds a custom notification for this event with the specified status and text.
+     * @param status the status of the notification
+     * @param text the custom text for the notification
+     * @param participantIDs list of participant IDs relevant to the notification
+     */
+    public void addCustomNotification(Status status, String text, ArrayList<String> participantIDs) {
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = new Date();
+        String now = formatter.format(date);
+        Notification notif = new Notification(now, status, text, this.name, true);
+        this.notifications.add(notif);
     }
 
     /**
