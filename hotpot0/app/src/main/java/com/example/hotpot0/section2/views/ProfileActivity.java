@@ -202,6 +202,12 @@ public class ProfileActivity extends AppCompatActivity{
                 // Clear saved user ID
                 getSharedPreferences("app_prefs", MODE_PRIVATE).edit().remove("userID").apply();
 
+                // Navigate to StartupActivity
+                Intent intent = new Intent(ProfileActivity.this, StartupActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+
             }
 
             @Override
