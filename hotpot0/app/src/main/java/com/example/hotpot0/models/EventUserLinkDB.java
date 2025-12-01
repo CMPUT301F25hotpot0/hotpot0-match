@@ -140,6 +140,24 @@ public class EventUserLinkDB {
     }
 
     /**
+     * Fetches all EventUserLink documents from Firestore.
+     * @param callback Callback to return the list of EventUserLinks or an error
+     */
+    public void getAllEventUserLinks(@NonNull GetCallback<List<EventUserLink>> callback) {
+        db.collection(EVENT_USER_LINK_COLLECTION)
+                .get()
+                .addOnSuccessListener(query -> {
+                    List<EventUserLink> result = new ArrayList<>();
+                    for (DocumentSnapshot doc : query.getDocuments()) {
+                        EventUserLink link = doc.toObject(EventUserLink.class);
+                        if (link != null) result.add(link);
+                    }
+                    callback.onSuccess(result);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    /**
      * Fetches an EventUserLink by linkID.
      * @param linkID   The ID of the EventUserLink to fetch
      * @param callback Callback to return the EventUserLink or an error
@@ -232,4 +250,34 @@ public class EventUserLinkDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
+
+    public void addSampledNotification(String linkID, Notification notification, @NonNull ActionCallback callback) {
+        getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink eventUserLink) {
+                eventUserLink.addNotification(notification);
+                updateEventUserLink(eventUserLink, callback);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    public void addWaitlistNotification(String linkID, Notification notification, @NonNull ActionCallback callback) {
+        getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink eventUserLink) {
+                eventUserLink.addNotification(notification);
+                updateEventUserLink(eventUserLink, callback);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
 }

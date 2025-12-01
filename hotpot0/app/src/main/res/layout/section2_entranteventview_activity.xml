@@ -13,6 +13,7 @@
 
         <!-- Event Image - Updated to MaterialCardView -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/eventImageCard"
             android:layout_width="match_parent"
             android:layout_height="230dp"
             android:layout_marginBottom="20dp"

@@ -18,7 +18,7 @@ public class EventUserLink {
     private Integer eventID;
     private String linkID;
     private Status status = new Status();
-    private ArrayList<String> notifications;
+    private ArrayList<Notification> notifications;
     private Double latitude;
     private Double longitude;
 
@@ -40,7 +40,7 @@ public class EventUserLink {
         this.userID = userID;
         this.eventID = eventID;
         this.status.setStatus(status);
-        this.notifications = new ArrayList<String>();
+        this.notifications = new ArrayList<>();
     }
 
     /**
@@ -113,7 +113,7 @@ public class EventUserLink {
      * Retrieves the list of notifications sent to the user for this event.
      * @return a list of notification messages
      */
-    public List<String> getNotifications() {
+    public ArrayList<Notification> getNotifications() {
         return notifications;
     }
 
@@ -141,7 +141,7 @@ public class EventUserLink {
      * Adds a new notification message to this event-user link.
      * @param notification the notification message to add
      */
-    public void addNotification(String notification) {
+    public void addNotification(Notification notification) {
         notifications.add(notification);
     }
 

@@ -13,6 +13,7 @@
 
         <!-- Event Image - Updated to match organizer's MaterialCardView style -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/eventImageCard"
             android:layout_width="match_parent"
             android:layout_height="230dp"
             android:layout_marginBottom="20dp"
@@ -204,6 +205,7 @@
             android:layout_marginBottom="16dp"
             android:textSize="15sp" />
 
+        <!-- Geolocation -->
         <TextView
             android:id="@+id/GeolocationStatus"
             android:layout_width="match_parent"
@@ -214,7 +216,6 @@
             android:textStyle="bold"
             android:layout_marginBottom="24dp"
             android:visibility="gone" />
-
 
         <!-- Confirm and Decline Buttons Row - Keeping entrant's structure -->
         <LinearLayout

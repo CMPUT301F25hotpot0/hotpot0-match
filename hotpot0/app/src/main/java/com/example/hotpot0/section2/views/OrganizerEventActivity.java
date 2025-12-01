@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.card.MaterialCardView;
 
 
 /**
@@ -57,7 +58,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class OrganizerEventActivity extends AppCompatActivity {
 
     private int eventID;
-    private Event currentEvent;
+    private Event currentEvent = new Event();
     private EventUserLink currentEventUserLink;
 
     TextView previewGeolocation;
@@ -104,7 +105,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
                         currentEvent = event;
 
                         // Decide which layout to show
-                        if (event.getSampledIDs().isEmpty()) {
+                        if (event.getSampledIDs().isEmpty() && event.getCancelledIDs().isEmpty()) {
                             setContentView(R.layout.section2_organizereventview_activity);
                             setupPreDrawLayout();
                         } else {
@@ -133,6 +134,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
         // View bindings
         ImageView eventImage = findViewById(R.id.eventImage);
+        MaterialCardView eventImageCard = findViewById(R.id.eventImageCard);
         TextView previewEventName = findViewById(R.id.previewEventName);
         TextView previewDescription = findViewById(R.id.previewDescription);
         TextView previewGuidelines = findViewById(R.id.previewGuidelines);
@@ -146,6 +148,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         TextView previewCurrentlyWaiting = findViewById(R.id.previewCurrentlyWaiting);
         TextView previewDaysLeft = findViewById(R.id.previewDaysLeft);
         Button generateSampleButton = findViewById(R.id.generate_sample_button);
+        generateSampleButton.setEnabled(currentEvent.getTotalSampled() == 0);
         LinearLayout entrantsContainer = findViewById(R.id.entrants_container);
         previewGeolocation = findViewById(R.id.GeolocationStatus);
         ImageView qrCodeImage = findViewById(R.id.qr_code_image);
@@ -166,8 +169,10 @@ public class OrganizerEventActivity extends AppCompatActivity {
         String priceText = formatPrice(currentEvent.getPrice().toString());
         previewPrice.setText(priceText);
         // Handle capacity
-        String capacityText = formatCapacity(currentEvent.getCapacity().toString());
-        previewSpotsOpen.setText(capacityText);
+        String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                ? "All spots are filled!"
+                : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+        previewSpotsOpen.setText(spotsOpen);
         // Handle waiting list
         String waitingListText = formatWaitingList(currentEvent.getLinkIDs().toString());
         previewWaitingListCapacity.setText(waitingListText);
@@ -181,6 +186,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         String imageURL = currentEvent.getImageURL();
         if (imageURL == null || imageURL.isEmpty()) {
             // Hide the ImageView if no image is available
+            eventImageCard.setVisibility(View.GONE);
             eventImage.setVisibility(View.GONE);
         } else {
             // Show the ImageView
@@ -309,7 +315,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
                     // Switch to Post-Draw layout
                     setContentView(R.layout.section2_organizereventview_postdraw);
-                    // setupPostDrawLayout();
+                    setupPostDrawLayout();
                 }
 
                 @Override
@@ -331,6 +337,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
     private void setupPostDrawLayout() {
         // --- View bindings ---
         ImageView eventImage = findViewById(R.id.eventImage);
+        MaterialCardView eventImageCard = findViewById(R.id.eventImageCard);
         TextView previewEventName = findViewById(R.id.previewEventName);
         TextView previewDescription = findViewById(R.id.previewDescription);
         TextView previewGuidelines = findViewById(R.id.previewGuidelines);
@@ -348,6 +355,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         Button buttonFillSpots = findViewById(R.id.button_fillSpots);
         Button buttonConfirm = findViewById(R.id.button_confirm);
         Button buttonBack = findViewById(R.id.button_BackPostDraw);
+
         FrameLayout mapContainer = findViewById(R.id.map_container);
         if (currentEvent.getGeolocationRequired()) {
             mapContainer.setVisibility(View.VISIBLE);
@@ -371,6 +379,20 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
 
         // --- Populate Event info ---
+        String imageURL = currentEvent.getImageURL();
+        if (imageURL == null || imageURL.isEmpty()) {
+            // Hide the ImageView if no image is available
+            eventImageCard.setVisibility(View.GONE);
+            eventImage.setVisibility(View.GONE);
+        } else {
+            // Show the ImageView
+            eventImage.setVisibility(View.VISIBLE);
+            // Load image using Glide
+            Glide.with(this)
+                    .load(imageURL)
+                    .placeholder(R.drawable.placeholder_image) // optional placeholder
+                    .into(eventImage);
+        }
         previewEventName.setText(currentEvent.getName());
         previewDescription.setText(currentEvent.getDescription());
         previewGuidelines.setText(currentEvent.getGuidelines());
@@ -378,11 +400,19 @@ public class OrganizerEventActivity extends AppCompatActivity {
         previewTimeAndDay.setText(currentEvent.getTime());
         previewDateRange.setText(buildDateRange(currentEvent.getStartDate(), currentEvent.getEndDate()));
         previewDuration.setText(currentEvent.getDuration());
-        previewPrice.setText(currentEvent.getPrice().toString());
-        previewSpotsOpen.setText(currentEvent.getCapacity());
+        String priceText = formatPrice(currentEvent.getPrice().toString());
+        previewPrice.setText(priceText);
+        String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                ? "All spots are filled!"
+                : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+        previewSpotsOpen.setText(spotsOpen);
 
         // Populate sampled entrants
-        populateEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
+        if (currentEvent.getSampledIDs().isEmpty()) {
+            buttonConfirm.setEnabled(false);
+        }
+
+        populateSampledEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
         populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
         populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
 
@@ -438,7 +468,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
                         });
                     }
 
-
                     Toast.makeText(OrganizerEventActivity.this,
                             "Filled spots successfully! Total: " + newlySampledUsers.size(),
                             Toast.LENGTH_SHORT).show();
@@ -493,6 +522,13 @@ public class OrganizerEventActivity extends AppCompatActivity {
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 return true;
             }
+            if (id == R.id.nav_search) {
+                Intent intent = new Intent(OrganizerEventActivity.this, SearchActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
             return false;
         });
     }
@@ -532,6 +568,60 @@ public class OrganizerEventActivity extends AppCompatActivity {
             });
         }
     }
+
+    private void populateSampledEntrants(LinearLayout container, List<String> linkIDs) {
+        container.removeAllViews();
+        if (linkIDs == null || linkIDs.isEmpty()) {
+            TextView noEntrantsText = new TextView(this);
+            noEntrantsText.setText("No entrants found.");
+            container.addView(noEntrantsText);
+            return;
+        }
+
+        int organizerId = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+
+        for (String id : linkIDs) {
+            String userID = id.split("_")[1];
+            if (Integer.parseInt(userID) == organizerId) {
+                continue; // Skip organizer's own profile
+            }
+            profileDB.getUserByID(Integer.parseInt(userID), new ProfileDB.GetCallback<UserProfile>() {
+                @Override
+                public void onSuccess(UserProfile profile) {
+                    View blobView = LayoutInflater.from(OrganizerEventActivity.this)
+                            .inflate(R.layout.sampled_user_blob, container, false);
+                    ((TextView) blobView.findViewById(R.id.profileNameTextView)).setText(profile.getName());
+                    ((ImageView) blobView.findViewById(R.id.profileIcon)).setImageResource(R.drawable.ic_profile);
+                    ((ImageView) blobView.findViewById(R.id.cancelButton)).setImageResource(R.drawable.ic_cross);
+                    container.addView(blobView);
+                    // Set an OnClickListener for the cancel button
+                    blobView.findViewById(R.id.cancelButton).setOnClickListener(v -> {
+                        eventHandler.cancelUser(currentEvent, Integer.parseInt(userID), new ProfileDB.GetCallback<Integer>() {
+                            @Override
+                            public void onSuccess(Integer result) {
+                                Toast.makeText(OrganizerEventActivity.this, "User cancelled successfully", Toast.LENGTH_SHORT).show();
+                                // Refresh the layout to reflect changes
+                                setContentView(R.layout.section2_organizereventview_postdraw);
+
+                                setupPostDrawLayout();
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(OrganizerEventActivity.this, "Error cancelling user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(OrganizerEventActivity.this, "Error loading profile", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
 
     private String buildDateRange(String startDate, String endDate) {
         if (startDate != null && startDate.equals(endDate)) {

@@ -1,13 +1,20 @@
 package com.example.hotpot0.models;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Handles all Firestore database operations related to {@link Event}.
@@ -267,7 +274,9 @@ public class EventDB {
      * @param callback   callback indicating completion status
      */
     public void removeSampledIDFromEvent(@NonNull Event event, @NonNull String sampledID, @NonNull GetCallback<Void> callback) {
-        if (event.getSampledIDs() != null) event.getSampledIDs().remove(sampledID);
+        if (event.getSampledIDs() != null) {
+            event.getSampledIDs().remove(sampledID);
+        }
 
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
@@ -286,6 +295,11 @@ public class EventDB {
         if (event.getCancelledIDs() == null) event.setCancelledIDs(new ArrayList<>());
         if (!event.getCancelledIDs().contains(cancelledID))
             event.getCancelledIDs().add(cancelledID);
+
+        Status status = new Status();
+        status.setStatus("Cancelled");
+
+        event.addNotification(status, event.getCancelledIDs());
 
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
@@ -371,7 +385,51 @@ public class EventDB {
                         .addOnSuccessListener(aVoid -> callback.onSuccess(sampled))
                         .addOnFailureListener(callback::onFailure);
 
+                for (String linkID : allLinkIDs) {
+                    String userID = linkID.split("_")[1]; // Extract userID from linkID
+                    if (sampled.contains(linkID)) {
+                        Status status = new Status();
+                        status.setStatus("Sampled");
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        Date date = new Date();
+                        String now = formatter.format(date);
+                        Notification notif = new Notification(now, status, true, event.getName(), event.getEventID());
+                        eventUserLinkDB.addSampledNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Notification added successfully
+                            }
 
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Handle failure to add notification
+                            }
+                        });
+                    } else if (event.getOrganizerID().toString().equals(userID)) {
+                        Log.d("EventDB", "User is organizer, no notification sent for linkID: " + linkID);
+                    } else {
+                        // Else inWaitList
+                        Status status = new Status();
+                        status.setStatus("inWaitList");
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        Date date = new Date();
+                        String now = formatter.format(date);
+                        Notification notif = new Notification(now, status, event.getName(), event.getEventID());
+                        eventUserLinkDB.addWaitlistNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Notification added successfully
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Handle failure to add notification
+                            }
+                        });
+                    }
+                }
             }
 
             @Override
@@ -402,6 +460,27 @@ public class EventDB {
                 eventRef.update("sampledIDs", event.getSampledIDs())
                         .addOnSuccessListener(aVoid -> callback.onSuccess(newlySampled))
                         .addOnFailureListener(callback::onFailure);
+
+                for (String linkID : newlySampled) {
+                    Status status = new Status();
+                    status.setStatus("Sampled");
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    Date date = new Date();
+                    String now = formatter.format(date);
+                    Notification notif = new Notification(now, status, true, event.getName(), event.getEventID());
+                    eventUserLinkDB.addSampledNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notification added successfully
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Handle failure to add notification
+                        }
+                    });
+                }
             }
 
             @Override

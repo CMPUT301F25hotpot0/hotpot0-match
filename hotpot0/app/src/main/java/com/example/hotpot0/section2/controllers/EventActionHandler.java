@@ -7,9 +7,16 @@ import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
+import com.example.hotpot0.models.Notification;
 import com.example.hotpot0.models.ProfileDB;
+import com.example.hotpot0.models.Status;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Handles user actions related to events such as joining or leaving waitlists,
@@ -88,7 +95,7 @@ public class EventActionHandler {
                 eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
                     @Override
                     public void onSuccess(Event eventObj) {
-                        int capacity = eventObj.getCapacity();
+                        int capacity = eventObj.getWaitingListCapacity();
                         int currentCount = eventObj.getTotalWaitlist();
                         if (currentCount < capacity) {
                             // There is space in the waitlist, proceed with adding the user
@@ -450,6 +457,73 @@ public class EventActionHandler {
 //
 //    }
 
-    public void cancelUser(Integer userID, Integer eventID) {}
+    public void cancelUser(Event event, Integer userID, ProfileDB.GetCallback<Integer> callback) {
+        // Construct the linkID
+        String linkID = generateLinkID(userID, event.getEventID());
+
+        // Fetch the user's EventUserLink from Firestore
+        EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
+
+        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink eventUserLink) {
+                // Attempt to set the status to "Cancelled"
+                eventUserLink.setStatus("Cancelled"); // Directly set the status to "Cancelled"
+
+                Status status = new Status();
+                status.setStatus(eventUserLink.getStatus());
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Date date = new Date();
+                String now = formatter.format(date);
+                Notification notif = new Notification(now, status, event.getName(), event.getEventID());
+
+                eventUserLink.addNotification(notif);
+
+                // Now, update the EventUserLink in the database
+                eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                        // Successfully updated the status to "Cancelled"
+                        eventDB.addCancelledIDToEvent(event, linkID, new EventDB.GetCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                eventDB.removeSampledIDFromEvent(event, linkID.toString(), new EventDB.GetCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        callback.onSuccess(0); // Success: User cancelled
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // Failed to update the event by removing sampled ID
+                                        callback.onFailure(e); // Failure to update event
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Failed to update the event with the cancelled ID
+                                callback.onFailure(e); // Failure to update event
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        // Failed to update the status in the database
+                        callback.onFailure(e); // Failure: Could not update status
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // If no EventUserLink is found, it means the user was never affiliated with the event
+                callback.onSuccess(1); // Failure: User not found
+            }
+        });
+    }
 
 }
