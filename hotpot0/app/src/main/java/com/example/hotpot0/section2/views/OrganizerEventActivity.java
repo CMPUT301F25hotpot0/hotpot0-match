@@ -849,7 +849,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
                     Toast.makeText(this, "Confirmed: " + message, Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
-                    // ❌ Just dismiss – this "negates the click"
                     dialog.dismiss();
                 })
                 .show();

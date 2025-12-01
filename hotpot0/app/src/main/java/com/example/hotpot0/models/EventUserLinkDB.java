@@ -225,6 +225,13 @@ public class EventUserLinkDB {
         }
     }
 
+    /** Adds a notification to the sampled notifications list
+     * for the EventUserLink identified by linkID.
+     *
+     * @param linkID       the ID of the EventUserLink
+     * @param notification the Notification to add
+     * @param callback     callback to notify success or failure
+     */
     public void addSampledNotification(String linkID, Notification notification, @NonNull ActionCallback callback) {
         getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
             @Override
@@ -240,6 +247,12 @@ public class EventUserLinkDB {
         });
     }
 
+    /**
+     *
+     * @param linkID
+     * @param notification
+     * @param callback
+     */
     public void addWaitlistNotification(String linkID, Notification notification, @NonNull ActionCallback callback) {
         getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
             @Override
