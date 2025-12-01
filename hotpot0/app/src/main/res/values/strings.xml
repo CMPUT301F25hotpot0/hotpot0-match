@@ -1,4 +1,5 @@
 <resources>
+
     <!-- Section 1 -->
     <string name="app_name">hotpot0</string>
     <string name="small_heading">Welcome to</string>
@@ -25,10 +26,10 @@
     <string name="event_description">Event Description</string>
     <string name="event_guidelines">Event Guidelines</string>
     <string name="location">Location</string>
-    <string name="what_time_does_event_occur">What time does event occur?</string>
+    <string name="what_time_does_event_occur">Event Start Time</string>
     <string name="when_does_event_occur">When does event occur? YYYY-MM-DD</string>
-    <string name="price_of_event">Price of event</string>
-    <string name="number_of_people_you_can_accommodate">Number of people you can accommodate</string>
+    <string name="price_of_event">Event Price</string>
+    <string name="number_of_people_you_can_accommodate">Event Total Capacity</string>
     <string name="preview_event">Preview Event</string>
     <string name="how_long_will_event_occur_dd_mm_yyyy_dd_mm_yyyy">How long will event occur?</string>
     <string name="registration_period_dd_mm_yyyy_dd_mm_yyyy">Registration period</string>
@@ -40,7 +41,8 @@
     <string name="current_invitations">Current Invitations</string>
     <string name="other_updates">Other Updates</string>
     <string name="fill_spots">Fill Spots</string>
-    <string name="sampled_entrants">Sampled Entrants</string>
+    <string name="sampled_entrants">Pending Entrants</string>
+    <string name="accepted_entrants">Accepted Entrants</string>
     <string name="cancelled_entrants">Cancelled Entrants</string>
     <string name="all_entrants">All Entrants</string>
     <string name="event_location">Location %1$s</string>
@@ -69,6 +71,15 @@
     <string name="map">Map</string>
     <string name="attendees">Attendees</string>
     <string name="export_csv">Export CSV</string>
+
+    <string name="select_event_time">Select Event Time</string>
+    <string name="select_event_start_date">Select Event Start Date</string>
+    <string name="select_event_end_date">Select Event End Date</string>
+    <string name="select_registration_start_date">Select Registration Start Date</string>
+    <string name="select_registration_end_date">Select Registration End Date</string>
+    <string name="go_to_event">Go to Event</string>
+    <string name="remove_event">Remove Event</string>
+    <string name="event_not_joinable">This event is closed</string>
 
     <!-- Section 3 -->
 

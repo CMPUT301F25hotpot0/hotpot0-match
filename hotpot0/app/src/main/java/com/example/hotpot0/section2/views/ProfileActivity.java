@@ -68,6 +68,7 @@ public class ProfileActivity extends AppCompatActivity{
         saveProfileButton = findViewById(R.id.save_profile_button);
         deleteProfileButton = findViewById(R.id.delete_profile_button);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        setupBottomNavigationView();
 
         loadUserProfile();
 
@@ -77,7 +78,31 @@ public class ProfileActivity extends AppCompatActivity{
         notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
-                String message = isChecked ? "Notifications Enabled" : "Notifications Disabled";
+                profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
+                    @Override
+                    public void onSuccess(UserProfile user) {
+                        if (user != null) {
+                            user.setNotificationsEnabled(isChecked);
+
+                            profileDB.updateUser(user, new ProfileDB.ActionCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    String message = isChecked ? "Notifications Enabled" : "Notifications Disabled";
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(ProfileActivity.this, "Failed to update notification setting.", Toast.LENGTH_SHORT).show();
+                                }
+                            }, user.getLongitude(), user.getLatitude(), isChecked );
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(ProfileActivity.this, "Failed to retrieve user profile.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -149,6 +174,12 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(ProfileActivity.this, "Failed to load profile.", Toast.LENGTH_SHORT).show();
+                getSharedPreferences("app_prefs", MODE_PRIVATE).edit().remove("userID").apply();
+                // Navigate to StartupActivity
+                Intent intent = new Intent(ProfileActivity.this, StartupActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
             }
         });
     }
@@ -200,13 +231,62 @@ public class ProfileActivity extends AppCompatActivity{
 
                 // Clear saved user ID
                 getSharedPreferences("app_prefs", MODE_PRIVATE).edit().remove("userID").apply();
-
+                // Navigate to StartupActivity
+                Intent intent = new Intent(ProfileActivity.this, StartupActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
             }
 
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(ProfileActivity.this, "Profile deletion failed.", Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    private void setupBottomNavigationView() {
+        // Highlight the current tab
+        bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+
+        // Set a single listener for all navigation
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(ProfileActivity.this, HomeActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_search) {
+                startActivity(new Intent(ProfileActivity.this, SearchActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_notifications) {
+                startActivity(new Intent(ProfileActivity.this, NotificationsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_events) {
+                startActivity(new Intent(ProfileActivity.this, CreateEventActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                // Already on this activity, do nothing
+                return true;
+            }
+
+            return false;
         });
     }
 }

@@ -12,11 +12,17 @@ import java.util.List;
  * </p>
  */
 public class EventUserLink {
+
+    // EventUserLink attributes
     private Integer userID;
     private Integer eventID;
     private String linkID;
     private Status status = new Status();
-    private List<String> notifications;
+    private ArrayList<Notification> notifications;
+    private Double latitude;
+    private Double longitude;
+
+    //
 
     /**
      * Default constructor required for Firestore deserialization.
@@ -36,26 +42,24 @@ public class EventUserLink {
         this.status.setStatus(status);
         this.notifications = new ArrayList<>();
     }
+
     /**
      * Constructs a new {@code EventUserLink} with a default status of {@code "inWaitList"}.
      * @param userID  the user’s unique ID
      * @param eventID the event’s unique ID
      */
-    public EventUserLink(Integer userID, Integer eventID) {
+    public EventUserLink(Integer userID, Integer eventID, Double latitude, Double longitude) {
         this.linkID = eventID.toString() + '_' + userID.toString(); // Assigned by FireStore when the instance is saved
         this.userID = userID;
         this.eventID = eventID;
         this.status.setStatus("inWaitList");
         this.notifications = new ArrayList<>();
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    /**
-     * Adds a new notification message to this event-user link.
-     * @param notification the notification message to add
-     */
-    public void addNotification(String notification) {
-        notifications.add(notification);
-    }
+    // Getters and Setters
+    // =================
 
     /**
      * Retrieves the link ID, which uniquely identifies the user-event association.
@@ -109,8 +113,36 @@ public class EventUserLink {
      * Retrieves the list of notifications sent to the user for this event.
      * @return a list of notification messages
      */
-    public List<String> getNotifications() {
+    public ArrayList<Notification> getNotifications() {
         return notifications;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+
+    // Utility Methods
+    // ===============
+
+    /**
+     * Adds a new notification message to this event-user link.
+     * @param notification the notification message to add
+     */
+    public void addNotification(Notification notification) {
+        notifications.add(notification);
     }
 
     /**

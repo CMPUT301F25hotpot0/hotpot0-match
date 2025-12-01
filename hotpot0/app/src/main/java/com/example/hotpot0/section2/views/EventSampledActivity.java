@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
@@ -17,6 +18,7 @@ import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
+import com.google.android.material.card.MaterialCardView;
 
 /**
  * Activity that displays a sampled view of an event for a user who
@@ -28,6 +30,7 @@ public class EventSampledActivity extends AppCompatActivity {
     private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay,
             previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft, GeolocationStatus, statusMessage;
     private ImageView eventImage;
+    private MaterialCardView eventImageCard;
     private Button confirmButton, declineButton, backButton;
 
     private EventDB eventDB = new EventDB();
@@ -48,6 +51,7 @@ public class EventSampledActivity extends AppCompatActivity {
 
         // Initialize UI elements
         eventImage = findViewById(R.id.eventImage);
+        eventImageCard = findViewById(R.id.eventImageCard);
         previewEventName = findViewById(R.id.previewEventName);
         previewDescription = findViewById(R.id.previewDescription);
         previewGuidelines = findViewById(R.id.previewGuidelines);
@@ -57,7 +61,6 @@ public class EventSampledActivity extends AppCompatActivity {
         previewDuration = findViewById(R.id.previewDuration);
         previewPrice = findViewById(R.id.previewPrice);
         previewSpotsOpen = findViewById(R.id.previewSpotsOpen);
-        previewDaysLeft = findViewById(R.id.previewDaysLeft);
         GeolocationStatus = findViewById(R.id.GeolocationStatus);
         confirmButton = findViewById(R.id.button_confirm);
         declineButton = findViewById(R.id.Decline);
@@ -99,16 +102,37 @@ public class EventSampledActivity extends AppCompatActivity {
      * Populates the UI elements with the current event's details.
      */
     private void populateUI() {
+        String imageURL = currentEvent.getImageURL();
+        if (imageURL == null || imageURL.isEmpty()) {
+            // Hide the ImageView if no image is available
+            eventImageCard.setVisibility(View.GONE);
+            eventImage.setVisibility(View.GONE);
+        } else {
+            // Show the ImageView
+            eventImageCard.setVisibility(View.VISIBLE);
+            eventImage.setVisibility(View.VISIBLE);
+            // Load image using Glide
+            Glide.with(this)
+                    .load(imageURL)
+                    .placeholder(R.drawable.placeholder_image) // optional placeholder
+                    .into(eventImage);
+        }
         previewEventName.setText(currentEvent.getName());
         previewDescription.setText(currentEvent.getDescription());
         previewGuidelines.setText(currentEvent.getGuidelines());
-        previewLocation.setText("Location: " + currentEvent.getLocation());
-        previewTimeAndDay.setText("Time: " + currentEvent.getTime());
-        previewDateRange.setText("Date: " + currentEvent.getDate());
-        previewDuration.setText("Duration: " + currentEvent.getDuration());
-        previewPrice.setText("Price: $" + currentEvent.getPrice());
-        previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
-        previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
+        previewEventName.setText(currentEvent.getName());
+        previewDescription.setText(currentEvent.getDescription());
+        previewGuidelines.setText(currentEvent.getGuidelines());
+        previewLocation.setText(currentEvent.getLocation());
+        previewTimeAndDay.setText(currentEvent.getTime());
+        previewDateRange.setText(buildDateRange(currentEvent.getStartDate(), currentEvent.getEndDate()));
+        previewDuration.setText(currentEvent.getDuration());
+        String priceText = formatPrice(currentEvent.getPrice().toString());
+        previewPrice.setText(priceText);
+        String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalSampled()) == 0
+                ? "All spots are filled!"
+                : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalSampled());
+        previewSpotsOpen.setText(spotsOpen);
 
         boolean geolocationEnabled = currentEvent.getGeolocationRequired();
         GeolocationStatus.setVisibility(View.VISIBLE);
@@ -132,9 +156,15 @@ public class EventSampledActivity extends AppCompatActivity {
 
                 String status = eventUserLink.getStatus();
                 if ("Accepted".equalsIgnoreCase(status)) {
-                    showStatusMessage("You have confirmed this event.");
+                    if (currentEvent.getJoinable()) {
+                        showStatusMessage("You have confirmed this event.");
+                    } else {
+                        showStatusMessage("The organizer has accepted your request to join this event.");
+                    }
                 } else if ("Declined".equalsIgnoreCase(status)) {
                     showStatusMessage("You have declined this event.");
+                } else if ("Cancelled".equalsIgnoreCase(status)) {
+                    showStatusMessage("You have been cancelled from this event.");
                 } else {
                     setupButtonListeners();
                 }
@@ -214,5 +244,47 @@ public class EventSampledActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
+    }
+
+    /**
+     * Builds a date range string based on the provided start and end dates.
+     *
+     * @param startDate The start date of the event
+     * @param endDate   The end date of the event
+     * @return A formatted date range string
+     */
+    private String buildDateRange(String startDate, String endDate) {
+        if (startDate != null && startDate.equals(endDate)) {
+            return startDate;
+        } else if (startDate != null && endDate != null && !endDate.isEmpty()) {
+            return startDate + " to " + endDate;
+        } else if (startDate != null) {
+            return startDate;
+        } else {
+            return "No dates specified";
+        }
+    }
+
+    /**
+     * Formats the price string for display.
+     *
+     * @param price The price string to format
+     * @return A formatted price string
+     */
+    private String formatPrice(String price) {
+        if (price == null || price.isEmpty()) {
+            return "Free";
+        }
+
+        try {
+            double priceValue = Double.parseDouble(price);
+            if (priceValue == 0) {
+                return "Free";
+            } else {
+                return String.format("$%.2f CAD", priceValue);
+            }
+        } catch (NumberFormatException e) {
+            return "Invalid price";
+        }
     }
 }

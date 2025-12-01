@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * ProfileDB handles all Firestore operations for UserProfile and AdminProfile.
@@ -21,7 +22,6 @@ public class ProfileDB {
 
     // Firestore instance
     private final FirebaseFirestore db;
-
     // Collection names
     private static final String USERS_COLLECTION = "UserProfiles";
     private static final String ADMINS_COLLECTION = "AdminProfiles";
@@ -47,6 +47,8 @@ public class ProfileDB {
         void onSuccess();
         void onFailure(Exception e);
     }
+
+    // UTILITY METHODS
 
     /**
      * Utility method to convert an ArrayList<String> of linkIDs in UserProfile
@@ -83,11 +85,23 @@ public class ProfileDB {
             }
 
             // Get the array of IDs already in use
-            ArrayList<Long> idsInUseLong = (ArrayList<Long>) documentSnapshot.get("idsInUse");
+//            ArrayList<Long> idsInUseLong = (ArrayList<Long>) documentSnapshot.get("idsInUse");
+//            ArrayList<Integer> idsInUse = new ArrayList<>();
+//            if (idsInUseLong != null) {
+//                for (Long id : idsInUseLong) {
+//                    idsInUse.add(id.intValue());
+//                }
+//            }
+
+            // Safer Method of retrieving IDs in use
+            List<Object> idsInUseObjects = (List<Object>) documentSnapshot.get("idsInUse");
             ArrayList<Integer> idsInUse = new ArrayList<>();
-            if (idsInUseLong != null) {
-                for (Long id : idsInUseLong) {
-                    idsInUse.add(id.intValue());
+
+            if (idsInUseObjects != null) {
+                for (Object obj : idsInUseObjects) {
+                    if (obj instanceof Number) {
+                        idsInUse.add(((Number) obj).intValue());
+                    }
                 }
             }
 
@@ -229,7 +243,6 @@ public class ProfileDB {
             }
         });
     }
-
 
     /**
      * Updates an existing UserProfile in Firestore.
@@ -398,4 +411,32 @@ public class ProfileDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
+
+    /**
+     * Gets total users from database
+     * @param callback callback to notify success or failure
+     */
+    public void getTotalUsers(@NonNull GetCallback<Integer> callback) {
+        db.collection(USERS_COLLECTION)
+                .get()
+                .addOnSuccessListener(querySnapshot -> callback.onSuccess(querySnapshot.size()))
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public void getAllProfiles(@NonNull GetCallback<List<UserProfile>> callback) {
+        db.collection(USERS_COLLECTION)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<UserProfile> profiles = new ArrayList<>();
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        UserProfile profile = doc.toObject(UserProfile.class);
+                        if (profile != null) {
+                            profiles.add(profile);
+                        }
+                    }
+                    callback.onSuccess(profiles);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
 }

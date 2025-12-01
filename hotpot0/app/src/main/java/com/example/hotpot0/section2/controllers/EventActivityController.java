@@ -69,6 +69,7 @@ public class EventActivityController {
                     case "Sampled":
                     case "Accepted":
                     case "Declined":
+                    case "Cancelled":
                         // User has sampled, accepted, or declined the event
                         openSampledActivity(eventID);
                         break;
@@ -77,7 +78,10 @@ public class EventActivityController {
                         // User is an organizer
                         openOrganizerActivity(eventID);
                         break;
-
+//                    case "Cancelled":
+//                        // User has cancelled participation
+//                        Toast.makeText(context, "You've been cancelled from this event and cannot access the event page.", Toast.LENGTH_LONG).show();
+//                        break;
                     default:
                         // No special status, show initial event activity
                         openEventInitialActivity(eventID);

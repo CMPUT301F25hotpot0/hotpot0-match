@@ -1,13 +1,17 @@
 package com.example.hotpot0.models;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -20,10 +24,8 @@ import java.util.List;
  */
 public class EventUserLinkDB {
 
-    // Firestore instance
+    // EventUserLinkDB attributes
     private final FirebaseFirestore db;
-
-    // Collection name for EventUserLink
     private static final String EVENT_USER_LINK_COLLECTION = "EventUserLinks";
 
     /** Initializes a new {@code EventUserLinkDB} and connects to Firestore. */
@@ -63,6 +65,9 @@ public class EventUserLinkDB {
          */
         void onFailure(Exception e);
     }
+
+    // Utility Methods
+    // ===============
 
     /**
      * Adds a new EventUserLink and returns the created EventUserLink on success.
@@ -135,6 +140,24 @@ public class EventUserLinkDB {
     }
 
     /**
+     * Fetches all EventUserLink documents from Firestore.
+     * @param callback Callback to return the list of EventUserLinks or an error
+     */
+    public void getAllEventUserLinks(@NonNull GetCallback<List<EventUserLink>> callback) {
+        db.collection(EVENT_USER_LINK_COLLECTION)
+                .get()
+                .addOnSuccessListener(query -> {
+                    List<EventUserLink> result = new ArrayList<>();
+                    for (DocumentSnapshot doc : query.getDocuments()) {
+                        EventUserLink link = doc.toObject(EventUserLink.class);
+                        if (link != null) result.add(link);
+                    }
+                    callback.onSuccess(result);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    /**
      * Fetches an EventUserLink by linkID.
      * @param linkID   The ID of the EventUserLink to fetch
      * @param callback Callback to return the EventUserLink or an error
@@ -158,27 +181,6 @@ public class EventUserLinkDB {
                 })
                 .addOnFailureListener(callback::onFailure);
     }
-
-//    public List<String> getWaitListUsers(List<String> linkIDs) {
-//        List<String> waitListUsers = new ArrayList<>();
-//        for (String linkID : linkIDs) {
-//            getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
-//                @Override
-//                public void onSuccess(EventUserLink result) {
-//                    if (result.getStatus().equals("inWaitList")) {
-//                        waitListUsers.add(result.getLinkID());
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Exception e) {
-//                    // Handle failure (e.g., log the error)
-//
-//                }
-//            });
-//        }
-//        return waitListUsers;
-//    }
 
     /**
      * Retrieves all user link IDs currently marked as {@code "inWaitList"}
@@ -225,5 +227,70 @@ public class EventUserLinkDB {
                 }
             });
         }
+    }
+
+    /**
+     * Fetches all organizers from database.
+     * @param callback Callback to return the EventUserLink or an error
+     */
+    public void getOrganizers(GetCallback<Integer> callback) {
+        db.collection(EVENT_USER_LINK_COLLECTION)
+                .whereEqualTo("status", "Organizer")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    HashSet<Integer> uniqueOrganizers = new HashSet<>();
+
+                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                        Integer userID = doc.getLong("userID").intValue();
+                        uniqueOrganizers.add(userID);
+                    }
+
+                    callback.onSuccess(uniqueOrganizers.size());
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+
+    /** Adds a notification to the sampled notifications list
+     * for the EventUserLink identified by linkID.
+     *
+     * @param linkID       the ID of the EventUserLink
+     * @param notification the Notification to add
+     * @param callback     callback to notify success or failure
+     */
+    public void addSampledNotification(String linkID, Notification notification, @NonNull ActionCallback callback) {
+        getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink eventUserLink) {
+                eventUserLink.addNotification(notification);
+                updateEventUserLink(eventUserLink, callback);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    /**
+     *
+     * @param linkID
+     * @param notification
+     * @param callback
+     */
+    public void addWaitlistNotification(String linkID, Notification notification, @NonNull ActionCallback callback) {
+        getEventUserLinkByID(linkID, new GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink eventUserLink) {
+                eventUserLink.addNotification(notification);
+                updateEventUserLink(eventUserLink, callback);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
     }
 }
