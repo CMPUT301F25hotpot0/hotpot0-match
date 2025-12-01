@@ -59,24 +59,24 @@ public class ManageImageActivity extends AppCompatActivity {
     private void deleteImage() {
         if (imageUrl == null) return;
 
-        int eventID = Integer.parseInt(
-                android.net.Uri.parse(imageUrl)
-                        .getLastPathSegment()
-                        .replace("event-", "")
-                        .replace(".png", "")
-        );
+        int eventID = extractEventId(imageUrl);
+
+        if (eventID == -1) {
+            Toast.makeText(this, "Could not extract event ID from URL", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         picturesDB.deleteEventImage(eventID, new PicturesDB.Callback<Void>() {
             @Override
             public void onSuccess(Void result) {
                 Toast.makeText(ManageImageActivity.this, "Image deleted", Toast.LENGTH_SHORT).show();
 
-                // Pass deleted URL back to AdminImageActivity
+                // send result back
                 Intent intent = new Intent();
                 intent.putExtra("deleted_image_url", imageUrl);
                 setResult(RESULT_OK, intent);
 
-                finish(); // close activity
+                finish();
             }
 
             @Override
@@ -85,6 +85,24 @@ public class ManageImageActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    private int extractEventId(String url) {
+        try {
+            String filename = android.net.Uri.parse(url).getLastPathSegment();
+            if (filename == null) return -1;
+
+            // Extract only digits from the filename
+            String digits = filename.replaceAll("\\D+", ""); // removes everything except digits
+
+            if (digits.isEmpty()) return -1;
+
+            return Integer.parseInt(digits);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
 
 
 
