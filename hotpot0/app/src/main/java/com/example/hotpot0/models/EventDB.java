@@ -33,6 +33,7 @@ public class EventDB {
     private final FirebaseFirestore db;
     private static final String EVENT_COLLECTION = "Events";
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
+    private ProfileDB profileDB = new ProfileDB();
 
     /** Initializes the EventDB instance and Firestore connection. */
     public EventDB() {
@@ -135,6 +136,52 @@ public class EventDB {
      */
     public void deleteEvent(@NonNull Integer eventID, @NonNull ProfileDB.ActionCallback callback) {
         DocumentReference eventRef = db.collection(EVENT_COLLECTION).document(String.valueOf(eventID));
+
+        List<String> linkIDs = new ArrayList<>();
+        // Handle failure to fetch event document
+        eventRef.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Event event = documentSnapshot.toObject(Event.class);
+                        if (event != null && event.getLinkIDs() != null) {
+                            linkIDs.addAll(event.getLinkIDs());
+                        }
+                    }
+                    // Delete associated EventUserLink documents
+                    for (String linkID : linkIDs) {
+                        int userID = Integer.parseInt(linkID.split("_")[1]);
+                        eventUserLinkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
+                                    @Override
+                                    public void onSuccess(UserProfile userProfile) {
+                                        profileDB.removeLinkIDFromUser(userProfile, linkID, new ProfileDB.GetCallback<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // Successfully removed linkID from user profile
+                                            }
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                // Handle failure to remove linkID from user profile
+                                            }
+                                        });
+                                    }
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // Handle failure to fetch user profile
+                                    }
+                                });
+                            }
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Handle failure to delete EventUserLink
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+
         eventRef.delete()
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
