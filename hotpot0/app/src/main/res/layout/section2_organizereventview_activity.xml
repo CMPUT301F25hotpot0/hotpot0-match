@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Event Image (Card like PreviewActivity) -->
+            <!-- Event Image -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/eventImageCard"
                 android:layout_width="match_parent"

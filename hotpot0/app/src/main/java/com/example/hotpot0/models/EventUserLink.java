@@ -19,6 +19,10 @@ public class EventUserLink {
     private String linkID;
     private Status status = new Status();
     private ArrayList<Notification> notifications;
+    private Double latitude;
+    private Double longitude;
+
+    //
 
     /**
      * Default constructor required for Firestore deserialization.
@@ -44,12 +48,14 @@ public class EventUserLink {
      * @param userID  the user’s unique ID
      * @param eventID the event’s unique ID
      */
-    public EventUserLink(Integer userID, Integer eventID) {
+    public EventUserLink(Integer userID, Integer eventID, Double latitude, Double longitude) {
         this.linkID = eventID.toString() + '_' + userID.toString(); // Assigned by FireStore when the instance is saved
         this.userID = userID;
         this.eventID = eventID;
         this.status.setStatus("inWaitList");
         this.notifications = new ArrayList<>();
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     // Getters and Setters
@@ -110,6 +116,23 @@ public class EventUserLink {
     public ArrayList<Notification> getNotifications() {
         return notifications;
     }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
 
     // Utility Methods
     // ===============

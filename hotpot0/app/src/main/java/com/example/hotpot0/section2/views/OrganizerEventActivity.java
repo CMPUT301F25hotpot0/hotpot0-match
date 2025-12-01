@@ -1,5 +1,6 @@
 package com.example.hotpot0.section2.views;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,6 +27,12 @@ import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
 import com.example.hotpot0.section2.controllers.QRGenerator;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
@@ -49,7 +57,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class OrganizerEventActivity extends AppCompatActivity {
 
     private int eventID;
-    private Event currentEvent;
+    private Event currentEvent = new Event();
     private EventUserLink currentEventUserLink;
 
     TextView previewGeolocation;
@@ -101,7 +109,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
                             setupPreDrawLayout();
                         } else {
                             setContentView(R.layout.section2_organizereventview_postdraw);
-                            // setupPostDrawLayout();
+                            setupPostDrawLayout();
                         }
                     }
 
@@ -158,8 +166,10 @@ public class OrganizerEventActivity extends AppCompatActivity {
         String priceText = formatPrice(currentEvent.getPrice().toString());
         previewPrice.setText(priceText);
         // Handle capacity
-        String capacityText = formatCapacity(currentEvent.getCapacity().toString());
-        previewSpotsOpen.setText(capacityText);
+        String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                ? "All spots are filled!"
+                : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+        previewSpotsOpen.setText(spotsOpen);
         // Handle waiting list
         String waitingListText = formatWaitingList(currentEvent.getLinkIDs().toString());
         previewWaitingListCapacity.setText(waitingListText);
@@ -168,17 +178,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
         previewDaysLeft.setText(registrationText);
         // Handle geolocation status
         updateGeolocationStatus(currentEvent.getGeolocationRequired());
-
-        // Generate QR Code for the Event
-        QRGenerator qrGenerator = new QRGenerator();
-        Bitmap qrBitmap = qrGenerator.generateQR("event:"+currentEvent.getEventID()); // or any unique event data
-
-        if (qrBitmap != null) {
-            qrCodeImage.setImageBitmap(qrBitmap);
-            qrCodeImage.setVisibility(View.VISIBLE);
-        } else {
-            qrCodeImage.setVisibility(View.GONE); // hide if QR generation failed
-        }
 
         // Handle Event Image
         String imageURL = currentEvent.getImageURL();
@@ -195,6 +194,17 @@ public class OrganizerEventActivity extends AppCompatActivity {
                     .into(eventImage);
         }
 
+        // Generate QR Code for the Event
+        QRGenerator qrGenerator = new QRGenerator();
+        Bitmap qrBitmap = qrGenerator.generateQR("event:"+currentEvent.getEventID());
+
+        if (qrBitmap != null) {
+            qrCodeImage.setImageBitmap(qrBitmap);
+            qrCodeImage.setVisibility(View.VISIBLE);
+        } else {
+            qrCodeImage.setVisibility(View.GONE); // hide if QR generation failed
+        }
+
         // Load waitlist users
         eventUserLinkDB.getWaitListUsers(currentEvent.getLinkIDs(), new EventUserLinkDB.GetCallback<List<String>>() {
             @Override
@@ -202,13 +212,36 @@ public class OrganizerEventActivity extends AppCompatActivity {
                 // Get Number of People in Wait List
                 String numWaitList = waitListLinkIDs.size() + "";
                 previewCurrentlyWaiting.setText(numWaitList);
+                TextView geoHeading = findViewById(R.id.event_map_title);
                 // Hide mapContainer if no one is waiting or if current event has no geolocation enabled
                 if (waitListLinkIDs.isEmpty() || !currentEvent.getGeolocationRequired()) {
-                    mapContainer.setVisibility(View.GONE);
+                    geoHeading.setVisibility(View.GONE);
                     mapTitle.setVisibility(View.GONE);
+                    mapContainer.setVisibility(View.GONE);
                 } else {
                     mapContainer.setVisibility(View.VISIBLE);
-                    // TODO : NEED TO PLOT LOCATION ON MAP --- need to define lat/long attributes in EventUserLink object
+                    // Check if geolocation is enabled, only then show the map
+                    if (currentEvent.getGeolocationRequired()) {
+                        // At this point, geolocation required - KEEP MAP VISIBLE
+                        mapContainer.setVisibility(View.VISIBLE);
+                        mapTitle.setVisibility(View.VISIBLE);
+
+                        // Create a SupportMapFragment dynamically
+                        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.map_container, mapFragment)
+                                .commit();
+
+                        // When map is ready, plot the entrants
+                        mapFragment.getMapAsync(googleMap -> {
+                            plotEntrantsOnMap(googleMap, currentEvent.getLinkIDs(), mapContainer);
+                        });
+
+                    } else {
+                        geoHeading.setVisibility(View.GONE);
+                        mapContainer.setVisibility(View.GONE);
+                    }
                 }
                 // Populate Entrants Section
                 populateEntrants(entrantsContainer, waitListLinkIDs);
@@ -296,129 +329,148 @@ public class OrganizerEventActivity extends AppCompatActivity {
      * Sets up the post-draw layout for organizers.
      * Displays event details, sampled entrants, cancelled entrants, and allows confirming entrants or filling empty spots.
      */
-//    private void setupPostDrawLayout() {
-//        // --- View bindings ---
-//        ImageView eventImage = findViewById(R.id.eventImage);
-//        TextView previewEventName = findViewById(R.id.preview_event_name);
-//        TextView previewDescription = findViewById(R.id.preview_description);
-//        TextView previewGuidelines = findViewById(R.id.preview_guidelines);
-//        TextView previewLocation = findViewById(R.id.preview_location);
-//        TextView previewTimeAndDay = findViewById(R.id.preview_time_and_day);
-//        TextView previewDateRange = findViewById(R.id.preview_date_range);
-//        TextView previewDuration = findViewById(R.id.preview_duration);
-//        TextView previewPrice = findViewById(R.id.preview_price);
-//        TextView previewSpotsOpen = findViewById(R.id.preview_spots_open);
-//        TextView previewDaysLeft = findViewById(R.id.preview_days_left);
-//        TextView currentlyWaiting = findViewById(R.id.currently_waiting);
-//
-//        LinearLayout sampledEntrantsContainer = findViewById(R.id.sampled_entrants_container);
-//        LinearLayout cancelledEntrantsContainer = findViewById(R.id.cancelled_entrants_container);
-//        LinearLayout allEntrantsContainer = findViewById(R.id.all_entrants_container);
-//
-//        Button buttonFillSpots = findViewById(R.id.button_fillSpots);
-//        Button buttonConfirm = findViewById(R.id.button_confirm);
-//        Button buttonBack = findViewById(R.id.button_BackPostDraw);
-//        ImageView mapPreview = findViewById(R.id.mapPreview);
-//
-//        // --- Populate Event info ---
-//        previewEventName.setText(currentEvent.getName());
-//        previewDescription.setText(currentEvent.getDescription());
-//        previewGuidelines.setText(currentEvent.getGuidelines());
-//        previewLocation.setText("Location: " + currentEvent.getLocation());
-//        previewTimeAndDay.setText("Time: " + currentEvent.getTime());
-//        // previewDateRange.setText("Date: " + currentEvent.getDate());
-//        previewDuration.setText("Duration: " + currentEvent.getDuration());
-//        previewPrice.setText("Price: $" + currentEvent.getPrice());
-//        previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
-//        // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
-//
-//        // --- Populate sampled entrants ---
-//        populateEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
-//
-//
-//        populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
-//        populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
-//
-//        // --- Button actions ---
-//        buttonBack.setOnClickListener(v -> finish());
-//
-//        buttonFillSpots.setOnClickListener(v -> {
-//            Toast.makeText(this, "Filling remaining spots...", Toast.LENGTH_SHORT).show();
-//            eventDB.fillEmptySampledSpots(currentEvent, new EventDB.GetCallback<List<String>>() {
-//                @Override
-//                public void onSuccess(List<String> newlySampledUsers) {
-//
-//                    // Change status of EventUserLinks to "Sampled"
-//                    for (String linkID : newlySampledUsers) {
-//                        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
-//                            @Override
-//                            public void onSuccess(EventUserLink eventUserLink) {
-//                                if (eventUserLink != null) {
-//                                    // Update status to "Sampled"
-//                                    eventUserLink.setStatus("Sampled");
-//                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
-//                                        @Override
-//                                        public void onSuccess() {
-//                                            ;
-//                                        }
-//
-//                                        @Override
-//                                        public void onFailure(Exception e) {
-//                                            Toast.makeText(
-//                                                    OrganizerEventActivity.this,
-//                                                    "Error updating link " + linkID + ": " + e.getMessage(),
-//                                                    Toast.LENGTH_SHORT
-//                                            ).show();
-//                                        }
-//                                    });
-//                                } else {
-//                                    Toast.makeText(
-//                                            OrganizerEventActivity.this,
-//                                            "EventUserLink not found for " + linkID,
-//                                            Toast.LENGTH_SHORT
-//                                    ).show();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Exception e) {
-//                                Toast.makeText(
-//                                        OrganizerEventActivity.this,
-//                                        "Error fetching EventUserLink " + linkID + ": " + e.getMessage(),
-//                                        Toast.LENGTH_SHORT
-//                                ).show();
-//                            }
-//                        });
-//                    }
-//
-//
-//                    Toast.makeText(OrganizerEventActivity.this,
-//                            "Filled spots successfully! Total: " + newlySampledUsers.size(),
-//                            Toast.LENGTH_SHORT).show();
-//
-//                    // Switch to Post-Draw layout
-//                    setContentView(R.layout.section2_organizereventview_postdraw);
-//                    setupPostDrawLayout();
-//                }
-//
-//                @Override
-//                public void onFailure(Exception e) {
-//                    Toast.makeText(OrganizerEventActivity.this, "Error generating sample: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//            buttonConfirm.setEnabled(true);
-//            // After filling, you could refresh UI:
-//            // setupPostDrawLayout();
-//        });
-//
-//        buttonConfirm.setOnClickListener(v -> {
-//            Toast.makeText(this, "Entrants confirmed!", Toast.LENGTH_SHORT).show();
-//            // TODO: Call eventHandler.confirmEntrants(eventID)
-//            buttonConfirm.setEnabled(false);
-//        });
-//
-//        setupBottomNavigation();
-//    }
+    @SuppressLint("SetTextI18n")
+    private void setupPostDrawLayout() {
+        // --- View bindings ---
+        ImageView eventImage = findViewById(R.id.eventImage);
+        TextView previewEventName = findViewById(R.id.previewEventName);
+        TextView previewDescription = findViewById(R.id.previewDescription);
+        TextView previewGuidelines = findViewById(R.id.previewGuidelines);
+        TextView previewLocation = findViewById(R.id.previewLocation);
+        TextView previewTimeAndDay = findViewById(R.id.previewTimeAndDay);
+        TextView previewDateRange = findViewById(R.id.previewDateRange);
+        TextView previewDuration = findViewById(R.id.previewDuration);
+        TextView previewPrice = findViewById(R.id.previewPrice);
+        TextView previewSpotsOpen = findViewById(R.id.previewSpotsOpen);
+
+        LinearLayout sampledEntrantsContainer = findViewById(R.id.sampled_entrants_container);
+        LinearLayout cancelledEntrantsContainer = findViewById(R.id.cancelled_entrants_container);
+        LinearLayout allEntrantsContainer = findViewById(R.id.all_entrants_container);
+
+        Button buttonFillSpots = findViewById(R.id.button_fillSpots);
+        Button buttonConfirm = findViewById(R.id.button_confirm);
+        Button buttonBack = findViewById(R.id.button_BackPostDraw);
+        FrameLayout mapContainer = findViewById(R.id.map_container);
+        if (currentEvent.getGeolocationRequired()) {
+            mapContainer.setVisibility(View.VISIBLE);
+
+            // Create a SupportMapFragment dynamically
+            SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.map_container, mapFragment)
+                    .commit();
+
+            // When map is ready, plot the entrants
+            mapFragment.getMapAsync(googleMap -> {
+                plotEntrantsOnMap(googleMap, currentEvent.getLinkIDs(), mapContainer);
+            });
+
+        } else {
+            TextView geoHeading = findViewById(R.id.GeolocationHeading);
+            geoHeading.setVisibility(View.GONE);
+            mapContainer.setVisibility(View.GONE);
+        }
+
+        // --- Populate Event info ---
+        previewEventName.setText(currentEvent.getName());
+        previewDescription.setText(currentEvent.getDescription());
+        previewGuidelines.setText(currentEvent.getGuidelines());
+        previewLocation.setText(currentEvent.getLocation());
+        previewTimeAndDay.setText(currentEvent.getTime());
+        previewDateRange.setText(buildDateRange(currentEvent.getStartDate(), currentEvent.getEndDate()));
+        previewDuration.setText(currentEvent.getDuration());
+        String priceText = formatPrice(currentEvent.getPrice().toString());
+        previewPrice.setText(priceText);
+        String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                ? "All spots are filled!"
+                : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+        previewSpotsOpen.setText(spotsOpen);
+
+        // Populate sampled entrants
+        populateEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
+        populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
+        populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
+
+        // --- Button actions ---
+        buttonBack.setOnClickListener(v -> finish());
+
+        buttonFillSpots.setOnClickListener(v -> {
+            Toast.makeText(this, "Filling remaining spots...", Toast.LENGTH_SHORT).show();
+            eventDB.fillEmptySampledSpots(currentEvent, new EventDB.GetCallback<List<String>>() {
+                @Override
+                public void onSuccess(List<String> newlySampledUsers) {
+
+                    // Change status of EventUserLinks to "Sampled"
+                    for (String linkID : newlySampledUsers) {
+                        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                            @Override
+                            public void onSuccess(EventUserLink eventUserLink) {
+                                if (eventUserLink != null) {
+                                    // Update status to "Sampled"
+                                    eventUserLink.setStatus("Sampled");
+                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            ;
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Toast.makeText(
+                                                    OrganizerEventActivity.this,
+                                                    "Error updating link " + linkID + ": " + e.getMessage(),
+                                                    Toast.LENGTH_SHORT
+                                            ).show();
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(
+                                            OrganizerEventActivity.this,
+                                            "EventUserLink not found for " + linkID,
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(
+                                        OrganizerEventActivity.this,
+                                        "Error fetching EventUserLink " + linkID + ": " + e.getMessage(),
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        });
+                    }
+
+                    Toast.makeText(OrganizerEventActivity.this,
+                            "Filled spots successfully! Total: " + newlySampledUsers.size(),
+                            Toast.LENGTH_SHORT).show();
+
+                    // Switch to Post-Draw layout
+                    setContentView(R.layout.section2_organizereventview_postdraw);
+                    setupPostDrawLayout();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(OrganizerEventActivity.this, "Error generating sample: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            buttonConfirm.setEnabled(true);
+            // After filling, you could refresh UI:
+            // setupPostDrawLayout();
+        });
+
+        buttonConfirm.setOnClickListener(v -> {
+            Toast.makeText(this, "Entrants confirmed!", Toast.LENGTH_SHORT).show();
+            // TODO: Call eventHandler.confirmEntrants(eventID)
+            buttonConfirm.setEnabled(false);
+        });
+
+        setupBottomNavigation();
+    }
 
     private void setupBottomNavigation() {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
@@ -487,10 +539,12 @@ public class OrganizerEventActivity extends AppCompatActivity {
     }
 
     private String buildDateRange(String startDate, String endDate) {
-        if (startDate != null && endDate != null) {
+        if (startDate != null && startDate.equals(endDate)) {
+            return startDate;
+        } else if (startDate != null && endDate != null && !endDate.isEmpty()) {
             return startDate + " to " + endDate;
         } else if (startDate != null) {
-            return startDate + " (Single day event)";
+            return startDate;
         } else {
             return "No dates specified";
         }
@@ -540,7 +594,9 @@ public class OrganizerEventActivity extends AppCompatActivity {
     }
 
     private String buildRegistrationPeriod(String registrationStart, String registrationEnd) {
-        if (registrationStart != null && registrationEnd != null) {
+        if (registrationStart != null && registrationStart.equals(registrationEnd)) {
+            return registrationStart;
+        } else if (registrationStart != null && registrationEnd != null && !registrationEnd.isEmpty()) {
             return registrationStart + " to " + registrationEnd;
         } else if (registrationStart != null) {
             return "Starts: " + registrationStart;
@@ -555,6 +611,64 @@ public class OrganizerEventActivity extends AppCompatActivity {
             previewGeolocation.setVisibility(View.VISIBLE);
         } else {
             previewGeolocation.setVisibility(View.GONE);
+        }
+    }
+
+    private void plotEntrantsOnMap(GoogleMap googleMap, List<String> linkIDs, FrameLayout mapContainer) {
+
+        if (linkIDs == null || linkIDs.isEmpty()) {
+            mapContainer.setVisibility(View.GONE);
+            return;
+        }
+
+        int organizerID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+        List<LatLng> allPositions = new ArrayList<>();
+
+        final int total = linkIDs.size();
+        final int[] completed = {0};
+
+        for (String linkID : linkIDs) {
+
+            String userIDStr = linkID.split("_")[1];
+            if (Integer.parseInt(userIDStr) == organizerID) {
+                completed[0]++;
+                continue;
+            }
+
+            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink link) {
+                    if (link != null && link.getLatitude() != null && link.getLongitude() != null) {
+                        LatLng pos = new LatLng(link.getLatitude(), link.getLongitude());
+                        googleMap.addMarker(new MarkerOptions().position(pos));
+                        allPositions.add(pos);
+                    }
+
+                    completed[0]++;
+                    checkIfDone();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    completed[0]++;
+                    checkIfDone();
+                }
+
+                private void checkIfDone() {
+                    if (completed[0] == total) {
+                        if (allPositions.isEmpty()) {
+                            mapContainer.setVisibility(View.GONE);
+                            return;
+                        }
+                        for (LatLng p : allPositions) boundsBuilder.include(p);
+
+                        LatLngBounds bounds = boundsBuilder.build();
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                    }
+                }
+            });
         }
     }
 }

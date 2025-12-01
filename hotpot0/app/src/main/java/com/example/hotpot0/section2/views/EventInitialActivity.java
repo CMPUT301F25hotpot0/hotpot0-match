@@ -8,6 +8,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Looper;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
@@ -23,7 +36,7 @@ import com.example.hotpot0.section2.controllers.EventActionHandler;
  * to join or leave the waitlist based on their current status.
  */
 public class EventInitialActivity extends AppCompatActivity {
-    private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft;
+    private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft, previewWaitingList;
     private ImageView eventImage;
     private Button joinLeaveButton, backButton;
     private TextView GeolocationStatus;
@@ -32,6 +45,10 @@ public class EventInitialActivity extends AppCompatActivity {
     private EventDB eventDB = new EventDB();
     private int eventID;
     private Event currentEvent;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private Double latitude = null;
+    private Double longitude = null;
 
     /**
      * Called when the activity is first created.
@@ -47,6 +64,8 @@ public class EventInitialActivity extends AppCompatActivity {
 
         int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
         eventID = getIntent().getIntExtra("event_id", -1); // Get event ID from Intent
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fetchCurrentLocation();
 
         // Initialize UI elements
         eventImage = findViewById(R.id.eventImage);
@@ -59,6 +78,7 @@ public class EventInitialActivity extends AppCompatActivity {
         previewDuration = findViewById(R.id.previewDuration);
         previewPrice = findViewById(R.id.previewPrice);
         previewSpotsOpen = findViewById(R.id.previewSpotsOpen);
+        previewWaitingList = findViewById(R.id.previewWaitingList);
         previewDaysLeft = findViewById(R.id.previewDaysLeft);
         GeolocationStatus = findViewById(R.id.GeolocationStatus);
         joinLeaveButton = findViewById(R.id.button_join_or_leave_waitlist);
@@ -81,13 +101,15 @@ public class EventInitialActivity extends AppCompatActivity {
                 previewGuidelines.setText(currentEvent.getGuidelines());
                 previewLocation.setText(currentEvent.getLocation());
                 previewTimeAndDay.setText(currentEvent.getTime());
-                // previewDateRange.setText("Date: " + currentEvent.getDate());
+                previewDateRange.setText(buildDateRange(currentEvent.getStartDate(), currentEvent.getEndDate()));
                 previewDuration.setText(currentEvent.getDuration());
-                previewPrice.setText("$" + currentEvent.getPrice());
-                String spotsOpen = (currentEvent.getWaitingListCapacity() - currentEvent.getTotalWaitlist()) == 0
+                String priceText = formatPrice(currentEvent.getPrice().toString());
+                previewPrice.setText(priceText);
+                String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalSampled()) == 0
                         ? "All spots are filled!"
-                        : Integer.toString(currentEvent.getWaitingListCapacity() - currentEvent.getTotalWaitlist());
+                        : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalSampled());
                 previewSpotsOpen.setText(spotsOpen);
+                previewWaitingList.setText(currentEvent.getTotalWaitlist().toString());
                 // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
                 // Handle geolocation status
@@ -120,8 +142,13 @@ public class EventInitialActivity extends AppCompatActivity {
                             });
                         } else {
                             joinLeaveButton.setText(getString(R.string.join_waitlist));
+                            if (latitude == null || longitude == null) {
+                                latitude = 0.0;
+                                longitude = 0.0;
+                                return;
+                            }
                             joinLeaveButton.setOnClickListener(v -> {
-                                eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                                eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
                                     @Override
                                     public void onSuccess(Integer result) {
                                         switch (result) {
@@ -152,8 +179,13 @@ public class EventInitialActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Exception e) {
                         joinLeaveButton.setText(getString(R.string.join_waitlist));
+                        if (latitude == null || longitude == null) {
+                            latitude = 0.0;
+                            longitude = 0.0;
+                            return;
+                        }
                         joinLeaveButton.setOnClickListener(v -> {
-                            eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                            eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
                                 @Override
                                 public void onSuccess(Integer result) {
                                     switch (result) {
@@ -199,5 +231,71 @@ public class EventInitialActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
+    }
+
+    private void fetchCurrentLocation() {
+        // Check for location permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    101);
+            return;
+        }
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            } else {
+                // If last location is null, request location updates
+                fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        if (locationResult == null) return;
+                        Location loc = locationResult.getLastLocation();
+                        if (loc != null) {
+                            latitude = loc.getLatitude();
+                            longitude = loc.getLongitude();
+                            fusedLocationClient.removeLocationUpdates(this); // Stop updates after first fix
+                        }
+                    }
+                }, Looper.getMainLooper());
+            }
+        });
+    }
+
+    private String buildDateRange(String startDate, String endDate) {
+        if (startDate != null && startDate.equals(endDate)) {
+            return startDate;
+        } else if (startDate != null && endDate != null && !endDate.isEmpty()) {
+            return startDate + " to " + endDate;
+        } else if (startDate != null) {
+            return startDate;
+        } else {
+            return "No dates specified";
+        }
+    }
+
+    private String formatPrice(String price) {
+        if (price == null || price.isEmpty()) {
+            return "Free";
+        }
+
+        try {
+            double priceValue = Double.parseDouble(price);
+            if (priceValue == 0) {
+                return "Free";
+            } else {
+                return String.format("$%.2f CAD", priceValue);
+            }
+        } catch (NumberFormatException e) {
+            return "Invalid price";
+        }
     }
 }
