@@ -1,15 +1,18 @@
 package com.example.hotpot0.section2.controllers;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.Patterns;
 import android.widget.Toast;
 
+import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -162,36 +165,107 @@ public class ProfileEditHandler {
                         }
                     });
                     return;
-                }
+                } else {
+                    for (String linkID : linkIDs) {
+//                        int eventID = Integer.parseInt(linkID.split("_")[0]);
+                        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<com.example.hotpot0.models.EventUserLink>() {
+                            @Override
+                            public void onSuccess(com.example.hotpot0.models.EventUserLink eventUserLink) {
+                                if ("Organizer".equals(eventUserLink.getStatus())) {
 
-                for (String linkID : linkIDs) {
-                    int eventID = Integer.parseInt(linkID.split("_")[0]);
-                    eventUserLinkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
-                        @Override
-                        public void onSuccess() {
-                            // Successfully deleted the EventUserLink
-                            eventDB.getEventByID(eventID, new EventDB.GetCallback<com.example.hotpot0.models.Event>() {
-                                @Override
-                                public void onSuccess(com.example.hotpot0.models.Event event) {
-                                    eventDB.removeLinkIDFromEvent(event, linkID, new EventDB.GetCallback<Void>() {
+                                    // Handle failure to fetch event document
+                                    eventDB.getEventByID(eventUserLink.getEventID(), new EventDB.GetCallback<Event>() {
                                         @Override
-                                        public void onSuccess(Void aVoid) {
-                                            // Successfully removed the linkID from the event
-                                            profileDB.removeLinkIDFromUser(user, linkID, new ProfileDB.GetCallback<Void>() {
+                                        public void onSuccess(Event event) {
+                                            List<String> linkIDs = event.getLinkIDs();
+                                            Log.d("EventDB", "Deleting Event with linkIDs: " + linkIDs);
+                                            // Delete associated EventUserLink documents
+                                            for (String linkID : linkIDs) {
+                                                int userID = Integer.parseInt(linkID.split("_")[1]);
+                                                eventUserLinkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
+                                                    @Override
+                                                    public void onSuccess() {
+                                                        profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
+                                                            @Override
+                                                            public void onSuccess(UserProfile userProfile) {
+                                                                profileDB.removeLinkIDFromUser(userProfile, linkID, new ProfileDB.GetCallback<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        // Successfully removed linkID from user profile
+                                                                        // Delete all events where user is an organizer
+                                                                        eventDB.deleteEvent(eventUserLink.getEventID(), new ProfileDB.ActionCallback() {
+                                                                            @Override
+                                                                            public void onSuccess() {
+                                                                                // Successfully deleted the event
+                                                                                Log.d("ProfileEditHandler", "Deleted event with ID: " + eventUserLink.getEventID());
+                                                                            }
+                                                                            @Override
+                                                                            public void onFailure(Exception e) {
+                                                                                // Log the failure but continue
+                                                                                e.printStackTrace();
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                    @Override
+                                                                    public void onFailure(Exception e) {
+                                                                        // Handle failure to remove linkID from user profile
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                });
+                                                            }
+                                                            @Override
+                                                            public void onFailure(Exception e) {
+                                                                // Handle failure to fetch user profile
+                                                                e.printStackTrace();
+                                                            }
+                                                        });
+                                                    }
+                                                    @Override
+                                                    public void onFailure(Exception e) {
+                                                        // Handle failure to delete EventUserLink
+                                                        e.printStackTrace();
+                                                    }
+                                                });
+                                            }
+                                        }
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Log.e("EventDB", "Failed to fetch event for deletion: " + e.getMessage());
+                                        }
+                                    });
+
+                                } else {
+                                    // Successfully fetched the EventUserLink, now delete it
+                                    eventUserLinkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            // Successfully deleted the EventUserLink
+                                            eventDB.getEventByID(eventUserLink.getEventID(), new EventDB.GetCallback<com.example.hotpot0.models.Event>() {
                                                 @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    // Successfully removed the linkID from the user
-                                                    profileDB.deleteUser(userID, new ProfileDB.ActionCallback() {
+                                                public void onSuccess(com.example.hotpot0.models.Event event) {
+                                                    eventDB.removeLinkIDFromEvent(event, linkID, new EventDB.GetCallback<Void>() {
                                                         @Override
-                                                        public void onSuccess() {
-                                                            // Notify that the profile was successfully deleted
-                                                            callback.onSuccess();
+                                                        public void onSuccess(Void aVoid) {
+                                                            // Successfully removed the linkID from the event
+                                                            profileDB.deleteUser(userID, new ProfileDB.ActionCallback() {
+                                                                @Override
+                                                                public void onSuccess() {
+                                                                    // Notify that the profile was successfully deleted
+                                                                    callback.onSuccess();
+                                                                }
+
+                                                                @Override
+                                                                public void onFailure(Exception e) {
+                                                                    // Notify failure in deleting the profile
+                                                                    callback.onFailure(e);
+                                                                }
+                                                            });
                                                         }
 
                                                         @Override
                                                         public void onFailure(Exception e) {
-                                                            // Notify failure in deleting the profile
-                                                            callback.onFailure(e);
+                                                            // Log the failure but continue
+                                                            e.printStackTrace();
                                                         }
                                                     });
                                                 }
@@ -203,6 +277,7 @@ public class ProfileEditHandler {
                                                 }
                                             });
                                         }
+
                                         @Override
                                         public void onFailure(Exception e) {
                                             // Log the failure but continue
@@ -210,19 +285,15 @@ public class ProfileEditHandler {
                                         }
                                     });
                                 }
-                                @Override
-                                public void onFailure(Exception e) {
-                                    // Log the failure but continue
-                                    e.printStackTrace();
-                                }
-                            });
-                        }
-                        @Override
-                        public void onFailure(Exception e) {
-                            // Log the failure but continue
-                            e.printStackTrace();
-                        }
-                    });
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Log the failure but continue
+                                e.printStackTrace();
+                            }
+                        });
+                    }
                 }
             }
             @Override
