@@ -60,6 +60,19 @@ public class UserProfile {
         this.linkIDs = new ArrayList<>();
     }
 
+    // For testing only
+    public UserProfile(String name, String emailID, String phoneNumber, String deviceID) {
+        this.userID = null;
+        this.deviceID = deviceID; // manually provide a fake or dummy ID
+        this.name = name;
+        this.emailID = emailID;
+        this.phoneNumber = phoneNumber;
+        this.notificationsEnabled = true;
+        this.latitude = 37.7749;
+        this.longitude = -122.4194;
+        this.linkIDs = new ArrayList<>();
+    }
+
     // Getters and Setters
 
     /**

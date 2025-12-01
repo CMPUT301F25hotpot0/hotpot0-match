@@ -101,7 +101,7 @@ public class Notification {
     private String resolveAutomaticText(Status status, String eventName) {
         String base = NOTIF_TEXTS.get(status.getStatus());
         if (base == null) return null;
-
+        if (eventName == null) eventName = "Event"; // Default
         return base.replace("[Event Name]", eventName);
     }
 
