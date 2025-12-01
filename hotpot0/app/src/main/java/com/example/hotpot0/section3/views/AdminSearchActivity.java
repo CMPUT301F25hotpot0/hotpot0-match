@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
+import com.example.hotpot0.models.EventUserLinkDB;
+import com.example.hotpot0.models.ProfileDB;
+import com.example.hotpot0.models.UserProfile;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
@@ -22,21 +25,22 @@ import java.util.List;
 public class AdminSearchActivity extends AppCompatActivity {
 
     private EventDB eventDB;
+    private ProfileDB profileDB;
 
     private ListView listView;
     private EditText searchBar;
     private ChipGroup chipGroup;
 
-    // Events (for "Events" chip)
-    private List<Event> allEvents = new ArrayList<>();
-    private List<Event> filteredEvents = new ArrayList<>();
+    // EVENTS
+    private final List<Event> allEvents = new ArrayList<>();
+    private final List<Event> filteredEvents = new ArrayList<>();
 
-    // Events (for "Organizers" chip – same events, different meaning)
-    private List<Event> allOrganizerEvents = new ArrayList<>();
-    private List<Event> filteredOrganizerEvents = new ArrayList<>();
+    // ORGANIZERS (REAL USERS)
+    private final List<UserProfile> allOrganizers = new ArrayList<>();
+    private final List<UserProfile> filteredOrganizers = new ArrayList<>();
 
-    private AdminEventAdapter adapter;              // for Events tab
-    private OrganizerEventAdapter organizerAdapter; // for Organizers tab
+    private AdminEventAdapter eventAdapter;
+    private OrganizerListAdapter organizerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +48,17 @@ public class AdminSearchActivity extends AppCompatActivity {
         setContentView(R.layout.section3_adminsearch_activity);
 
         eventDB = new EventDB();
+        profileDB = new ProfileDB();
 
         listView = findViewById(R.id.searchResultsListView);
         searchBar = findViewById(R.id.searchEditText);
         chipGroup = findViewById(R.id.filterChipGroup);
 
-        // Ensure a default selection
         chipGroup.check(R.id.eventsChip);
 
         loadEvents();
+        loadOrganizers();
+
         setupSearchFilter();
         setupChipSwitching();
         setupItemClick();
@@ -63,137 +69,173 @@ public class AdminSearchActivity extends AppCompatActivity {
         eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
             @Override
             public void onSuccess(List<Event> events) {
-                // All events for normal "Events" tab
                 allEvents.clear();
                 allEvents.addAll(events);
-                filteredEvents = new ArrayList<>(allEvents);
 
-                // Prepare list for "Organizers" tab (only events that have an organizerID)
-                allOrganizerEvents.clear();
-                for (Event e : events) {
-                    if (e.getOrganizerID() != null) {
-                        allOrganizerEvents.add(e);
-                    }
-                }
-                filteredOrganizerEvents = new ArrayList<>(allOrganizerEvents);
+                filteredEvents.clear();
+                filteredEvents.addAll(allEvents);
 
-                // Default adapter = Events view
-                adapter = new AdminEventAdapter(AdminSearchActivity.this, filteredEvents);
-                listView.setAdapter(adapter);
+                eventAdapter = new AdminEventAdapter(AdminSearchActivity.this, filteredEvents);
+
+                // Default tab = events
+                listView.setAdapter(eventAdapter);
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(
-                        AdminSearchActivity.this,
-                        "Failed loading events: " + e.getMessage(),
-                        Toast.LENGTH_SHORT
-                ).show();
+                Toast.makeText(AdminSearchActivity.this,
+                        "Failed loading events.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // ------------------------ LOAD ORGANIZERS ------------------------
+    private void loadOrganizers() {
+
+        EventUserLinkDB linkDB = new EventUserLinkDB();
+
+        // Step 1: Get all userIDs where status == "Organizer"
+        linkDB.getAllOrganizers(new EventUserLinkDB.GetCallback<List<Integer>>() {
+            @Override
+            public void onSuccess(List<Integer> organizerIDs) {
+
+                if (organizerIDs.isEmpty()) {
+                    filteredOrganizers.clear();
+                    return;
+                }
+
+                // Step 2: Load all UserProfiles and match with organizer IDs
+                profileDB.getAllUsers(new ProfileDB.GetCallback<List<UserProfile>>() {
+                    @Override
+                    public void onSuccess(List<UserProfile> users) {
+
+                        allOrganizers.clear();
+
+                        for (UserProfile u : users) {
+                            if (organizerIDs.contains(u.getUserID())) {
+                                allOrganizers.add(u);
+                            }
+                        }
+
+                        filteredOrganizers.clear();
+                        filteredOrganizers.addAll(allOrganizers);
+
+                        organizerAdapter =
+                                new OrganizerListAdapter(AdminSearchActivity.this, filteredOrganizers);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(AdminSearchActivity.this,
+                                "Failed loading organizer profiles.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(AdminSearchActivity.this,
+                        "Failed loading organizer links.",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     // ------------------------ SEARCH BAR ------------------------
     private void setupSearchFilter() {
+
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
-                String q = s.toString().trim().toLowerCase();
+                String q = s.toString().toLowerCase().trim();
 
                 int selected = chipGroup.getCheckedChipId();
-                if (selected == View.NO_ID) selected = R.id.eventsChip;
 
-                // Filter EVENTS tab
+                // EVENTS
                 if (selected == R.id.eventsChip) {
                     filteredEvents.clear();
+
                     for (Event e : allEvents) {
-                        if (e.getName() != null && e.getName().toLowerCase().contains(q)) {
+                        if (e.getName() != null &&
+                                e.getName().toLowerCase().contains(q)) {
                             filteredEvents.add(e);
                         }
                     }
-                    if (adapter != null) adapter.notifyDataSetChanged();
+
+                    if (eventAdapter != null) eventAdapter.notifyDataSetChanged();
                 }
 
-                // Filter ORGANIZERS tab
+                // ORGANIZERS
                 else if (selected == R.id.organizersChip) {
-                    filteredOrganizerEvents.clear();
-                    for (Event e : allOrganizerEvents) {
-                        if (e.getName() != null && e.getName().toLowerCase().contains(q)) {
-                            filteredOrganizerEvents.add(e);
+                    filteredOrganizers.clear();
+
+                    for (UserProfile u : allOrganizers) {
+                        String name = u.getName() != null ? u.getName().toLowerCase() : "";
+                        String id = String.valueOf(u.getUserID());
+
+                        if (name.contains(q) || id.contains(q)) {
+                            filteredOrganizers.add(u);
                         }
                     }
+
                     if (organizerAdapter != null) organizerAdapter.notifyDataSetChanged();
                 }
-
-                // Profiles search not implemented
             }
         });
     }
 
     // ------------------------ CHIP SWITCHING ------------------------
     private void setupChipSwitching() {
+
         chipGroup.setOnCheckedChangeListener((group, checkedId) -> {
 
             if (checkedId == R.id.eventsChip) {
-                if (adapter == null) {
-                    adapter = new AdminEventAdapter(AdminSearchActivity.this, filteredEvents);
-                }
-                listView.setAdapter(adapter);
+                if (eventAdapter != null) listView.setAdapter(eventAdapter);
             }
 
-            // FIX #1 — this must run BEFORE profilesChip
             else if (checkedId == R.id.organizersChip) {
-                if (organizerAdapter == null) {
-                    organizerAdapter = new OrganizerEventAdapter(AdminSearchActivity.this, filteredOrganizerEvents);
-                }
-                listView.setAdapter(organizerAdapter);
+                if (organizerAdapter != null) listView.setAdapter(organizerAdapter);
             }
 
-            // FIX #2 — this must be last
             else if (checkedId == R.id.profilesChip) {
-                Toast.makeText(
-                        AdminSearchActivity.this,
-                        "Profiles search not implemented yet.",
-                        Toast.LENGTH_SHORT
-                ).show();
+                Toast.makeText(this,
+                        "Profiles search not implemented.",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     // ------------------------ ITEM CLICK ------------------------
     private void setupItemClick() {
+
         listView.setOnItemClickListener((parent, view, position, id) -> {
 
             int selected = chipGroup.getCheckedChipId();
-            if (selected == View.NO_ID) selected = R.id.eventsChip;
 
             // EVENTS → ManageEventActivity
             if (selected == R.id.eventsChip) {
-                if (position < 0 || position >= filteredEvents.size()) return;
-                Event chosen = filteredEvents.get(position);
+                if (position >= filteredEvents.size()) return;
 
-                Intent i = new Intent(AdminSearchActivity.this, ManageEventActivity.class);
-                i.putExtra("eventID", chosen.getEventID());
+                Event e = filteredEvents.get(position);
+
+                Intent i = new Intent(this, ManageEventActivity.class);
+                i.putExtra("eventID", e.getEventID());
                 startActivity(i);
             }
 
             // ORGANIZERS → AdminOrganizerViewActivity
             else if (selected == R.id.organizersChip) {
-                if (position < 0 || position >= filteredOrganizerEvents.size()) return;
+                if (position >= filteredOrganizers.size()) return;
 
-                Event chosen = filteredOrganizerEvents.get(position);
-                Integer organizerID = chosen.getOrganizerID();
+                UserProfile organizer = filteredOrganizers.get(position);
 
-                if (organizerID == null) {
-                    Toast.makeText(this, "This event has no organizer linked.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Intent i = new Intent(AdminSearchActivity.this, AdminOrganizerViewActivity.class);
-                i.putExtra("organizerID", organizerID);
+                Intent i = new Intent(this, AdminOrganizerViewActivity.class);
+                i.putExtra("organizerID", organizer.getUserID());
                 startActivity(i);
             }
         });

@@ -413,7 +413,7 @@ public class ProfileDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    public void getAllUserProfiles(@NonNull GetCallback<java.util.List<UserProfile>> callback) {
+    public void getAllUsers(@NonNull GetCallback<java.util.List<UserProfile>> callback) {
         db.collection(USERS_COLLECTION)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {

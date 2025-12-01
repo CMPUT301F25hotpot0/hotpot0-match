@@ -206,4 +206,24 @@ public class EventUserLinkDB {
             });
         }
     }
+    public void getAllOrganizers(@NonNull GetCallback<List<Integer>> callback) {
+
+        db.collection(EVENT_USER_LINK_COLLECTION)
+                .whereEqualTo("status.status", "Organizer")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+
+                    List<Integer> organizerIDs = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        EventUserLink link = doc.toObject(EventUserLink.class);
+                        if (link != null && link.getUserID() != null) {
+                            organizerIDs.add(link.getUserID());
+                        }
+                    }
+
+                    callback.onSuccess(organizerIDs);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
 }

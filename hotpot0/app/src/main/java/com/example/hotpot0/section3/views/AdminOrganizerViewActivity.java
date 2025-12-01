@@ -27,7 +27,7 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
 
     private int organizerID;
 
-    private TextView organizerName, organizerEmail, organizerPhone, organizerUserID;
+    private TextView organizerName, organizerUserID;
     private Button removeButton;
 
     @Override
@@ -42,8 +42,6 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
         organizerID = getIntent().getIntExtra("organizerID", -1);
 
         organizerName = findViewById(R.id.organizerName);
-        organizerEmail = findViewById(R.id.organizerEmail);
-        organizerPhone = findViewById(R.id.organizerPhone);
         organizerUserID = findViewById(R.id.organizerUserID);
         removeButton = findViewById(R.id.removeOrganizerButton);
 
@@ -66,8 +64,6 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UserProfile user) {
                 organizerName.setText(user.getName());
-                organizerEmail.setText(user.getEmailID());
-                organizerPhone.setText(user.getPhoneNumber());
                 organizerUserID.setText(String.valueOf(user.getUserID()));
             }
 
@@ -83,11 +79,10 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
         });
     }
 
-    // ------------------------ CONFIRMATION DIALOG (OPTION 2) ------------------------
     private void showConfirmDeleteDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Remove Organizer?")
-                .setMessage("Deleting this organizer will also remove ALL their events and registrations. This cannot be undone.\n\nAre you sure?")
+                .setMessage("Deleting this organizer will also remove ALL their events and registrations.\n\nThis cannot be undone.")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     removeButton.setEnabled(false);
                     cascadeDeleteOrganizer();
@@ -96,15 +91,11 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ------------------------ CASCADE DELETE ------------------------
     private void cascadeDeleteOrganizer() {
-
-        // 1) Fetch all events
         eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
             @Override
             public void onSuccess(List<Event> events) {
 
-                // Filter to events belonging to this organizer
                 List<Event> toDelete = new ArrayList<>();
                 for (Event e : events) {
                     if (e.getOrganizerID() != null && e.getOrganizerID() == organizerID) {
@@ -113,19 +104,16 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
                 }
 
                 if (toDelete.isEmpty()) {
-                    // No events -> just delete organizer profile
                     deleteOrganizerProfile();
                     return;
                 }
 
-                // We have events to delete → delete them + their links, then the organizer
                 final int[] remaining = {toDelete.size()};
 
                 for (Event e : toDelete) {
                     deleteEventWithLinks(e, () -> {
                         remaining[0]--;
                         if (remaining[0] == 0) {
-                            // All events processed → now delete organizer profile
                             deleteOrganizerProfile();
                         }
                     });
@@ -136,7 +124,7 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
             public void onFailure(Exception e) {
                 Toast.makeText(
                         AdminOrganizerViewActivity.this,
-                        "Failed to load events for deletion: " + e.getMessage(),
+                        "Failed to load events for deletion.",
                         Toast.LENGTH_LONG
                 ).show();
                 removeButton.setEnabled(true);
@@ -144,48 +132,70 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Deletes all EventUserLinks for this event (based on its linkIDs),
-     * then deletes the Event document itself.
-     */
-    private void deleteEventWithLinks(Event event, Runnable onDone) {
-        List<String> linkIDs = event.getLinkIDs();
+    // 🔥 NEW METHOD — removes a linkID from ALL users' linkIDs arrays
+    private void removeEventLinkFromAllUsers(String linkID) {
 
-        // Delete all EventUserLink docs (best-effort, we don't block on each one)
-        if (linkIDs != null) {
-            for (String linkID : linkIDs) {
-                linkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
-                    @Override
-                    public void onSuccess() {
-                        // no-op
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        // also no-op: we still continue overall deletion
-                    }
-                });
-            }
-        }
-
-        // Now delete the event itself
-        eventDB.deleteEvent(event.getEventID(), new ProfileDB.ActionCallback() {
+        profileDB.getAllUsers(new ProfileDB.GetCallback<List<UserProfile>>() {
             @Override
-            public void onSuccess() {
-                onDone.run();
+            public void onSuccess(List<UserProfile> users) {
+
+                for (UserProfile user : users) {
+                    List<String> links = user.getLinkIDs();
+
+                    if (links != null && links.contains(linkID)) {
+
+                        profileDB.removeLinkIDFromUser(
+                                user,
+                                linkID,
+                                new ProfileDB.GetCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void result) {
+                                        // removed successfully
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // ignore, continue
+                                    }
+                                }
+                        );
+                    }
+                }
             }
 
             @Override
             public void onFailure(Exception e) {
-                // even if one event fails, we still proceed with the rest
-                onDone.run();
+                // ignore
             }
         });
     }
 
-    /**
-     * Deletes the organizer's UserProfile.
-     */
+    private void deleteEventWithLinks(Event event, Runnable onDone) {
+        List<String> linkIDs = event.getLinkIDs();
+
+        if (linkIDs != null) {
+            for (String linkID : linkIDs) {
+
+                removeEventLinkFromAllUsers(linkID);
+
+                // delete EventUserLink doc
+                linkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
+                    @Override public void onSuccess() {}
+                    @Override public void onFailure(Exception e) {}
+                });
+            }
+        }
+
+        // delete event document
+        eventDB.deleteEvent(event.getEventID(), new ProfileDB.ActionCallback() {
+            @Override
+            public void onSuccess() { onDone.run(); }
+
+            @Override
+            public void onFailure(Exception e) { onDone.run(); }
+        });
+    }
+
     private void deleteOrganizerProfile() {
         profileDB.deleteUser(organizerID, new ProfileDB.ActionCallback() {
             @Override
@@ -202,7 +212,7 @@ public class AdminOrganizerViewActivity extends AppCompatActivity {
             public void onFailure(Exception e) {
                 Toast.makeText(
                         AdminOrganizerViewActivity.this,
-                        "Failed to delete organizer profile: " + e.getMessage(),
+                        "Failed to delete organizer profile.",
                         Toast.LENGTH_LONG
                 ).show();
                 removeButton.setEnabled(true);
