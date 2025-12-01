@@ -54,7 +54,7 @@ public class NotificationsActivity extends AppCompatActivity {
         userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
 
         if (userID == null) {
-            emptyInvitationsText.setText("Usser not found.");
+            emptyInvitationsText.setText("User not found.");
             emptyInvitationsText.setVisibility(View.VISIBLE);
             return;
         }
@@ -188,6 +188,13 @@ public class NotificationsActivity extends AppCompatActivity {
             if (id == R.id.nav_notifications) {
                 startActivity(new Intent(NotificationsActivity.this, NotificationsActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
+            }
+            if (id == R.id.nav_search) {
+                Intent intent = new Intent(NotificationsActivity.this, SearchActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 return true;
             }
             if (id == R.id.nav_events) {

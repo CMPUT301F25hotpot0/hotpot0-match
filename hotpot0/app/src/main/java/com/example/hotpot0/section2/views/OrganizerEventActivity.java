@@ -522,6 +522,13 @@ public class OrganizerEventActivity extends AppCompatActivity {
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 return true;
             }
+            if (id == R.id.nav_search) {
+                Intent intent = new Intent(OrganizerEventActivity.this, SearchActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+                return true;
+            }
             return false;
         });
     }

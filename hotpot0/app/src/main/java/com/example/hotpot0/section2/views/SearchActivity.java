@@ -439,7 +439,12 @@ public class SearchActivity extends AppCompatActivity {
 
                 for (Event event : allEvents) {
                     // Filter by name
-                    if (!event.getName().toLowerCase().contains(query)) continue;
+                    String queryLower = query.toLowerCase();
+
+                    if (!event.getName().toLowerCase().contains(queryLower) &&
+                            !event.getDescription().toLowerCase().contains(queryLower)) {
+                        continue; // skip if neither matches
+                    }
 
                     // Filter by registration status
                     if (!matchesRegStatus(event)) continue;
