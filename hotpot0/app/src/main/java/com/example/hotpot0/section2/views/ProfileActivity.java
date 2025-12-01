@@ -150,6 +150,12 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(ProfileActivity.this, "Failed to load profile.", Toast.LENGTH_SHORT).show();
+                getSharedPreferences("app_prefs", MODE_PRIVATE).edit().remove("userID").apply();
+                // Navigate to StartupActivity
+                Intent intent = new Intent(ProfileActivity.this, StartupActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
             }
         });
     }

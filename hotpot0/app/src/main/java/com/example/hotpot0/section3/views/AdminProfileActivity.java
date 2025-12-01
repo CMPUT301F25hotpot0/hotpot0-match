@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
+import com.example.hotpot0.section2.controllers.ProfileEditHandler;
 
 public class AdminProfileActivity extends AppCompatActivity {
 
@@ -22,6 +23,7 @@ public class AdminProfileActivity extends AppCompatActivity {
     private ProfileDB profileDB;
     private UserProfile currentProfile;
     private int profileID;
+    private ProfileEditHandler profileHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class AdminProfileActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
 
         profileDB = new ProfileDB();
+        profileHandler = new ProfileEditHandler();
 
         // Get profileID from intent
         profileID = getIntent().getIntExtra("profileID", -1);
@@ -87,7 +90,18 @@ public class AdminProfileActivity extends AppCompatActivity {
     }
 
     private void removeProfile() {
-        // Implement delete profile
+        profileHandler.deleteUserProfile(currentProfile.getUserID(), new ProfileDB.ActionCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(AdminProfileActivity.this, "Profile removed successfully", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(AdminProfileActivity.this, "Failed to remove profile", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
 

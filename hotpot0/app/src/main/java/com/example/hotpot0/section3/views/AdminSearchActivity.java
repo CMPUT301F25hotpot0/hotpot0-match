@@ -151,20 +151,26 @@ public class AdminSearchActivity extends AppCompatActivity {
 
                 if (!showingProfiles) {
                     filteredEvents.clear();
-                    for (Event event : allEvents) {
-                        if (event.getName().toLowerCase().contains(query) || event.getDescription().toLowerCase().contains(query)) {
-                            filteredEvents.add(event);
+                    if (!allEvents.isEmpty()) {
+                        for (Event event : allEvents) {
+                            if (event.getName().toLowerCase().contains(query) || event.getDescription().toLowerCase().contains(query)) {
+                                filteredEvents.add(event);
+                            }
                         }
+                        adapter.notifyDataSetChanged();
+
                     }
-                    adapter.notifyDataSetChanged();
                 } else {
                     filteredProfiles.clear();
-                    for (UserProfile profile : allProfiles) {
-                        if (profile.getName().toLowerCase().contains(query) || query.contains(profile.getUserID().toString())) {
-                            filteredProfiles.add(profile);
+                    if (!allProfiles.isEmpty()) {
+
+                        for (UserProfile profile : allProfiles) {
+                            if (profile.getName().toLowerCase().contains(query) || query.contains(profile.getUserID().toString())) {
+                                filteredProfiles.add(profile);
+                            }
                         }
+                        profileAdapter.notifyDataSetChanged();
                     }
-                    profileAdapter.notifyDataSetChanged();
                 }
             }
         });
