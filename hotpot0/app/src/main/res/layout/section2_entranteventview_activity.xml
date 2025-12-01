@@ -62,23 +62,15 @@
             android:layout_marginBottom="12dp"
             android:textSize="15sp" />
 
-        <Spinner
-            android:id="@+id/EventDetailsSpinner"
+        <!-- Guidelines -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Click to view more details"
+            android:text="Guidelines"
             android:textColor="@color/text"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- Guidelines -->
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Guidelines"-->
-<!--            android:textColor="@color/text"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textSize="16sp"-->
-<!--            android:layout_marginBottom="4dp" />-->
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewGuidelines"
@@ -89,14 +81,14 @@
             android:textSize="15sp" />
 
         <!-- Location -->
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Location"-->
-<!--            android:textColor="@color/text"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textSize="16sp"-->
-<!--            android:layout_marginBottom="4dp" />-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewLocation"
@@ -107,14 +99,14 @@
             android:textSize="15sp" />
 
         <!-- Time and Date -->
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Time"-->
-<!--            android:textColor="@color/text"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textSize="16sp"-->
-<!--            android:layout_marginBottom="4dp" />-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewTimeAndDay"
@@ -124,14 +116,14 @@
             android:layout_marginBottom="12dp"
             android:textSize="15sp" />
 
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Event Dates"-->
-<!--            android:textColor="@color/text"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textSize="16sp"-->
-<!--            android:layout_marginBottom="4dp" />-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Event Dates"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewDateRange"
@@ -142,14 +134,14 @@
             android:textSize="15sp" />
 
         <!-- Duration -->
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Duration"-->
-<!--            android:textColor="@color/text"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textSize="16sp"-->
-<!--            android:layout_marginBottom="4dp" />-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Duration"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewDuration"
@@ -160,14 +152,14 @@
             android:textSize="15sp" />
 
         <!-- Price -->
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Price"-->
-<!--            android:textColor="@color/text"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textSize="16sp"-->
-<!--            android:layout_marginBottom="4dp" />-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Price"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/previewPrice"
@@ -181,7 +173,6 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_marginBottom="4dp"
             android:text="Total Spots Open"
             android:textColor="@color/text"
