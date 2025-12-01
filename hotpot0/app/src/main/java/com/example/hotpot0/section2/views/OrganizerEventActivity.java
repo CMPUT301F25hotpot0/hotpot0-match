@@ -104,7 +104,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
                         currentEvent = event;
 
                         // Decide which layout to show
-                        if (event.getSampledIDs().isEmpty()) {
+                        if (event.getSampledIDs().isEmpty() && event.getCancelledIDs().isEmpty()) {
                             setContentView(R.layout.section2_organizereventview_activity);
                             setupPreDrawLayout();
                         } else {
