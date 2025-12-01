@@ -14,6 +14,10 @@ import com.example.hotpot0.R;
 import com.example.hotpot0.models.PicturesDB;
 import com.google.android.material.button.MaterialButton;
 
+/**
+ * Handles deletion of an image by admin.
+ */
+
 public class ManageImageActivity extends AppCompatActivity {
     private ImageView selectedImageView;
     private TextView filenameTextView;
@@ -34,7 +38,7 @@ public class ManageImageActivity extends AppCompatActivity {
         removeButton = findViewById(R.id.remove_image_button);
         backButton = findViewById(R.id.backButton);
 
-        // Get image URL passed from AdminImageActivity
+        // Get image URL from AdminImageActivity
         imageUrl = getIntent().getStringExtra("image_url");
         String eventName = getIntent().getStringExtra("event_name");
         if (imageUrl != null) {
@@ -43,7 +47,6 @@ public class ManageImageActivity extends AppCompatActivity {
             if (eventName != null) {
                 filenameTextView.setText(eventName);
             } else {
-                // Fallback: show filename if event name not passed
                 String filename = android.net.Uri.parse(imageUrl).getLastPathSegment();
                 filenameTextView.setText(filename);
             }
@@ -54,12 +57,14 @@ public class ManageImageActivity extends AppCompatActivity {
     }
 
     private void deleteImage() {
-        if (imageUrl == null) return;
+        if (imageUrl == null) {
+            return;
+        }
 
         int eventID = extractEventId(imageUrl);
 
         if (eventID == -1) {
-            Toast.makeText(this, "Could not extract event ID from URL", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Event ID not available", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -82,14 +87,13 @@ public class ManageImageActivity extends AppCompatActivity {
         });
     }
 
-
     private int extractEventId(String url) {
         try {
             String filename = android.net.Uri.parse(url).getLastPathSegment();
             if (filename == null) return -1;
 
-            // Extract only digits from the filename
-            String digits = filename.replaceAll("\\D+", ""); // removes everything except digits
+            // Extract only digits
+            String digits = filename.replaceAll("\\D+", "");
 
             if (digits.isEmpty()) return -1;
 
@@ -98,9 +102,6 @@ public class ManageImageActivity extends AppCompatActivity {
             return -1;
         }
     }
-
-
-
 
 }
 

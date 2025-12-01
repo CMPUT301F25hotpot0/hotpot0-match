@@ -3,7 +3,6 @@ package com.example.hotpot0.models;
 import android.net.Uri;
 import android.util.Log;
 
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -11,7 +10,6 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class PicturesDB {
 
@@ -76,34 +74,23 @@ public class PicturesDB {
         uploadEventImage(newImageUri, eventID, callback);
     }
 
-    // Delete event image
-//    public void deleteEventImage(int eventID, Callback<Void> callback) {
-//        StorageReference imageRef = storageRef.child("event_images/" + "event-" + eventID + ".png");
-//        imageRef.delete()
-//                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
-//                .addOnFailureListener(callback::onFailure);
-//    }
-
     public void deleteEventImage(int eventId, Callback<Void> callback) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Path to storage file
-        StorageReference imageRef = storage.getReference().child("event-images/event-" + eventId + ".png");
+        StorageReference imageRef = storage.getReference().child("event_images/event-" + eventId + ".png");
 
-        // Delete from storage
         imageRef.delete().addOnSuccessListener(aVoid -> {
 
             // After storage delete, remove URL from Firestore
             db.collection("Events")
                     .document(String.valueOf(eventId))
-                    .update("imageURL", FieldValue.delete())
+                    .update("imageURL", null)
                     .addOnSuccessListener(a -> callback.onSuccess(null))
                     .addOnFailureListener(callback::onFailure);
 
         }).addOnFailureListener(callback::onFailure);
     }
-
 
     public void getAllEventImages(Callback<List<String>> callback) {
         StorageReference eventsRef = storageRef.child("event_images/");
