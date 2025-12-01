@@ -16,11 +16,13 @@ import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
+import com.example.hotpot0.section2.controllers.EventActionHandler;
 import com.google.android.material.button.MaterialButton;
 
 public class ManageEventActivity extends AppCompatActivity {
 
     private EventDB eventDB;
+    private EventActionHandler eventHandler = new EventActionHandler();
     private Integer eventID;
     private Event loadedEvent;
     private ProfileDB profileDB;
@@ -107,7 +109,7 @@ public class ManageEventActivity extends AppCompatActivity {
         MaterialButton removeBtn = findViewById(R.id.removeEventButton);
 
         removeBtn.setOnClickListener(v -> {
-                eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
+                eventHandler.deleteEventLinks(eventID, new EventDB.ActionCallback() {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(ManageEventActivity.this, "Event removed", Toast.LENGTH_SHORT).show();

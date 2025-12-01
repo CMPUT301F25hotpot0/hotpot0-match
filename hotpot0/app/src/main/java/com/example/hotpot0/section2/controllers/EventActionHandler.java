@@ -10,6 +10,7 @@ import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.Notification;
+import com.example.hotpot0.models.PicturesDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.Status;
 import com.example.hotpot0.models.UserProfile;
@@ -38,6 +39,7 @@ public class EventActionHandler {
     private ProfileDB profileDB;
     private EventDB eventDB;
     private EventUserLinkDB eventUserLinkDB;
+    private PicturesDB picturesDB;
 
     /**
      * Constructs a new {@code EventActionHandler}.
@@ -50,6 +52,7 @@ public class EventActionHandler {
         profileDB = new ProfileDB();
         eventDB = new EventDB();
         eventUserLinkDB = new EventUserLinkDB();
+        picturesDB = new PicturesDB();
     }
 
     public EventActionHandler(EventUserLinkDB eventUserLinkDB, ProfileDB profileDB) {
@@ -689,11 +692,21 @@ public class EventActionHandler {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 // Successfully removed linkID from user profile
-                                                eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
+                                                picturesDB.deleteEventImage(eventID, new PicturesDB.Callback<Void>() {
                                                     @Override
-                                                    public void onSuccess() {
-                                                        // Successfully deleted event
-                                                        callback.onSuccess();
+                                                    public void onSuccess(Void result) {
+                                                        // Successfully deleted event image
+                                                        eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
+                                                            @Override
+                                                            public void onSuccess() {
+                                                                // Successfully deleted event
+                                                                callback.onSuccess();
+                                                            }
+                                                            @Override
+                                                            public void onFailure(Exception e) {
+                                                                // Log failure but continue
+                                                            }
+                                                        });
                                                     }
                                                     @Override
                                                     public void onFailure(Exception e) {
