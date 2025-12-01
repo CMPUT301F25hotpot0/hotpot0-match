@@ -156,7 +156,11 @@ public class EventSampledActivity extends AppCompatActivity {
 
                 String status = eventUserLink.getStatus();
                 if ("Accepted".equalsIgnoreCase(status)) {
-                    showStatusMessage("You have confirmed this event.");
+                    if (currentEvent.getJoinable()) {
+                        showStatusMessage("You have confirmed this event.");
+                    } else {
+                        showStatusMessage("The organizer has accepted your request to join this event.");
+                    }
                 } else if ("Declined".equalsIgnoreCase(status)) {
                     showStatusMessage("You have declined this event.");
                 } else if ("Cancelled".equalsIgnoreCase(status)) {

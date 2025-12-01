@@ -35,6 +35,7 @@ public class Event {
 
     private Boolean geolocationRequired;
     private Boolean isEventActive;
+    private Boolean joinable;
     private ArrayList<String> linkIDs;
     private ArrayList<String> sampledIDs;
     private ArrayList<String> cancelledIDs;
@@ -48,6 +49,7 @@ public class Event {
     public Event() {
         this.eventID = null; // Handled by Firestore in EventDB
         this.isEventActive = true;
+        this.joinable = true;
         this.geolocationRequired = false;
         this.linkIDs = new ArrayList<>();
         this.sampledIDs = new ArrayList<>();
@@ -76,6 +78,7 @@ public class Event {
         this.qrValue = qrValue;
         this.geolocationRequired = geolocationRequired;
         this.isEventActive = true;
+        this.joinable = true;
         this.linkIDs = new ArrayList<>();
         this.sampledIDs = new ArrayList<>();
         this.cancelledIDs = new ArrayList<>();
@@ -246,6 +249,16 @@ public class Event {
     /** @param eventActive true if the event is active */
     public void setIsEventActive(Boolean eventActive) {
         isEventActive = eventActive;
+    }
+
+    /** @return whether the event is joinable */
+    public Boolean getJoinable() {
+        return joinable;
+    }
+
+    /** @param joinable true if the event is open for joining */
+    public void setJoinable(Boolean joinable) {
+        this.joinable = joinable;
     }
 
     /** @return the list of registered participant IDs */

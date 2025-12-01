@@ -576,6 +576,7 @@ public class EventActionHandler {
                 }
             });
         }
+        event.setJoinable(false);
     }
 
     public void exportEntrantsToCSV(List<String> linkIDs,
@@ -594,7 +595,7 @@ public class EventActionHandler {
 
         // Add header
         csvRows.add("Event: " + csvEscape(eventName));
-        csvRows.add("Name,Email,Status,UserID,LinkID");
+        csvRows.add("Name,Email,Phone Number");
 
         for (String linkID : linkIDs) {
             String[] parts = linkID.split("_");
@@ -624,14 +625,12 @@ public class EventActionHandler {
                         public void onSuccess(UserProfile profile) {
                             String name = profile != null && profile.getName() != null ? profile.getName() : "";
                             String email = profile != null && profile.getEmailID() != null ? profile.getEmailID() : "";
-                            String status = link.getStatus() != null ? link.getStatus() : "";
+                            String phoneNumber = profile != null && profile.getPhoneNumber() != null ? ("Ph: " + profile.getPhoneNumber()) : "";
 
                             String row = String.join(",",
                                     csvEscape(name),
                                     csvEscape(email),
-                                    csvEscape(status),
-                                    csvEscape(String.valueOf(userId)),
-                                    csvEscape(linkID)
+                                    csvEscape(phoneNumber)
                             );
 
                             csvRows.add(row);
