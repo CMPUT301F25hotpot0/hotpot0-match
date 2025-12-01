@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -181,6 +182,7 @@ public class AdminSearchActivity extends AppCompatActivity {
             } else {
                 UserProfile selected = filteredProfiles.get(position);
                 Intent intent = new Intent(AdminSearchActivity.this, AdminProfileActivity.class);
+                Log.d("AdminSearchActivity", "Passing profileID: " + selected.getUserID());
                 intent.putExtra("profileID", selected.getUserID());
                 startActivity(intent);
             }

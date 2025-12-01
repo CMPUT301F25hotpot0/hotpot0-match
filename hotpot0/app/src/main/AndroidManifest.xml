@@ -54,6 +54,7 @@
         <activity android:name=".section2.views.EventInitialActivity"/>
         <activity android:name=".section2.views.OrganizerEventActivity" />
         <activity android:name=".section2.views.EventSampledActivity" />
+        <activity android:name=".section3.views.AdminProfileActivity" />
         <activity android:name=".section2.views.QRActivity"
             android:exported="false"/>
 

@@ -28,11 +28,11 @@
             android:contentDescription="Back" />
 
         <TextView
-            android:id="@+id/organizerViewTitle"
+            android:id="@+id/profileViewTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Organizer"
+            android:text="Profile"
             android:textColor="@color/text"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -48,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@+id/headerLayout"
-        app:layout_constraintBottom_toTopOf="@+id/removeOrganizerButton">
+        app:layout_constraintBottom_toTopOf="@+id/removeProfileButton">
 
         <LinearLayout
             android:orientation="vertical"
@@ -63,14 +63,14 @@
                 android:text="Name"
                 android:textColor="@color/text"
                 android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textSize="32sp"/>
 
             <TextView
-                android:id="@+id/organizerName"
+                android:id="@+id/profileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
+                android:textSize="30sp"
                 android:layout_marginBottom="12dp"/>
 
             <!-- Email -->
@@ -80,14 +80,14 @@
                 android:text="Email"
                 android:textColor="@color/text"
                 android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textSize="32sp"/>
 
             <TextView
-                android:id="@+id/organizerEmail"
+                android:id="@+id/profileEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
+                android:textSize="30sp"
                 android:layout_marginBottom="12dp"/>
 
             <!-- Phone -->
@@ -97,14 +97,14 @@
                 android:text="Phone Number"
                 android:textColor="@color/text"
                 android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textSize="32sp"/>
 
             <TextView
-                android:id="@+id/organizerPhone"
+                android:id="@+id/profilePhone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
+                android:textSize="30sp"
                 android:layout_marginBottom="12dp"/>
 
             <!-- User ID -->
@@ -114,14 +114,14 @@
                 android:text="User ID"
                 android:textColor="@color/text"
                 android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textSize="32sp"/>
 
             <TextView
-                android:id="@+id/organizerUserID"
+                android:id="@+id/profileUserID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
+                android:textSize="30sp"
                 android:layout_marginBottom="12dp"/>
 
         </LinearLayout>
@@ -129,10 +129,10 @@
 
     <!-- Remove Button -->
     <Button
-        android:id="@+id/removeOrganizerButton"
+        android:id="@+id/removeProfileButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Remove Organizer"
+        android:text="Remove Profile"
         android:textColor="#FFFFFF"
         android:backgroundTint="@color/bar"
         android:layout_margin="20dp"
