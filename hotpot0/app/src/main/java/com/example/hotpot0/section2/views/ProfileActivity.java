@@ -113,6 +113,8 @@ public class ProfileActivity extends AppCompatActivity{
             }
         });
 
+        locationSwitch.setVisibility(SwitchCompat.GONE); // Hide location switch
+
         // Bottom navigation setup
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
