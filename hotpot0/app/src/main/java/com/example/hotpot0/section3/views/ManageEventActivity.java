@@ -107,7 +107,7 @@ public class ManageEventActivity extends AppCompatActivity {
         MaterialButton removeBtn = findViewById(R.id.removeEventButton);
 
         removeBtn.setOnClickListener(v -> {
-            eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
+                eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(ManageEventActivity.this, "Event removed", Toast.LENGTH_SHORT).show();

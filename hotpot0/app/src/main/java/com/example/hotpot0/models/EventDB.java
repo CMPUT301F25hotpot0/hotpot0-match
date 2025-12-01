@@ -48,6 +48,11 @@ public class EventDB {
         void onFailure(Exception e);
     }
 
+    public interface ActionCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
     // Utility Methods
     // ===============
 
@@ -135,6 +140,7 @@ public class EventDB {
      */
     public void deleteEvent(@NonNull Integer eventID, @NonNull ProfileDB.ActionCallback callback) {
         DocumentReference eventRef = db.collection(EVENT_COLLECTION).document(String.valueOf(eventID));
+
         eventRef.delete()
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
@@ -243,9 +249,19 @@ public class EventDB {
     public void removeLinkIDFromEvent(@NonNull Event event, @NonNull String linkID, @NonNull GetCallback<Void> callback) {
         if (event.getLinkIDs() != null) event.removeLinkID(linkID);
 
+        // Remove linkID if it's there in sampledIDs or cancelledIDs as well
+        if (event.getSampledIDs() != null) event.getSampledIDs().remove(linkID);
+        if (event.getCancelledIDs() != null) event.getCancelledIDs().remove(linkID);
+
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
         eventRef.update("linkIDs", FieldValue.arrayRemove(linkID))
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+        eventRef.update("sampledIDs", FieldValue.arrayRemove(linkID))
+                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onFailure);
+        eventRef.update("cancelledIDs", FieldValue.arrayRemove(linkID))
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
