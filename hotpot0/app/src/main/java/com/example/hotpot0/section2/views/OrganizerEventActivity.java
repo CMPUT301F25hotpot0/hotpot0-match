@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.card.MaterialCardView;
 
 
 /**
@@ -133,6 +134,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
         // View bindings
         ImageView eventImage = findViewById(R.id.eventImage);
+        MaterialCardView eventImageCard = findViewById(R.id.eventImageCard);
         TextView previewEventName = findViewById(R.id.previewEventName);
         TextView previewDescription = findViewById(R.id.previewDescription);
         TextView previewGuidelines = findViewById(R.id.previewGuidelines);
@@ -184,6 +186,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         String imageURL = currentEvent.getImageURL();
         if (imageURL == null || imageURL.isEmpty()) {
             // Hide the ImageView if no image is available
+            eventImageCard.setVisibility(View.GONE);
             eventImage.setVisibility(View.GONE);
         } else {
             // Show the ImageView
@@ -334,6 +337,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
     private void setupPostDrawLayout() {
         // --- View bindings ---
         ImageView eventImage = findViewById(R.id.eventImage);
+        MaterialCardView eventImageCard = findViewById(R.id.eventImageCard);
         TextView previewEventName = findViewById(R.id.previewEventName);
         TextView previewDescription = findViewById(R.id.previewDescription);
         TextView previewGuidelines = findViewById(R.id.previewGuidelines);
@@ -375,6 +379,20 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
 
         // --- Populate Event info ---
+        String imageURL = currentEvent.getImageURL();
+        if (imageURL == null || imageURL.isEmpty()) {
+            // Hide the ImageView if no image is available
+            eventImageCard.setVisibility(View.GONE);
+            eventImage.setVisibility(View.GONE);
+        } else {
+            // Show the ImageView
+            eventImage.setVisibility(View.VISIBLE);
+            // Load image using Glide
+            Glide.with(this)
+                    .load(imageURL)
+                    .placeholder(R.drawable.placeholder_image) // optional placeholder
+                    .into(eventImage);
+        }
         previewEventName.setText(currentEvent.getName());
         previewDescription.setText(currentEvent.getDescription());
         previewGuidelines.setText(currentEvent.getGuidelines());

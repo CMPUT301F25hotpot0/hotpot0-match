@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
@@ -17,6 +18,7 @@ import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
+import com.google.android.material.card.MaterialCardView;
 
 /**
  * Activity that displays a sampled view of an event for a user who
@@ -28,6 +30,7 @@ public class EventSampledActivity extends AppCompatActivity {
     private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay,
             previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft, GeolocationStatus, statusMessage;
     private ImageView eventImage;
+    private MaterialCardView eventImageCard;
     private Button confirmButton, declineButton, backButton;
 
     private EventDB eventDB = new EventDB();
@@ -48,6 +51,7 @@ public class EventSampledActivity extends AppCompatActivity {
 
         // Initialize UI elements
         eventImage = findViewById(R.id.eventImage);
+        eventImageCard = findViewById(R.id.eventImageCard);
         previewEventName = findViewById(R.id.previewEventName);
         previewDescription = findViewById(R.id.previewDescription);
         previewGuidelines = findViewById(R.id.previewGuidelines);
@@ -98,6 +102,21 @@ public class EventSampledActivity extends AppCompatActivity {
      * Populates the UI elements with the current event's details.
      */
     private void populateUI() {
+        String imageURL = currentEvent.getImageURL();
+        if (imageURL == null || imageURL.isEmpty()) {
+            // Hide the ImageView if no image is available
+            eventImageCard.setVisibility(View.GONE);
+            eventImage.setVisibility(View.GONE);
+        } else {
+            // Show the ImageView
+            eventImageCard.setVisibility(View.VISIBLE);
+            eventImage.setVisibility(View.VISIBLE);
+            // Load image using Glide
+            Glide.with(this)
+                    .load(imageURL)
+                    .placeholder(R.drawable.placeholder_image) // optional placeholder
+                    .into(eventImage);
+        }
         previewEventName.setText(currentEvent.getName());
         previewDescription.setText(currentEvent.getDescription());
         previewGuidelines.setText(currentEvent.getGuidelines());

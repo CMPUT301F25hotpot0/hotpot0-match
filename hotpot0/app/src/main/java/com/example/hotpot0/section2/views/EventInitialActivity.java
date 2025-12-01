@@ -15,6 +15,7 @@ import android.os.Looper;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -30,6 +31,7 @@ import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
+import com.google.android.material.card.MaterialCardView;
 
 /**
  * Activity that displays the details of a selected event and allows a user
@@ -38,6 +40,7 @@ import com.example.hotpot0.section2.controllers.EventActionHandler;
 public class EventInitialActivity extends AppCompatActivity {
     private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft, previewWaitingList;
     private ImageView eventImage;
+    private MaterialCardView eventImageCard;
     private Button joinLeaveButton, backButton;
     private TextView GeolocationStatus;
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
@@ -69,6 +72,7 @@ public class EventInitialActivity extends AppCompatActivity {
 
         // Initialize UI elements
         eventImage = findViewById(R.id.eventImage);
+        eventImageCard = findViewById(R.id.eventImageCard);
         previewEventName = findViewById(R.id.previewEventName);
         previewDescription = findViewById(R.id.previewDescription);
         previewGuidelines = findViewById(R.id.previewGuidelines);
@@ -94,8 +98,23 @@ public class EventInitialActivity extends AppCompatActivity {
                     return;
                 }
                 currentEvent = event;
-
                 // Populate the UI with the event details
+                String imageURL = currentEvent.getImageURL();
+                if (imageURL == null || imageURL.isEmpty()) {
+                    // Hide the ImageView if no image is available
+                    eventImageCard.setVisibility(View.GONE);
+                    eventImage.setVisibility(View.GONE);
+                } else {
+                    // Show the ImageView
+                    eventImageCard.setVisibility(View.VISIBLE);
+                    eventImage.setVisibility(View.VISIBLE);
+                    // Load image using Glide
+                    Glide.with(EventInitialActivity.this)
+                            .load(imageURL)
+                            .placeholder(R.drawable.placeholder_image) // optional placeholder
+                            .into(eventImage);
+                }
+
                 previewEventName.setText(currentEvent.getName());
                 previewDescription.setText(currentEvent.getDescription());
                 previewGuidelines.setText(currentEvent.getGuidelines());
