@@ -350,6 +350,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         Button buttonFillSpots = findViewById(R.id.button_fillSpots);
         Button buttonConfirm = findViewById(R.id.button_confirm);
         Button buttonBack = findViewById(R.id.button_BackPostDraw);
+
         FrameLayout mapContainer = findViewById(R.id.map_container);
         if (currentEvent.getGeolocationRequired()) {
             mapContainer.setVisibility(View.VISIBLE);
@@ -388,7 +389,11 @@ public class OrganizerEventActivity extends AppCompatActivity {
         previewSpotsOpen.setText(spotsOpen);
 
         // Populate sampled entrants
-        populateEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
+        if (currentEvent.getSampledIDs().isEmpty()) {
+            buttonConfirm.setEnabled(false);
+        } else {
+            populateSampledEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
+        }
         populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
         populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
 
@@ -537,6 +542,59 @@ public class OrganizerEventActivity extends AppCompatActivity {
             });
         }
     }
+
+    private void populateSampledEntrants(LinearLayout container, List<String> linkIDs) {
+        container.removeAllViews();
+        if (linkIDs == null || linkIDs.isEmpty()) {
+            TextView noEntrantsText = new TextView(this);
+            noEntrantsText.setText("No entrants found.");
+            container.addView(noEntrantsText);
+            return;
+        }
+
+        int organizerId = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+
+        for (String id : linkIDs) {
+            String userID = id.split("_")[1];
+            if (Integer.parseInt(userID) == organizerId) {
+                continue; // Skip organizer's own profile
+            }
+            profileDB.getUserByID(Integer.parseInt(userID), new ProfileDB.GetCallback<UserProfile>() {
+                @Override
+                public void onSuccess(UserProfile profile) {
+                    View blobView = LayoutInflater.from(OrganizerEventActivity.this)
+                            .inflate(R.layout.sampled_user_blob, container, false);
+                    ((TextView) blobView.findViewById(R.id.profileNameTextView)).setText(profile.getName());
+                    ((ImageView) blobView.findViewById(R.id.profileIcon)).setImageResource(R.drawable.ic_profile);
+                    ((ImageView) blobView.findViewById(R.id.cancelButton)).setImageResource(R.drawable.ic_cross);
+                    container.addView(blobView);
+                    // Set an OnClickListener for the cancel button
+                    blobView.findViewById(R.id.cancelButton).setOnClickListener(v -> {
+                        eventHandler.cancelUser(currentEvent, Integer.parseInt(userID), new ProfileDB.GetCallback<Integer>() {
+                            @Override
+                            public void onSuccess(Integer result) {
+                                Toast.makeText(OrganizerEventActivity.this, "User cancelled successfully", Toast.LENGTH_SHORT).show();
+                                // Refresh the layout to reflect changes
+                                setContentView(R.layout.section2_organizereventview_postdraw);
+                                setupPostDrawLayout();
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(OrganizerEventActivity.this, "Error cancelling user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(OrganizerEventActivity.this, "Error loading profile", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
 
     private String buildDateRange(String startDate, String endDate) {
         if (startDate != null && startDate.equals(endDate)) {

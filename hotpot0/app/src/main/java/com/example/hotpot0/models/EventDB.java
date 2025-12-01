@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Handles all Firestore database operations related to {@link Event}.
@@ -293,6 +294,13 @@ public class EventDB {
         if (!event.getCancelledIDs().contains(cancelledID))
             event.getCancelledIDs().add(cancelledID);
 
+        Status status = new Status();
+        status.setStatus("Cancelled");
+        ArrayList<String> cancelledIDs = new ArrayList<>();
+        cancelledIDs.add(cancelledID);
+
+        event.addNotification(status, cancelledIDs);
+
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
         eventRef.update("cancelledIDs", FieldValue.arrayUnion(cancelledID))
@@ -382,7 +390,8 @@ public class EventDB {
                     if (sampled.contains(linkID)) {
                         Status status = new Status();
                         status.setStatus("Sampled");
-                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                         Date date = new Date();
                         String now = formatter.format(date);
                         Notification notif = new Notification(now, status, true, event.getName());
@@ -403,7 +412,8 @@ public class EventDB {
                         // Else inWaitList
                         Status status = new Status();
                         status.setStatus("inWaitList");
-                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                         Date date = new Date();
                         String now = formatter.format(date);
                         Notification notif = new Notification(now, status, event.getName());
@@ -454,7 +464,8 @@ public class EventDB {
                 for (String linkID : newlySampled) {
                     Status status = new Status();
                     status.setStatus("Sampled");
-                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                     Date date = new Date();
                     String now = formatter.format(date);
                     Notification notif = new Notification(now, status, true, event.getName());

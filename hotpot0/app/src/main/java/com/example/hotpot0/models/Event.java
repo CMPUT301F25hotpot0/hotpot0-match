@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Represents an event managed by an organizer and stored in Firestore.
@@ -443,7 +444,8 @@ public class Event {
      * @param participantIDs list of participant IDs relevant to the notification
      */
     public void addNotification(Status status, ArrayList<String> participantIDs) {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = new Date();
         String now = formatter.format(date);
         Notification notif = new Notification(now, status, this.name);
@@ -456,7 +458,8 @@ public class Event {
      * @param participantIDs list of participant IDs relevant to the notification
      */
     public void addSampleNotification(Status status, ArrayList<String> participantIDs) {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = new Date();
         String now = formatter.format(date);
         Notification notif = new Notification(now, status, true, this.name);
@@ -470,7 +473,7 @@ public class Event {
      * @param participantIDs list of participant IDs relevant to the notification
      */
     public void addCustomNotification(Status status, String text, ArrayList<String> participantIDs) {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         String now = formatter.format(date);
         Notification notif = new Notification(now, status, text, this.name, true);
