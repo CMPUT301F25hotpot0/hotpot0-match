@@ -12,6 +12,7 @@ import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.Notification;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.Status;
+import com.example.hotpot0.models.UserProfile;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,6 +46,11 @@ public class EventActionHandler {
         profileDB = new ProfileDB();
         eventDB = new EventDB();
         eventUserLinkDB = new EventUserLinkDB();
+    }
+
+    public interface ExportCallback {
+        void onSuccess(String csvData);
+        void onFailure(Exception e);
     }
 
     /**
@@ -524,5 +530,143 @@ public class EventActionHandler {
                 }
             });
         }
+    }
+
+    public void confirmEntrants(List<String> linkIDs, Event event, @NonNull EventUserLinkDB.ActionCallback callback) {
+        for (String linkID : linkIDs) {
+            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink eventUserLink) {
+                    Status statusObj = new Status();
+                    statusObj.setStatus("Accepted");
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    Date date = new Date();
+                    String now = formatter.format(date);
+                    Notification notif = new Notification(now, statusObj,  event.getName(), event.getEventID());
+                    eventUserLink.addNotification(notif);
+                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notification added successfully
+                            callback.onSuccess();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Failed to update EventUserLink with notification
+                            callback.onFailure(e);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    // Failed to retrieve EventUserLink
+                    callback.onFailure(e);
+                }
+            });
+        }
+    }
+
+    public void exportEntrantsToCSV(List<String> linkIDs,
+                                    String eventName,
+                                    @NonNull ExportCallback callback) {
+
+        if (linkIDs == null || linkIDs.isEmpty()) {
+            callback.onFailure(new IllegalArgumentException("No entrants to export"));
+            return;
+        }
+
+        StringBuilder csvBuilder = new StringBuilder();
+
+        // Optional: add event name as first line
+        csvBuilder.append("Event: ").append(csvEscape(eventName)).append("\n");
+
+        // Header row
+        csvBuilder.append("Name,Email,Status,UserID,LinkID\n");
+
+        final int total = linkIDs.size();
+        final int[] completed = {0};
+        final boolean[] failed = {false};
+
+        for (String linkID : linkIDs) {
+            // Extract userID from linkID like "eventId_userId"
+            String[] parts = linkID.split("_");
+            if (parts.length < 2) {
+                // Skip malformed IDs but still count them as completed
+                if (++completed[0] == total && !failed[0]) {
+                    callback.onSuccess(csvBuilder.toString());
+                }
+                continue;
+            }
+
+            int userId;
+            try {
+                userId = Integer.parseInt(parts[1]);
+            } catch (NumberFormatException e) {
+                if (++completed[0] == total && !failed[0]) {
+                    callback.onSuccess(csvBuilder.toString());
+                }
+                continue;
+            }
+
+            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink link) {
+                    if (link == null) {
+                        if (++completed[0] == total && !failed[0]) {
+                            callback.onSuccess(csvBuilder.toString());
+                        }
+                        return;
+                    }
+
+                    profileDB.getUserByID(userId, new ProfileDB.GetCallback<UserProfile>() {
+                        @Override
+                        public void onSuccess(UserProfile profile) {
+                            String name = profile != null && profile.getName() != null
+                                    ? profile.getName() : "";
+                            String email = profile != null && profile.getEmailID() != null
+                                    ? profile.getEmailID() : "";
+                            String status = link.getStatus() != null
+                                    ? link.getStatus() : "";
+
+                            // Append CSV row
+                            csvBuilder
+                                    .append(csvEscape(name)).append(",")
+                                    .append(csvEscape(email)).append(",")
+                                    .append(csvEscape(status)).append(",")
+                                    .append(csvEscape(String.valueOf(userId))).append(",")
+                                    .append(csvEscape(linkID))
+                                    .append("\n");
+
+                            if (++completed[0] == total && !failed[0]) {
+                                callback.onSuccess(csvBuilder.toString());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            failed[0] = true;
+                            callback.onFailure(e);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    failed[0] = true;
+                    callback.onFailure(e);
+                }
+            });
+        }
+    }
+
+    private String csvEscape(String value) {
+        if (value == null) return "";
+        // Escape " by ""
+        String escaped = value.replace("\"", "\"\"");
+        // Wrap in quotes to be safe against commas, newlines, etc.
+        return "\"" + escaped + "\"";
     }
 }

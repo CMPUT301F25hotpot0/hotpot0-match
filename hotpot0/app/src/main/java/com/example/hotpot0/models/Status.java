@@ -26,8 +26,6 @@ public class Status {
         statuses.add("Organizer");
         statuses.add("Sampled");
         statuses.add("Cancelled");
-        // statuses.add("OrganizerPreSample");
-        // statuses.add("OrganizerPostSample");
     }
 
     /**

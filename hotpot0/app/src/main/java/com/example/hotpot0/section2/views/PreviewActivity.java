@@ -343,6 +343,9 @@ public class PreviewActivity extends AppCompatActivity {
 
         try {
             int capacityValue = Integer.parseInt(capacity);
+            if (capacityValue == 1) {
+                return "1 spot";
+            }
             return capacityValue + " spots";
         } catch (NumberFormatException e) {
             return "Invalid capacity";
@@ -356,7 +359,10 @@ public class PreviewActivity extends AppCompatActivity {
 
         try {
             int waitingListValue = Integer.parseInt(waitingList);
-            return waitingListValue + " waiting list spots";
+            if (waitingListValue == 1) {
+                return "1 participant";
+            }
+            return waitingListValue + " participants";
         } catch (NumberFormatException e) {
             return "Invalid waiting list capacity";
         }

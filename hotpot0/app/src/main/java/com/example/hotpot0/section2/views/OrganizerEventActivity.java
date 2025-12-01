@@ -10,11 +10,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -36,6 +38,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hotpot0.R;
@@ -469,9 +473,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
         previewSpotsOpen.setText(spotsOpen);
 
         // Populate sampled entrants
-        if (currentEvent.getSampledIDs().isEmpty()) {
-            buttonConfirm.setEnabled(false);
-        }
 
         List<String> acceptedIDs = new ArrayList<>();
         List<String> sampledIDs = new ArrayList<>();
@@ -575,15 +576,11 @@ public class OrganizerEventActivity extends AppCompatActivity {
                     Toast.makeText(OrganizerEventActivity.this, "Error generating sample: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-            buttonConfirm.setEnabled(true);
-            // After filling, you could refresh UI:
-            // setupPostDrawLayout();
         });
 
         buttonConfirm.setOnClickListener(v -> {
             Toast.makeText(this, "Entrants confirmed!", Toast.LENGTH_SHORT).show();
-            // TODO: Call eventHandler.confirmEntrants(eventID)
-            buttonConfirm.setEnabled(false);
+            openFinalListDialog(acceptedIDs, currentEvent);
         });
 
         sampledSendCustomNotif.setOnClickListener(v -> {
@@ -1075,4 +1072,169 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
     }
 
+    private void openFinalListDialog(List<String> acceptedIDs, Event event) {
+        // Inflate your custom layout
+        View dialogView = LayoutInflater.from(this)
+                .inflate(R.layout.confirm_final_list_verification, null);
+
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
+
+        androidx.appcompat.app.AlertDialog dialog =
+                new androidx.appcompat.app.AlertDialog.Builder(this, R.style.CustomAlertDialog)
+                        .setView(dialogView)
+                        .setCancelable(true)
+                        .create();
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirm.setOnClickListener(v -> {
+            eventHandler.confirmEntrants(acceptedIDs, event, new EventUserLinkDB.ActionCallback() {
+                @Override
+                public void onSuccess() {
+                    // Proceed to show final list
+                    // Inflate custom layout
+                    View finalListView = LayoutInflater.from(OrganizerEventActivity.this)
+                            .inflate(R.layout.section3_final_list_activity, null);
+                    RecyclerView finalListRecycler = finalListView.findViewById(R.id.finalParticipantRecycler);
+                    finalListRecycler.setLayoutManager(new LinearLayoutManager(OrganizerEventActivity.this));
+                    FinalParticipantAdapter adapter = new FinalParticipantAdapter(new ArrayList<>(), OrganizerEventActivity.this);
+                    finalListRecycler.setAdapter(adapter);
+                    // Fetch profiles for acceptedIDs
+                    List<UserProfile> acceptedProfiles = new ArrayList<>();
+                    final int total = acceptedIDs.size();
+                    final int[] completed = {0};
+                    for (String linkID : acceptedIDs) {
+                        String userIDStr = linkID.split("_")[1];
+                        profileDB.getUserByID(Integer.parseInt(userIDStr), new ProfileDB.GetCallback<UserProfile>() {
+                            @Override
+                            public void onSuccess(UserProfile profile) {
+                                acceptedProfiles.add(profile);
+                                completed[0]++;
+                                checkIfDone();
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                completed[0]++;
+                                checkIfDone();
+                            }
+
+                            private void checkIfDone() {
+                                if (completed[0] == total) {
+                                    // All profiles fetched
+                                    adapter.updateProfiles(acceptedProfiles);
+                                }
+                            }
+                        });
+                    }
+
+                    Button buttonExportCSV = finalListView.findViewById(R.id.exportCsvButton);
+
+                    // Show the final list dialog
+                    androidx.appcompat.app.AlertDialog finalListDialog =
+                            new androidx.appcompat.app.AlertDialog.Builder(OrganizerEventActivity.this, R.style.CustomAlertDialog)
+                                    .setView(finalListView)
+                                    .setCancelable(true)
+                                    .setNegativeButton("Close", (d, w) -> d.dismiss())
+                                    .create();
+                    finalListDialog.show();
+
+                    buttonExportCSV.setOnClickListener(v -> {
+                        eventHandler.exportEntrantsToCSV(acceptedIDs, event.getName(), new EventActionHandler.ExportCallback() {
+                            @Override
+                            public void onSuccess(String csvData) {
+                                // Save CSV to device
+                                try {
+                                    String fileName = event.getName().replaceAll("\\s+", "_") + "_Final_Entrants.csv";
+                                    File csvFile = new File(
+                                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                            fileName
+                                    );
+                                    try (FileOutputStream fos = new FileOutputStream(csvFile)) {
+                                        fos.write(csvData.getBytes());
+                                    }
+                                    Toast.makeText(OrganizerEventActivity.this,
+                                            "CSV exported to Downloads/" + fileName,
+                                            Toast.LENGTH_LONG).show();
+                                } catch (Exception e) {
+                                    Toast.makeText(OrganizerEventActivity.this,
+                                            "Failed to save CSV: " + e.getMessage(),
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(OrganizerEventActivity.this,
+                                        "Failed to export CSV: " + e.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(OrganizerEventActivity.this,
+                            "Failed to confirm entrants: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+            Toast.makeText(this, "Entrants confirmed!", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+
+    private class FinalParticipantAdapter extends RecyclerView.Adapter<FinalParticipantAdapter.ViewHolder> {
+        private List<UserProfile> profiles;
+        private final Context context;
+
+        public FinalParticipantAdapter(List<UserProfile> profiles, Context context) {
+            this.profiles = profiles;
+            this.context = context;
+        }
+
+        public void updateProfiles(List<UserProfile> newProfiles) {
+            this.profiles = newProfiles;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.admin_profile_blob, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            UserProfile profile = profiles.get(position);
+            holder.nameTextView.setText(profile.getName());
+            // Load profile image if available
+            Glide.with(context)
+                    .load(R.drawable.ic_profile)
+                    .into(holder.profileImageView);
+        }
+
+        @Override
+        public int getItemCount() {
+            return profiles.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView nameTextView;
+            public ImageView profileImageView;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                nameTextView = itemView.findViewById(R.id.profileNameTextView);
+                profileImageView = itemView.findViewById(R.id.profileIcon);
+            }
+        }
+    }
 }
