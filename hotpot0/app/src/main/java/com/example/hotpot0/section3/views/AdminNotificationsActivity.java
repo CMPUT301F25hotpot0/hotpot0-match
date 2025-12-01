@@ -43,7 +43,7 @@ public class AdminNotificationsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.section2_notifications_activity);
+        setContentView(R.layout.section3_adminnotif_activity);
 
         notificationsRecycler = findViewById(R.id.notifications_recycler);
         emptyInvitationsText = findViewById(R.id.emptyInvitationsText);
@@ -178,31 +178,30 @@ public class AdminNotificationsActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        if (bottomNav == null) return;
+        BottomNavigationView bottomNav = findViewById(R.id.adminBottomNavigationView);
+        bottomNav.setSelectedItemId(R.id.admin_notif);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-
-            if (id == R.id.nav_home) {
-                startActivity(new Intent(AdminNotificationsActivity.this, HomeActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            if (id == R.id.admin_notif) {
+                // Already on home
                 return true;
-            }
-            if (id == R.id.nav_profile) {
-                startActivity(new Intent(AdminNotificationsActivity.this, ProfileActivity.class));
+            } else if (id == R.id.admin_search) {
+                Intent searchIntent = new Intent(AdminNotificationsActivity.this, AdminSearchActivity.class);
+                startActivity(searchIntent);
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
-            }
-            if (id == R.id.nav_notifications) {
-                startActivity(new Intent(AdminNotificationsActivity.this, AdminNotificationsActivity.class));
+            } else if (id == R.id.admin_images) {
+                startActivity(new Intent(AdminNotificationsActivity.this, AdminImageActivity.class));
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
-            }
-            if (id == R.id.nav_search) {
-                startActivity(new Intent(AdminNotificationsActivity.this, SearchActivity.class));
+            } else if (id == R.id.admin_home) {
+                startActivity(new Intent(AdminNotificationsActivity.this, AdminHomeActivity.class));
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
-            }
-            if (id == R.id.nav_events) {
-                startActivity(new Intent(AdminNotificationsActivity.this, CreateEventActivity.class));
+            } else if (id == R.id.admin_settings) {
+                startActivity(new Intent(AdminNotificationsActivity.this, AdminSettingsActivity.class));
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
             }
             return false;
