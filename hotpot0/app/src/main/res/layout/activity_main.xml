@@ -8,7 +8,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="?attr/colorSurface"
+    android:background="@drawable/gradient_background"
+    android:fitsSystemWindows="true"
     tools:context=".section1.views.MainActivity">
 
     <!-- App logo or icon -->
@@ -19,7 +20,7 @@
         android:src="@drawable/ic_launcher_foreground"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
         android:contentDescription="@string/app_name"
-        android:tint="?attr/colorPrimary" />
+        android:tint="@android:color/black" />
 
     <!-- Spacer -->
     <View
@@ -31,24 +32,15 @@
         android:id="@+id/appNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
+        android:text="Something is brewing ..."
         android:textAppearance="?attr/textAppearanceHeadlineSmall"
-        android:textColor="?attr/colorOnSurface"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
         android:fontFamily="@font/roboto" />
 
     <!-- Spacer -->
     <View
         android:layout_width="match_parent"
         android:layout_height="16dp" />
-
-    <!-- Circular Progress Indicator -->
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/loadingProgress"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        app:indicatorSize="48dp"
-        app:trackThickness="4dp"
-        app:indicatorColor="?attr/colorPrimary"
-        app:trackColor="?attr/colorSurfaceVariant" />
 
 </LinearLayout>

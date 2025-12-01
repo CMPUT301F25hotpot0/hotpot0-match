@@ -8,6 +8,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Looper;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.bumptech.glide.Glide;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
@@ -17,14 +31,16 @@ import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
+import com.google.android.material.card.MaterialCardView;
 
 /**
  * Activity that displays the details of a selected event and allows a user
  * to join or leave the waitlist based on their current status.
  */
 public class EventInitialActivity extends AppCompatActivity {
-    private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft;
+    private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft, previewWaitingList;
     private ImageView eventImage;
+    private MaterialCardView eventImageCard;
     private Button joinLeaveButton, backButton;
     private TextView GeolocationStatus;
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
@@ -32,6 +48,10 @@ public class EventInitialActivity extends AppCompatActivity {
     private EventDB eventDB = new EventDB();
     private int eventID;
     private Event currentEvent;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private Double latitude = null;
+    private Double longitude = null;
 
     /**
      * Called when the activity is first created.
@@ -47,9 +67,12 @@ public class EventInitialActivity extends AppCompatActivity {
 
         int userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
         eventID = getIntent().getIntExtra("event_id", -1); // Get event ID from Intent
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fetchCurrentLocation();
 
         // Initialize UI elements
         eventImage = findViewById(R.id.eventImage);
+        eventImageCard = findViewById(R.id.eventImageCard);
         previewEventName = findViewById(R.id.previewEventName);
         previewDescription = findViewById(R.id.previewDescription);
         previewGuidelines = findViewById(R.id.previewGuidelines);
@@ -59,6 +82,7 @@ public class EventInitialActivity extends AppCompatActivity {
         previewDuration = findViewById(R.id.previewDuration);
         previewPrice = findViewById(R.id.previewPrice);
         previewSpotsOpen = findViewById(R.id.previewSpotsOpen);
+        previewWaitingList = findViewById(R.id.previewWaitingList);
         previewDaysLeft = findViewById(R.id.previewDaysLeft);
         GeolocationStatus = findViewById(R.id.GeolocationStatus);
         joinLeaveButton = findViewById(R.id.button_join_or_leave_waitlist);
@@ -74,18 +98,38 @@ public class EventInitialActivity extends AppCompatActivity {
                     return;
                 }
                 currentEvent = event;
-
                 // Populate the UI with the event details
+                String imageURL = currentEvent.getImageURL();
+                if (imageURL == null || imageURL.isEmpty()) {
+                    // Hide the ImageView if no image is available
+                    eventImageCard.setVisibility(View.GONE);
+                    eventImage.setVisibility(View.GONE);
+                } else {
+                    // Show the ImageView
+                    eventImageCard.setVisibility(View.VISIBLE);
+                    eventImage.setVisibility(View.VISIBLE);
+                    // Load image using Glide
+                    Glide.with(EventInitialActivity.this)
+                            .load(imageURL)
+                            .placeholder(R.drawable.placeholder_image) // optional placeholder
+                            .into(eventImage);
+                }
+
                 previewEventName.setText(currentEvent.getName());
                 previewDescription.setText(currentEvent.getDescription());
                 previewGuidelines.setText(currentEvent.getGuidelines());
-                previewLocation.setText("Location: " + currentEvent.getLocation());
-                previewTimeAndDay.setText("Time: " + currentEvent.getTime());
-                previewDateRange.setText("Date: " + currentEvent.getDate());
-                previewDuration.setText("Duration: " + currentEvent.getDuration());
-                previewPrice.setText("Price: $" + currentEvent.getPrice());
-                previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
-                previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
+                previewLocation.setText(currentEvent.getLocation());
+                previewTimeAndDay.setText(currentEvent.getTime());
+                previewDateRange.setText(buildDateRange(currentEvent.getStartDate(), currentEvent.getEndDate()));
+                previewDuration.setText(currentEvent.getDuration());
+                String priceText = formatPrice(currentEvent.getPrice().toString());
+                previewPrice.setText(priceText);
+                String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalSampled()) == 0
+                        ? "All spots are filled!"
+                        : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalSampled());
+                previewSpotsOpen.setText(spotsOpen);
+                previewWaitingList.setText(currentEvent.getTotalWaitlist().toString());
+                // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
                 // Handle geolocation status
                 boolean geolocationEnabled = currentEvent.getGeolocationRequired(); // Assuming you have this info in your event model
@@ -99,26 +143,74 @@ public class EventInitialActivity extends AppCompatActivity {
                 eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
                     @Override
                     public void onSuccess(EventUserLink eventUserLink) {
-                        if (eventUserLink != null && "inWaitList".equals(eventUserLink.getStatus())) {
-                            joinLeaveButton.setText(getString(R.string.leave_waitlist));
-                            joinLeaveButton.setOnClickListener(v -> {
-                                eventHandler.leaveWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
-                                    @Override
-                                    public void onSuccess(Integer result) {
-                                        Toast.makeText(EventInitialActivity.this, "Successfully left the waitlist!", Toast.LENGTH_SHORT).show();
-                                        navigateHome();
-                                    }
+                        if (event.getJoinable()) {
+                            if (eventUserLink != null && "inWaitList".equals(eventUserLink.getStatus())) {
+                                joinLeaveButton.setText(getString(R.string.leave_waitlist));
+                                joinLeaveButton.setOnClickListener(v -> {
+                                    eventHandler.leaveWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                                        @Override
+                                        public void onSuccess(Integer result) {
+                                            Toast.makeText(EventInitialActivity.this, "Successfully left the waitlist!", Toast.LENGTH_SHORT).show();
+                                            navigateHome();
+                                        }
 
-                                    @Override
-                                    public void onFailure(Exception e) {
-                                        Toast.makeText(EventInitialActivity.this, "Error leaving waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Toast.makeText(EventInitialActivity.this, "Error leaving waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                 });
-                            });
+                            } else {
+                                joinLeaveButton.setText(getString(R.string.join_waitlist));
+                                if (latitude == null || longitude == null) {
+                                    latitude = 0.0;
+                                    longitude = 0.0;
+                                    return;
+                                }
+                                joinLeaveButton.setOnClickListener(v -> {
+                                    eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
+                                        @Override
+                                        public void onSuccess(Integer result) {
+                                            switch (result) {
+                                                case 0: // Successfully added to waitlist
+                                                    Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                                                    navigateHome();
+                                                    break;
+                                                case 1:
+                                                    Toast.makeText(EventInitialActivity.this, "You are already affiliated with this event.", Toast.LENGTH_SHORT).show();
+                                                    break;
+                                                case 2: // Waitlist full
+                                                    Toast.makeText(EventInitialActivity.this, "Waitlist is full, cannot join!", Toast.LENGTH_SHORT).show();
+                                                    break;
+                                                default:
+                                                    Toast.makeText(EventInitialActivity.this, "Unknown status: " + result, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Toast.makeText(EventInitialActivity.this, "Error joining waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                });
+                            }
                         } else {
+                            joinLeaveButton.setText(getString(R.string.event_not_joinable));
+                            joinLeaveButton.setEnabled(false);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        if (event.getJoinable()) {
                             joinLeaveButton.setText(getString(R.string.join_waitlist));
+                            if (latitude == null || longitude == null) {
+                                latitude = 0.0;
+                                longitude = 0.0;
+                                return;
+                            }
                             joinLeaveButton.setOnClickListener(v -> {
-                                eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
+                                eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
                                     @Override
                                     public void onSuccess(Integer result) {
                                         switch (result) {
@@ -143,26 +235,10 @@ public class EventInitialActivity extends AppCompatActivity {
                                     }
                                 });
                             });
+                        } else {
+                            joinLeaveButton.setText(getString(R.string.event_not_joinable));
+                            joinLeaveButton.setEnabled(false);
                         }
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        joinLeaveButton.setText(getString(R.string.join_waitlist));
-                        joinLeaveButton.setOnClickListener(v -> {
-                            eventHandler.joinWaitList(userID, eventID, new ProfileDB.GetCallback<Integer>() {
-                                @Override
-                                public void onSuccess(Integer result) {
-                                    Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
-                                    navigateHome();
-                                }
-
-                                @Override
-                                public void onFailure(Exception e) {
-                                    Toast.makeText(EventInitialActivity.this, "Error joining waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        });
                     }
                 });
             }
@@ -184,5 +260,88 @@ public class EventInitialActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
+    }
+
+    /**
+     * Fetches the current location of the device.
+     * Requests location permission if not already granted.
+     */
+    private void fetchCurrentLocation() {
+        // Check for location permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    101);
+            return;
+        }
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            } else {
+                // If last location is null, request location updates
+                fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        if (locationResult == null) return;
+                        Location loc = locationResult.getLastLocation();
+                        if (loc != null) {
+                            latitude = loc.getLatitude();
+                            longitude = loc.getLongitude();
+                            fusedLocationClient.removeLocationUpdates(this); // Stop updates after first fix
+                        }
+                    }
+                }, Looper.getMainLooper());
+            }
+        });
+    }
+
+    /**
+     * Builds a date range string based on start and end dates.
+     *
+     * @param startDate The start date of the event.
+     * @param endDate   The end date of the event.
+     * @return A formatted date range string.
+     */
+    private String buildDateRange(String startDate, String endDate) {
+        if (startDate != null && startDate.equals(endDate)) {
+            return startDate;
+        } else if (startDate != null && endDate != null && !endDate.isEmpty()) {
+            return startDate + " to " + endDate;
+        } else if (startDate != null) {
+            return startDate;
+        } else {
+            return "No dates specified";
+        }
+    }
+
+    /**
+     * Formats the price string for display.
+     *
+     * @param price The price as a string.
+     * @return Formatted price string.
+     */
+    private String formatPrice(String price) {
+        if (price == null || price.isEmpty()) {
+            return "Free";
+        }
+
+        try {
+            double priceValue = Double.parseDouble(price);
+            if (priceValue == 0) {
+                return "Free";
+            } else {
+                return String.format("$%.2f CAD", priceValue);
+            }
+        } catch (NumberFormatException e) {
+            return "Invalid price";
+        }
     }
 }

@@ -3,13 +3,28 @@ package com.example.hotpot0.section2.controllers;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
+import com.example.hotpot0.models.Notification;
+import com.example.hotpot0.models.PicturesDB;
 import com.example.hotpot0.models.ProfileDB;
+import com.example.hotpot0.models.Status;
+import com.example.hotpot0.models.UserProfile;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Handles user actions related to events such as joining or leaving waitlists,
@@ -24,6 +39,7 @@ public class EventActionHandler {
     private ProfileDB profileDB;
     private EventDB eventDB;
     private EventUserLinkDB eventUserLinkDB;
+    private PicturesDB picturesDB;
 
     /**
      * Constructs a new {@code EventActionHandler}.
@@ -36,6 +52,17 @@ public class EventActionHandler {
         profileDB = new ProfileDB();
         eventDB = new EventDB();
         eventUserLinkDB = new EventUserLinkDB();
+        picturesDB = new PicturesDB();
+    }
+
+    public EventActionHandler(EventUserLinkDB eventUserLinkDB, ProfileDB profileDB) {
+        this.eventUserLinkDB = eventUserLinkDB;
+        this.profileDB = profileDB;
+    }
+
+    public interface ExportCallback {
+        void onSuccess(String csvData);
+        void onFailure(Exception e);
     }
 
     /**
@@ -67,7 +94,7 @@ public class EventActionHandler {
      *                     <li>{@code onFailure(e)} – failure during database operation</li>
      *                 </ul>
      */
-    public void joinWaitList(Integer userID, Integer eventID, ProfileDB.GetCallback<Integer> callback) {
+    public void joinWaitList(Integer userID, Integer eventID, Double latitude, Double longitude, ProfileDB.GetCallback<Integer> callback) {
         // Construct the linkID
         String linkID = generateLinkID(userID, eventID);
 
@@ -88,13 +115,13 @@ public class EventActionHandler {
                 eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
                     @Override
                     public void onSuccess(Event eventObj) {
-                        int capacity = eventObj.getCapacity();
+                        int capacity = eventObj.getWaitingListCapacity();
                         int currentCount = eventObj.getTotalWaitlist();
                         if (currentCount < capacity) {
                             // There is space in the waitlist, proceed with adding the user
                             // If no EventUserLink was found, the user can join the waitlist.
                             // Create a new EventUserLink for the user with the default "inWaitList" status
-                            EventUserLink newEventUserLink = new EventUserLink(userID, eventID);
+                            EventUserLink newEventUserLink = new EventUserLink(userID, eventID, latitude, longitude);
 
                             // Add the new EventUserLink to Firestore
                             eventUserLinkDB.addEventUserLink(newEventUserLink, new EventUserLinkDB.GetCallback<EventUserLink>() {
@@ -396,60 +423,391 @@ public class EventActionHandler {
         });
     }
 
-//    public void sampleUsers(Integer eventID, ProfileDB.GetCallback<Integer> callback) {
-//        eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
-//            @Override
-//            public void onSuccess(Event eventObj) {
-//                eventDB.sampleEvent(eventObj, new EventDB.GetCallback<List<String>>(){
-//                    @Override
-//                    public void onSuccess(List<String> result) {
-//                        for (String linkID : result) {
-//                            // For each sampled user, update their EventUserLink status to "Sampled"
-//                            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
-//                                @Override
-//                                public void onSuccess(EventUserLink eventUserLink) {
-//                                    eventUserLink.setStatus("Sampled");
-//                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
-//                                        @Override
-//                                        public void onSuccess() {
-//                                            // Successfully updated the user's status to "Sampled"
-//                                            callback.onSuccess(0); // Success: Users sampled
-//                                        }
-//
-//                                        @Override
-//                                        public void onFailure(Exception e) {
-//                                            // Failed to update the user's status
-//                                            callback.onFailure(e); // Failure to update user status
-//                                        }
-//                                    });
-//                                }
-//
-//                                @Override
-//                                public void onFailure(Exception e) {
-//                                    // Failed to retrieve the EventUserLink
-//                                    callback.onFailure(e); // Failure to retrieve EventUserLink
-//                                }
-//                            });
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Exception e) {
-//                        // Failed to sample users for the event
-//                        callback.onFailure(e); // Failure to sample users
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onFailure(Exception e) {
-//                // Failed to retrieve the event
-//                callback.onFailure(e); // Failure to retrieve event
-//            }
-//        });
-//
-//    }
+    /**
+     * Allows an organizer to cancel their participation in an event.
+     * <p>
+     * The user's status is updated to "Cancelled", and the event record
+     * is updated to reflect the cancellation.
+     * </p>
+     *
+     * @param userID   the user’s ID
+     * @param event    the event object
+     * @param callback callback invoked upon completion:
+     *                 <ul>
+     *                     <li>{@code onSuccess(0)} – successfully cancelled participation</li>
+     *                     <li>{@code onSuccess(1)} – user not affiliated</li>
+     *                     <li>{@code onFailure(e)} – failure during update</li>
+     *                 </ul>
+     */
+    public void cancelUser(Event event, Integer userID, ProfileDB.GetCallback<Integer> callback) {
+        // Construct the linkID
+        String linkID = generateLinkID(userID, event.getEventID());
 
-    public void cancelUser(Integer userID, Integer eventID) {}
+        // Fetch the user's EventUserLink from Firestore
+        EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
 
+        eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink eventUserLink) {
+                // Attempt to set the status to "Cancelled"
+                eventUserLink.setStatus("Cancelled"); // Directly set the status to "Cancelled"
+
+                Status status = new Status();
+                status.setStatus(eventUserLink.getStatus());
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Date date = new Date();
+                String now = formatter.format(date);
+                Notification notif = new Notification(now, status, event.getName(), event.getEventID());
+
+                eventUserLink.addNotification(notif);
+
+                // Now, update the EventUserLink in the database
+                eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                        // Successfully updated the status to "Cancelled"
+                        eventDB.addCancelledIDToEvent(event, linkID, new EventDB.GetCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                eventDB.removeSampledIDFromEvent(event, linkID.toString(), new EventDB.GetCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        callback.onSuccess(0); // Success: User cancelled
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // Failed to update the event by removing sampled ID
+                                        callback.onFailure(e); // Failure to update event
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Failed to update the event with the cancelled ID
+                                callback.onFailure(e); // Failure to update event
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        // Failed to update the status in the database
+                        callback.onFailure(e); // Failure: Could not update status
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // If no EventUserLink is found, it means the user was never affiliated with the event
+                callback.onSuccess(1); // Failure: User not found
+            }
+        });
+    }
+
+    /**
+     * Sends a custom notification to a list of users associated with an event.
+     *
+     * @param message   the notification message
+     * @param status    the status associated with the notification
+     * @param linkIDs   the list of EventUserLink IDs representing the recipients
+     * @param event     the event object
+     * @param callback  callback invoked upon completion:
+     */
+    public void sendCustomNotification(String message, String status, List<String> linkIDs, Event event, @NonNull EventUserLinkDB.ActionCallback callback) {
+        for (String linkID : linkIDs) {
+            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink eventUserLink) {
+                    Status statusObj = new Status();
+                    statusObj.setStatus(status);
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    Date date = new Date();
+                    String now = formatter.format(date);
+                    Notification notif = new Notification(now, statusObj, message, event.getName(), event.getEventID(),true);
+                    eventUserLink.addNotification(notif);
+                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notification added successfully
+                            callback.onSuccess();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Failed to update EventUserLink with notification
+                            callback.onFailure(e);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    // Failed to retrieve EventUserLink
+                    callback.onFailure(e);
+                }
+            });
+        }
+    }
+
+    /**
+     * Confirms a list of entrants for an event by updating their status to "Accepted"
+     * and adding a notification to their EventUserLink.
+     *
+     * @param linkIDs  the list of EventUserLink IDs representing the entrants
+     * @param event    the event object
+     * @param callback callback invoked upon completion:
+     */
+    public void confirmEntrants(List<String> linkIDs, Event event, @NonNull EventUserLinkDB.ActionCallback callback) {
+        for (String linkID : linkIDs) {
+            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink eventUserLink) {
+                    Status statusObj = new Status();
+                    statusObj.setStatus("Accepted");
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    Date date = new Date();
+                    String now = formatter.format(date);
+                    Notification notif = new Notification(now, statusObj,  event.getName(), event.getEventID());
+                    eventUserLink.addNotification(notif);
+                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notification added successfully
+                            callback.onSuccess();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Failed to update EventUserLink with notification
+                            callback.onFailure(e);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    // Failed to retrieve EventUserLink
+                    callback.onFailure(e);
+                }
+            });
+        }
+        event.setJoinable(false);
+    }
+
+    /**
+     * Exports a list of event entrants to a CSV format string.
+     *
+     * @param linkIDs   the list of EventUserLink IDs representing the entrants
+     * @param eventName the name of the event
+     * @param callback  callback invoked upon completion:
+     *                  <ul>
+     *                      <li>{@code onSuccess(csvData)} – successfully generated CSV data</li>
+     *                      <li>{@code onFailure(e)} – failure during export</li>
+     *                  </ul>
+     */
+    public void exportEntrantsToCSV(List<String> linkIDs,
+                                    String eventName,
+                                    @NonNull ExportCallback callback) {
+
+        if (linkIDs == null || linkIDs.isEmpty()) {
+            callback.onFailure(new IllegalArgumentException("No entrants to export"));
+            return;
+        }
+
+        final List<String> csvRows = Collections.synchronizedList(new ArrayList<>());
+        final int total = linkIDs.size();
+        final AtomicInteger completed = new AtomicInteger(0);
+        final AtomicBoolean failed = new AtomicBoolean(false);
+
+        // Add header
+        csvRows.add("Event: " + csvEscape(eventName));
+        csvRows.add("Name,Email,Phone Number");
+
+        for (String linkID : linkIDs) {
+            String[] parts = linkID.split("_");
+            if (parts.length < 2) {
+                checkCompletion(total, completed, failed, csvRows, callback);
+                continue;
+            }
+
+            int userId;
+            try {
+                userId = Integer.parseInt(parts[1]);
+            } catch (NumberFormatException e) {
+                checkCompletion(total, completed, failed, csvRows, callback);
+                continue;
+            }
+
+            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink link) {
+                    if (link == null) {
+                        checkCompletion(total, completed, failed, csvRows, callback);
+                        return;
+                    }
+
+                    profileDB.getUserByID(userId, new ProfileDB.GetCallback<UserProfile>() {
+                        @Override
+                        public void onSuccess(UserProfile profile) {
+                            String name = profile != null && profile.getName() != null ? profile.getName() : "";
+                            String email = profile != null && profile.getEmailID() != null ? profile.getEmailID() : "";
+                            String phoneNumber = profile != null && profile.getPhoneNumber() != null ? ("Ph: " + profile.getPhoneNumber()) : "";
+
+                            String row = String.join(",",
+                                    csvEscape(name),
+                                    csvEscape(email),
+                                    csvEscape(phoneNumber)
+                            );
+
+                            csvRows.add(row);
+                            checkCompletion(total, completed, failed, csvRows, callback);
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            failed.set(true);
+                            callback.onFailure(e);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    failed.set(true);
+                    callback.onFailure(e);
+                }
+            });
+        }
+    }
+
+    /**
+     * Checks if all operations are completed and invokes callback if yes.
+     *
+     * @param total      the total number of operations
+     * @param completed  the atomic integer tracking completed operations
+     * @param failed     the atomic boolean indicating if any operation failed
+     * @param csvRows    the list of CSV rows being constructed
+     * @param callback   the export callback to invoke upon completion
+     */
+    private void checkCompletion(int total,
+                                 AtomicInteger completed,
+                                 AtomicBoolean failed,
+                                 List<String> csvRows,
+                                 ExportCallback callback) {
+        if (completed.incrementAndGet() == total && !failed.get()) {
+            String csvData = String.join("\n", csvRows);
+            callback.onSuccess(csvData);
+        }
+    }
+
+    /**
+     * Escapes a string value for inclusion in a CSV file.
+     *
+     * @param value the string value to escape
+     * @return the escaped string
+     */
+    private String csvEscape(String value) {
+        if (value == null) return "";
+        String escaped = value.replace("\"", "\"\"");
+        return "\"" + escaped + "\"";
+    }
+
+    /**
+     * Deletes all links associated with an event, including user links,
+     * profile references, and event images.
+     *
+     * @param eventID  the event's ID
+     * @param callback callback invoked upon completion:
+     *                 <ul>
+     *                     <li>{@code onSuccess()} – successfully deleted all links</li>
+     *                     <li>{@code onFailure(e)} – failure during deletion</li>
+     *                 </ul>
+     */
+    public void deleteEventLinks(Integer eventID, EventDB.ActionCallback callback) {
+        eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
+            @Override
+            public void onSuccess(Event event) {
+                List<String> linkIDs = event.getLinkIDs();
+                if (linkIDs != null) {
+                    for (String linkID : linkIDs) {
+                        int userID = Integer.parseInt(linkID.split("_")[1]);
+                        eventUserLinkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Successfully deleted EventUserLink
+                                profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
+                                    @Override
+                                    public void onSuccess(UserProfile userProfile) {
+                                        profileDB.removeLinkIDFromUser(userProfile, linkID, new ProfileDB.GetCallback<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // Successfully removed linkID from user profile
+                                                picturesDB.deleteEventImage(eventID, new PicturesDB.Callback<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void result) {
+                                                        // Successfully deleted event image
+                                                        eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
+                                                            @Override
+                                                            public void onSuccess() {
+                                                                // Successfully deleted event
+                                                                callback.onSuccess();
+                                                            }
+                                                            @Override
+                                                            public void onFailure(Exception e) {
+                                                                // Log failure but continue
+                                                            }
+                                                        });
+                                                    }
+                                                    @Override
+                                                    public void onFailure(Exception e) {
+                                                        eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
+                                                            @Override
+                                                            public void onSuccess() {
+                                                                // Successfully deleted event
+                                                                callback.onSuccess();
+                                                            }
+                                                            @Override
+                                                            public void onFailure(Exception e) {
+                                                                // Log failure but continue
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                // Log failure but continue
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // Log failure but continue
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Log failure but continue
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
 }

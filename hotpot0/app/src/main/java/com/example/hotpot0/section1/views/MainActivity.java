@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                         .apply();
                 Intent intent = new Intent(MainActivity.this, com.example.hotpot0.section2.views.HomeActivity.class);
                 startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 finish();
             }
 
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 // Device does not exist → go to StartupActivity
                 Intent intent = new Intent(MainActivity.this, com.example.hotpot0.section1.views.StartupActivity.class);
                 startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 finish();
             }
         });

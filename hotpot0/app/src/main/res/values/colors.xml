@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="bar">#A67B5B</color>
     <color name="text">#4B2E05</color>
+    <color name="statusbar"> #D2B48C </color>
+    <color name="navbar"> #A67B5B </color>
 
 </resources>

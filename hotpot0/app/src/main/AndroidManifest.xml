@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="SelectedPhotoAccess">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
+        tools:ignore="PhotoAndVideoPolicy" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -27,15 +42,28 @@
         <activity android:name=".section2.views.CreateEventActivity" />
         <activity android:name=".section2.views.PreviewActivity" />
         <activity android:name=".section3.views.AdminHomeActivity" />
+        <activity android:name=".section3.views.AdminSearchActivity" />
+        <activity android:name=".section3.views.ManageEventActivity" />
+        <activity android:name=".section3.views.AdminImageActivity" />
+        <activity android:name=".section3.views.ManageImageActivity" />
+        <activity android:name=".section3.views.AdminSettingsActivity" />
+        <activity android:name=".section3.views.AdminNotificationsActivity" />
         <activity android:name=".section2.views.ProfileActivity"/>
         <activity android:name=".section2.views.NotificationsActivity"/>
         <activity android:name=".section2.views.SearchActivity"/>
         <activity android:name=".section2.views.EventInitialActivity"/>
         <activity android:name=".section2.views.OrganizerEventActivity" />
         <activity android:name=".section2.views.EventSampledActivity" />
+        <activity android:name=".section3.views.AdminProfileActivity" />
+        <activity android:name=".section2.views.QRActivity"
+            android:exported="false"/>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDyXdScb2_tQMtxDc_JA43HcoqCxAA_Y7k"/>
     </application>
 
 </manifest>

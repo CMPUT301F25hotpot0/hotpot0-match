@@ -1,178 +1,301 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <!-- Scrollable content -->
+    <!-- Scrollable Content -->
     <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:layout_weight="1"
+        android:padding="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
+            <!-- Back Button -->
             <Button
                 android:id="@+id/button_BackPostDraw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
                 android:backgroundTint="@color/text"
                 android:text="@string/back"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:padding="6dp"
-                android:layout_gravity="start" />
-
-            <ImageView
-                android:id="@+id/eventImage"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:background="#E0E0E0"
-                android:scaleType="centerCrop" />
-
-            <!-- Event Details -->
-            <TextView
-                android:id="@+id/preview_event_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_guidelines"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_time_and_day"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_date_range"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_duration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_price"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_spots_open"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/preview_days_left"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
+                android:layout_gravity="start"
                 android:layout_marginBottom="16dp" />
 
-            <TextView
-                android:id="@+id/currently_waiting"
+            <!-- Event Image -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/eventImageCard"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="230dp"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                app:cardUseCompatPadding="true">
 
-            <!-- Event Info -->
+                <ImageView
+                    android:id="@+id/eventImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    android:maxHeight="400dp"
+                    android:contentDescription="Event Poster" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Event Name (centered like first XML) -->
             <TextView
                 android:id="@+id/previewEventName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:text="Event Name"
+                android:textColor="@color/text"
+                android:textSize="22sp"
                 android:textStyle="bold"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp" />
+                android:gravity="center"
+                android:layout_marginBottom="12dp" />
 
-            <!-- Fill Spots Button -->
-            <LinearLayout
+            <!-- Description -->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp">
+                android:text="Description"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
 
-                <Button
-                    android:id="@+id/button_fillSpots"
+            <TextView
+                android:id="@+id/previewDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Guidelines -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Guidelines"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/previewGuidelines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Location -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Location"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/previewLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Time -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Time"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/previewTimeAndDay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Date Range -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Event Dates"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/previewDateRange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Duration -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Duration"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/previewDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Price -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Price"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/previewPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Spots Open -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total Spots Open"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/previewSpotsOpen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="24dp" />
+
+            <Button
+                android:id="@+id/button_fillSpots"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fill_spots"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/text"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="24dp" />
+
+            <!-- ===== SAMPLED ENTRANTS ===== -->
+            <LinearLayout
+                android:id="@+id/SampledEntrantsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/SampledEntrantsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/fill_spots"
-                    android:textColor="#FFFFFF"
-                    android:backgroundTint="@color/text"
-                    android:gravity="center" />
+                    android:layout_weight="1"
+                    android:text="@string/sampled_entrants"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/SampledSendCustomNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="Send Custom Notification"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="8dp"
+                    app:tint="@color/text" />
+
             </LinearLayout>
 
-            <!-- Sampled Entrants Section -->
-            <TextView
-                android:id="@+id/SampledEntrantsLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/sampled_entrants"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="@color/text"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp" />
 
             <LinearLayout
                 android:id="@+id/sampled_entrants_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <include layout="@layout/profile_blob_icon" />
-                <include layout="@layout/profile_blob_icon" />
-                <include layout="@layout/profile_blob_icon" />
+                android:orientation="vertical" />
+
+            <!-- ===== ACCEPTED ENTRANTS ===== -->
+            <LinearLayout
+                android:id="@+id/AcceptedEntrantsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/AcceptedEntrantsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/accepted_entrants"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/AcceptedSendCustomNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="Send Custom Notification"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="8dp"
+                    app:tint="@color/text" />
+
             </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/accepted_entrants_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
             <!-- Confirm Button -->
             <Button
@@ -180,78 +303,121 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/confirm"
-                android:enabled="false"
+                android:enabled="true"
                 android:textColor="#FFFFFF"
                 android:backgroundTint="@color/text"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="24dp" />
 
-            <!-- Cancelled Entrants Section -->
-            <TextView
-                android:id="@+id/CancelledEntrantsLabel"
+            <!-- ===== CANCELLED ENTRANTS ===== -->
+            <LinearLayout
+                android:id="@+id/CancelledEntrantsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/cancelled_entrants"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="@color/text"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/CancelledEntrantsLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/cancelled_entrants"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/CancelledSendCustomNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="Send Custom Notification"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="8dp"
+                    app:tint="@color/text" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/cancelled_entrants_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <include layout="@layout/profile_blob" />
-                <include layout="@layout/profile_blob" />
-            </LinearLayout>
+                android:orientation="vertical" />
 
-            <!-- All Entrants -->
+            <!-- ===== INTERACTIVE MAP ===== -->
             <TextView
-                android:id="@+id/AllEntrantsLabel"
+                android:id="@+id/GeolocationHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/all_entrants"
-                android:textStyle="bold"
-                android:textSize="14sp"
+                android:text="Entrants Geolocation"
                 android:textColor="@color/text"
-                android:layout_marginTop="24dp"
+                android:textStyle="bold"
+                android:textSize="16sp"
                 android:layout_marginBottom="8dp" />
+
+            <FrameLayout
+                android:id="@+id/map_container"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="20dp" />
+
+            <!-- ===== ALL ENTRANTS ===== -->
+            <LinearLayout
+                android:id="@+id/AllEntrantsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/AllEntrantsLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/all_entrants"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/AllSendCustomNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="Send Custom Notification"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="8dp"
+                    app:tint="@color/text" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/all_entrants_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <include layout="@layout/profile_blob" />
-                <include layout="@layout/profile_blob" />
-            </LinearLayout>
+                android:orientation="vertical" />
 
-            <!-- Map Preview -->
-            <ImageView
-                android:id="@+id/mapPreview"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="24dp"
-                android:background="#E0E0E0"
-                android:scaleType="centerCrop" />
         </LinearLayout>
     </ScrollView>
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bar"
-        app:menu="@menu/bottom_nav_menu"
+        app:itemIconSize="30dp"
         app:itemIconTint="@color/nav_item_selector"
         app:itemTextColor="@color/nav_item_selector"
         app:labelVisibilityMode="labeled"
-        app:itemIconSize="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:menu="@menu/bottom_nav_menu" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -3,10 +3,10 @@ package com.example.hotpot0;
 import static org.junit.Assert.*;
 
 import com.example.hotpot0.models.EventUserLink;
+import com.example.hotpot0.models.Notification;
+import com.example.hotpot0.models.Status;
 
 import org.junit.Test;
-
-import java.util.List;
 
 public class EventUserLinkTest {
 
@@ -23,62 +23,137 @@ public class EventUserLinkTest {
     }
 
     @Test
-    public void testConstructorWithoutStatus() {
-        EventUserLink link = new EventUserLink(2, 200);
+    public void testConstructorWithLatLong() {
+        EventUserLink link = new EventUserLink(2, 200, 53.5, -113.4);
 
         assertEquals(Integer.valueOf(2), link.getUserID());
         assertEquals(Integer.valueOf(200), link.getEventID());
         assertEquals("200_2", link.getLinkID());
         assertEquals("inWaitList", link.getStatus());
-        assertNotNull(link.getNotifications());
-        assertTrue(link.getNotifications().isEmpty());
-    }
 
-    @Test
-    public void testAddNotification() {
-        EventUserLink link = new EventUserLink(3, 300);
-
-        link.addNotification("Notification 1");
-        link.addNotification("Notification 2");
-
-        List<String> notifications = link.getNotifications();
-        assertEquals(2, notifications.size());
-        assertTrue(notifications.contains("Notification 1"));
-        assertTrue(notifications.contains("Notification 2"));
+        assertEquals(Double.valueOf(53.5), link.getLatitude());
+        assertEquals(Double.valueOf(-113.4), link.getLongitude());
     }
 
     @Test
     public void testSetAndGetStatus_valid() {
-        EventUserLink link = new EventUserLink(4, 400);
-        link.setStatus("Sampled");
+        EventUserLink link = new EventUserLink(3, 300, "Accepted");
+        link.setStatus("Cancelled");
 
-        assertEquals("Sampled", link.getStatus());
+        assertEquals("Cancelled", link.getStatus());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetStatus_invalid_throwsException() {
-        EventUserLink link = new EventUserLink(5, 500);
-        link.setStatus("InvalidStatus"); // should throw exception
+        EventUserLink link = new EventUserLink(4, 400, "Accepted");
+        link.setStatus("NotAStatus"); // Should throw
+    }
+
+    @Test
+    public void testSetAndGetLatitudeLongitude() {
+        EventUserLink link = new EventUserLink(5, 500, 10.0, 20.0);
+
+        link.setLatitude(11.1);
+        link.setLongitude(22.2);
+
+        assertEquals(Double.valueOf(11.1), link.getLatitude());
+        assertEquals(Double.valueOf(22.2), link.getLongitude());
+    }
+
+    @Test
+    public void testAddNotification_AutomaticNotification() {
+        EventUserLink link = new EventUserLink(6, 600, "Accepted");
+
+        Status status = new Status();
+        status.setStatus("Sampled");
+
+        Notification notif = new Notification(
+                "2025-03-10",
+                status,
+                "My Event",
+                600
+        );
+
+        link.addNotification(notif);
+
+        assertEquals(1, link.getNotifications().size());
+        assertEquals(notif, link.getNotifications().get(0));
+    }
+
+    @Test
+    public void testAddNotification_CustomNotification() {
+        EventUserLink link = new EventUserLink(7, 700, "Accepted");
+
+        Status status = new Status();
+        status.setStatus("Declined");
+
+        Notification notif = new Notification(
+                "2025-03-12",
+                status,
+                "Custom message",
+                "Mega Event",
+                700,
+                true
+        );
+
+        link.addNotification(notif);
+
+        assertEquals(1, link.getNotifications().size());
+        assertEquals("Custom message", link.getNotifications().get(0).getText());
+        assertTrue(link.getNotifications().get(0).isCustomNotif());
+    }
+
+    @Test
+    public void testAddNotification_ResampledNotification() {
+        EventUserLink link = new EventUserLink(8, 800, "inWaitList");
+
+        Status status = new Status();
+        status.setStatus("Sampled");
+
+        Notification notif = new Notification(
+                "2025-03-12",
+                status,
+                true,
+                "Event XYZ",
+                800
+        );
+
+        link.addNotification(notif);
+
+        assertEquals(1, link.getNotifications().size());
+        assertTrue(link.getNotifications().get(0).isResampledNotif());
     }
 
     @Test
     public void testSetAndGetLinkID() {
-        EventUserLink link = new EventUserLink(6, 600);
+        EventUserLink link = new EventUserLink(9, 900, "Accepted");
+
         link.setLinkID("customLinkID");
 
         assertEquals("customLinkID", link.getLinkID());
     }
 
     @Test
-    public void testToString() {
-        EventUserLink link = new EventUserLink(7, 700, "Declined");
-        link.addNotification("Notification 1");
+    public void testToString_containsImportantFields() {
+        EventUserLink link = new EventUserLink(10, 1000, "Declined");
 
-        String str = link.toString();
-        assertTrue(str.contains("7"));
-        assertTrue(str.contains("700"));
-        assertTrue(str.contains("700_7"));
-        assertTrue(str.contains("Declined"));
-        assertTrue(str.contains("Notification 1"));
+        Status status = new Status();
+        status.setStatus("Sampled");
+
+        Notification notif = new Notification(
+                "2025-03-14",
+                status,
+                "Event ABC",
+                1000
+        );
+
+        link.addNotification(notif);
+
+        String result = link.toString();
+
+        assertTrue(result.contains("10"));
+        assertTrue(result.contains("1000"));
+        assertTrue(result.contains("1000_10"));
+        assertTrue(result.contains("Declined"));
     }
 }

@@ -29,7 +29,10 @@ public class UserProfile {
 
     /**
      * Required empty constructor for Firestore deserialization.*/
-    public UserProfile() {}
+    public UserProfile() {
+        this.deviceID = "Default Constructor cannot initialize Device ID";
+        this.linkIDs = new ArrayList<>();
+    }
 
     /**
      * Constructs a new UserProfile using provided user details and
@@ -48,6 +51,19 @@ public class UserProfile {
                 context.getContentResolver(),
                 Settings.Secure.ANDROID_ID
         );
+        this.name = name;
+        this.emailID = emailID;
+        this.phoneNumber = phoneNumber;
+        this.notificationsEnabled = true;
+        this.latitude = 37.7749;
+        this.longitude = -122.4194;
+        this.linkIDs = new ArrayList<>();
+    }
+
+    // For testing only
+    public UserProfile(String name, String emailID, String phoneNumber, String deviceID) {
+        this.userID = null;
+        this.deviceID = deviceID; // manually provide a fake or dummy ID
         this.name = name;
         this.emailID = emailID;
         this.phoneNumber = phoneNumber;
@@ -203,7 +219,7 @@ public class UserProfile {
      *
      * @param linkID index or value to remove from the list
      */
-    public void removeLinkID(int linkID) {
+    public void removeLinkID(String linkID) {
         linkIDs.remove(linkID);
     }
 

@@ -1,17 +1,23 @@
 package com.example.hotpot0.section2.controllers;
 
-import android.content.Context;
-import android.text.TextUtils;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
+import android.text.TextUtils;
+import android.content.Context;
 
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
-import com.example.hotpot0.models.EventUserLink;
-import com.example.hotpot0.models.EventUserLinkDB;
+import com.example.hotpot0.models.PicturesDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
+import com.example.hotpot0.models.EventUserLink;
+import com.example.hotpot0.models.EventUserLinkDB;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.regex.Pattern;
 
 /**
@@ -22,10 +28,11 @@ import java.util.regex.Pattern;
  * </p>
  */
 public class CreateEventHandler {
+
+    private ProfileDB profileDB;
     private final EventDB eventDB;
     private final Context context;
     private EventUserLinkDB eventUserLinkDB;
-    private ProfileDB profileDB;
 
     /**
      * Constructs a new {@code CreateEventHandler}.
@@ -39,84 +46,31 @@ public class CreateEventHandler {
         this.profileDB = new ProfileDB();
     }
 
-    /**
-     * Creates a new event and associates it with the organizer.
-     * <p>
-     * This method performs validation on all required fields before creating the event.
-     * If successful, it creates the event record, links it to the organizer as an "Organizer"
-     * in {@link EventUserLinkDB}, and updates both the organizer’s profile and event record
-     * with the link ID.
-     * </p>
-     *
-     * @param organizerID          the ID of the user organizing the event
-     * @param name                 the event name (required)
-     * @param description          a brief description of the event (required)
-     * @param guidelines           optional guidelines for participants
-     * @param location             the location where the event will take place (required)
-     * @param time                 the time of the event (required)
-     * @param date                 the date of the event in YYYY-MM-DD format (required)
-     * @param duration             the duration of the event (required)
-     * @param capacity             the maximum number of participants allowed (must be positive)
-     * @param price                the entry fee or price (cannot be negative)
-     * @param registrationPeriod   the period during which registration is open (required)
-     * @param imageURL             an optional image URL for the event
-     * @param geolocationRequired  whether the event requires location access
-     * @param callback             callback for success or failure
-     */
-    public void createEvent(Integer organizerID, String name,
+    public Context getContext() {
+        return context;
+    }
+
+    public void createEvent(Integer organizerID,
+                            String name,
                             String description,
                             String guidelines,
                             String location,
                             String time,
-                            String date,
+                            String startDate,
+                            String endDate,
                             String duration,
                             Integer capacity,
+                            Integer waitingListCapacity,
                             Double price,
-                            String registrationPeriod,
-                            String imageURL,
+                            String regStart,
+                            String regEnd,
+                            String imageUriString,
                             Boolean geolocationRequired,
                             EventDB.GetCallback<Event> callback) {
-        if (TextUtils.isEmpty(name)) {
-            callback.onFailure(new IllegalArgumentException("Event name is required"));
-            return;
-        }
-        if (TextUtils.isEmpty(description)) {
-            callback.onFailure(new IllegalArgumentException("Event description is required"));
-            return;
-        }
-        if (capacity == null || capacity <= 0) {
-            callback.onFailure(new IllegalArgumentException("Capacity must be a positive integer"));
-            return;
-        }
-        if (price == null || price < 0) {
-            callback.onFailure(new IllegalArgumentException("Price cannot be negative"));
-            return;
-        }
-        if (TextUtils.isEmpty(location)) {
-            callback.onFailure(new IllegalArgumentException("Event location is required"));
-            return;
-        }
-        if (TextUtils.isEmpty(date)) {
-            callback.onFailure(new IllegalArgumentException("Event date is required"));
-            return;
-        }
-        Pattern datePattern = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$");
-        if (!datePattern.matcher(date).matches()) {
-            callback.onFailure(new IllegalArgumentException("Event date must be in YYYY-MM-DD format"));
-            return;
-        }
-        if (TextUtils.isEmpty(time)) {
-            callback.onFailure(new IllegalArgumentException("Event time is required"));
-            return;
-        }
-        if (TextUtils.isEmpty(duration)) {
-            callback.onFailure(new IllegalArgumentException("Event duration is required"));
-            return;
-        }
-        if (TextUtils.isEmpty(registrationPeriod)) {
-            callback.onFailure(new IllegalArgumentException("Registration period is required"));
-            return;
-        }
+
+        Uri imageUri = imageUriString != null ? Uri.parse(imageUriString) : null;
+
+        // Create event object
         Event event = new Event(
                 organizerID,
                 name,
@@ -124,74 +78,126 @@ public class CreateEventHandler {
                 guidelines,
                 location,
                 time,
-                date,
+                startDate,
+                endDate,
                 duration,
                 capacity,
+                waitingListCapacity,
                 price,
-                registrationPeriod,
-                imageURL,
+                regStart,
+                regEnd,
+                null,         // imageURL is null initially
+                null,                  // qrValue is null initially
                 geolocationRequired
         );
+
         eventDB.addEvent(event, new EventDB.GetCallback<Event>() {
             @Override
             public void onSuccess(Event result) {
+
                 int eventID = result.getEventID();
 
-                EventUserLink link = new EventUserLink(organizerID, eventID, "Organizer");
+                // If image exists → upload it
+                if (imageUriString != null && !imageUriString.isEmpty()) {
 
-                // Create the EventUserLink
-                eventUserLinkDB.addEventUserLink(link, new EventUserLinkDB.GetCallback<EventUserLink>() {
-                    @Override
-                    public void onSuccess(EventUserLink linkResult) {
-                        // Successfully created EventUserLink
-                        profileDB.getUserByID(organizerID, new ProfileDB.GetCallback<UserProfile>() {
+                    PicturesDB picturesDB = new PicturesDB();
+
+                    Uri localUri = getSafeUriForUpload(imageUri);
+
+                    if (localUri != null) {
+
+                        picturesDB.uploadEventImage(localUri, eventID, new PicturesDB.Callback<String>() {
                             @Override
-                            public void onSuccess(UserProfile userProfile) {
-                                // Update the organizer's profile
-                                // add log of success
-                                Log.i("CreateEventHandler", "Successfully created EventUserLink with ID: " + linkResult.getLinkID());
+                            public void onSuccess(String downloadURL) {
 
-                                profileDB.addLinkIDToUser(userProfile, linkResult.getLinkID(), new ProfileDB.GetCallback<Void>() {
+                                // ONLY update imageURL (QR is already set)
+                                eventDB.updateEventImageURL(result, downloadURL, new EventDB.GetCallback<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        eventDB.addLinkIDToEvent(event, linkResult.getLinkID(), new EventDB.GetCallback<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                callback.onSuccess(result);
-                                            }
-
-                                            @Override
-                                            public void onFailure(Exception e) {
-                                                // Log the error but do not fail the event creation
-                                                e.printStackTrace();
-                                            }
-                                        });
+                                        finalizeEventCreation(organizerID, result, callback);
                                     }
 
                                     @Override
                                     public void onFailure(Exception e) {
-                                        // Log the error but do not fail the event creation
-                                        e.printStackTrace();
-                                        callback.onSuccess(result);  // Continue with success even if update fails
+                                        Toast.makeText(context, "EventDB.updateEventImageURL failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                        callback.onFailure(e);
                                     }
                                 });
                             }
 
                             @Override
                             public void onFailure(Exception e) {
-                                // Log the error but do not fail the event creation
-                                Log.i("CreateEventHandler", "Failed to retrieve user profile for ID: " + organizerID);
-                                e.printStackTrace();
-                                callback.onSuccess(result);  // Continue with success even if user retrieval fails
+                                Toast.makeText(context, "PicturesDB.uploadEventImage failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                callback.onFailure(e);
+                            }
+                        });
+
+                    } else {
+                        Toast.makeText(context, "Failed to prepare image for upload", Toast.LENGTH_LONG).show();
+                        finalizeEventCreation(organizerID, result, callback);
+                    }
+
+                } else {
+                    // No image → finish immediately
+                    finalizeEventCreation(organizerID, result, callback);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "EventDB.addEvent failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    /**
+     * Finalizes the event creation by linking the event to the organizer
+     * and updating both the event and organizer profile with the link ID.
+     *
+     * @param organizerID The ID of the organizer creating the event.
+     * @param event       The event that was created.
+     * @param callback    The callback to be invoked upon completion.
+     */
+    private void finalizeEventCreation(int organizerID, Event event, EventDB.GetCallback<Event> callback) {
+        int eventID = event.getEventID();
+
+        EventUserLink link = new EventUserLink(organizerID, eventID, "Organizer");
+
+        eventUserLinkDB.addEventUserLink(link, new EventUserLinkDB.GetCallback<EventUserLink>() {
+            @Override
+            public void onSuccess(EventUserLink linkResult) {
+                profileDB.getUserByID(organizerID, new ProfileDB.GetCallback<UserProfile>() {
+                    @Override
+                    public void onSuccess(UserProfile userProfile) {
+
+                        profileDB.addLinkIDToUser(userProfile, linkResult.getLinkID(), new ProfileDB.GetCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                eventDB.addLinkIDToEvent(event, linkResult.getLinkID(), new EventDB.GetCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        callback.onSuccess(event);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        callback.onFailure(e);
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                callback.onFailure(e);
                             }
                         });
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        // Log the error but do not fail the event creation
-                        e.printStackTrace();
-                        callback.onSuccess(result);  // Continue with success even if link creation fails
+                        callback.onFailure(e);
                     }
                 });
             }
@@ -201,5 +207,51 @@ public class CreateEventHandler {
                 callback.onFailure(e);
             }
         });
+    }
+
+    /**
+     * Creates a safe URI for uploading by copying the content to a temporary file.
+     *
+     * @param originalUri The original URI of the image.
+     * @return A URI pointing to a temporary file suitable for upload, or null on failure.
+     */
+    private Uri getSafeUriForUpload(Uri originalUri) {
+        if (originalUri == null) return null;
+
+        try {
+            Context context = getContext();
+            if (context == null) {
+                Log.e("CreateEventHandler", "Context is null");
+                return null;
+            }
+
+            InputStream in = context.getContentResolver().openInputStream(originalUri);
+            if (in == null) {
+                Log.e("CreateEventHandler", "Cannot open input stream from URI: " + originalUri);
+                return null;
+            }
+
+            // Use cache directory
+            File cacheDir = context.getCacheDir();
+            File tempFile = new File(cacheDir, "event_upload_" + System.currentTimeMillis() + ".png");
+
+            OutputStream out = new FileOutputStream(tempFile);
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            out.flush();
+            out.close();
+
+            Log.d("CreateEventHandler", "Temp file created: " + tempFile.getAbsolutePath());
+            return Uri.fromFile(tempFile);
+
+        } catch (Exception e) {
+            Log.e("CreateEventHandler", "Error creating safe URI", e);
+            return null;
+        }
     }
 }
