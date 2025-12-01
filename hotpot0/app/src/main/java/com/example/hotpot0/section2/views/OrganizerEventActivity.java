@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -86,6 +87,8 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
     private int eventID;
     private Event currentEvent = new Event();
+    List<String> acceptedIDs = new ArrayList<>();
+    List<String> sampledIDs = new ArrayList<>();
     private EventUserLink currentEventUserLink;
 
     TextView previewGeolocation;
@@ -496,9 +499,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
         // Populate sampled entrants
 
-        List<String> acceptedIDs = new ArrayList<>();
-        List<String> sampledIDs = new ArrayList<>();
-
         int total = currentEvent.getSampledIDs().size();
         AtomicInteger completed = new AtomicInteger(0);
 
@@ -618,7 +618,17 @@ public class OrganizerEventActivity extends AppCompatActivity {
         });
 
         allSendCustomNotif.setOnClickListener(v -> {
-            showCustomMessageDialog("All", currentEvent.getLinkIDs(), currentEvent);
+            eventUserLinkDB.getWaitListUsers(currentEvent.getLinkIDs(), new EventUserLinkDB.GetCallback<List<String>>() {
+                @Override
+                public void onSuccess(List<String> waitListLinkIDs) {
+                    showCustomMessageDialog(waitListLinkIDs, currentEvent);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(OrganizerEventActivity.this, "Failed to load waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         setupBottomNavigation();
@@ -1103,10 +1113,88 @@ public class OrganizerEventActivity extends AppCompatActivity {
                         return; // do nothing else
                     }
 
+                    if (Objects.equals(status, "Organizer")) {
+                        return; // do nothing else
+                    }
+
                     eventHandler.sendCustomNotification(message, status, targetLinkIDs, event, new EventUserLinkDB.ActionCallback() {
                         @Override
                         public void onSuccess() {
                             Toast.makeText(OrganizerEventActivity.this, "Custom notification sent to " + status + " users.", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(OrganizerEventActivity.this, "Failed to send notification: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    /** Shows a custom message dialog for sending notifications to all users.
+     *
+     * @param targetLinkIDs The list of link IDs representing the target users.
+     * @param event         The event associated with the notification.
+     */
+    private void showCustomMessageDialog(List<String> targetLinkIDs, Event event) {
+        // Inflate custom layout
+        View dialogView = LayoutInflater.from(this)
+                .inflate(R.layout.custom_message_popout, null);
+
+        EditText messageEditText = dialogView.findViewById(R.id.customMessageEditText);
+
+        new androidx.appcompat.app.AlertDialog.Builder(this, R.style.CustomAlertDialog)
+                .setView(dialogView)
+                .setCancelable(true)
+                .setPositiveButton("Confirm", (dialog, which) -> {
+                    String message = messageEditText.getText().toString().trim();
+
+                    if (message.isEmpty()) {
+                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                        return; // do nothing else
+                    }
+
+                    eventHandler.sendCustomNotification(message, "inWaitList", targetLinkIDs, event, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(OrganizerEventActivity.this, "Custom notification sent to users in waitlist.", Toast.LENGTH_SHORT).show();
+                            eventHandler.sendCustomNotification(message, "Sampled", sampledIDs, event, new EventUserLinkDB.ActionCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    Toast.makeText(OrganizerEventActivity.this, "Custom notification sent to Sampled users.", Toast.LENGTH_SHORT).show();
+                                    eventHandler.sendCustomNotification(message, "Accepted", acceptedIDs, event, new EventUserLinkDB.ActionCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            Toast.makeText(OrganizerEventActivity.this, "Custom notification sent to Accepted users.", Toast.LENGTH_SHORT).show();
+                                            eventHandler.sendCustomNotification(message, "Cancelled", currentEvent.getCancelledIDs(), event, new EventUserLinkDB.ActionCallback() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    Toast.makeText(OrganizerEventActivity.this, "Custom notification sent to Cancelled users.", Toast.LENGTH_SHORT).show();
+                                                }
+
+                                                @Override
+                                                public void onFailure(Exception e) {
+                                                    Toast.makeText(OrganizerEventActivity.this, "Failed to send notification to Cancelled users: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Toast.makeText(OrganizerEventActivity.this, "Failed to send notification to Accepted users: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(OrganizerEventActivity.this, "Failed to send notification to Sampled users: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
 
                         @Override
