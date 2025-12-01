@@ -202,38 +202,43 @@ public class EventInitialActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Exception e) {
-                        joinLeaveButton.setText(getString(R.string.join_waitlist));
-                        if (latitude == null || longitude == null) {
-                            latitude = 0.0;
-                            longitude = 0.0;
-                            return;
-                        }
-                        joinLeaveButton.setOnClickListener(v -> {
-                            eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
-                                @Override
-                                public void onSuccess(Integer result) {
-                                    switch (result) {
-                                        case 0: // Successfully added to waitlist
-                                            Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
-                                            navigateHome();
-                                            break;
-                                        case 1:
-                                            Toast.makeText(EventInitialActivity.this, "You are already affiliated with this event.", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        case 2: // Waitlist full
-                                            Toast.makeText(EventInitialActivity.this, "Waitlist is full, cannot join!", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        default:
-                                            Toast.makeText(EventInitialActivity.this, "Unknown status: " + result, Toast.LENGTH_SHORT).show();
+                        if (event.getJoinable()) {
+                            joinLeaveButton.setText(getString(R.string.join_waitlist));
+                            if (latitude == null || longitude == null) {
+                                latitude = 0.0;
+                                longitude = 0.0;
+                                return;
+                            }
+                            joinLeaveButton.setOnClickListener(v -> {
+                                eventHandler.joinWaitList(userID, eventID, latitude, longitude, new ProfileDB.GetCallback<Integer>() {
+                                    @Override
+                                    public void onSuccess(Integer result) {
+                                        switch (result) {
+                                            case 0: // Successfully added to waitlist
+                                                Toast.makeText(EventInitialActivity.this, "Successfully joined the waitlist!", Toast.LENGTH_SHORT).show();
+                                                navigateHome();
+                                                break;
+                                            case 1:
+                                                Toast.makeText(EventInitialActivity.this, "You are already affiliated with this event.", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            case 2: // Waitlist full
+                                                Toast.makeText(EventInitialActivity.this, "Waitlist is full, cannot join!", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            default:
+                                                Toast.makeText(EventInitialActivity.this, "Unknown status: " + result, Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(Exception e) {
-                                    Toast.makeText(EventInitialActivity.this, "Error joining waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        Toast.makeText(EventInitialActivity.this, "Error joining waitlist: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             });
-                        });
+                        } else {
+                            joinLeaveButton.setText(getString(R.string.event_not_joinable));
+                            joinLeaveButton.setEnabled(false);
+                        }
                     }
                 });
             }
