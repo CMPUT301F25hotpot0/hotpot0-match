@@ -339,7 +339,7 @@ public class Event {
      * Calculates the number of participants currently on the waitlist.
      * @return the total number of waitlisted participants
      */
-    public int getTotalWaitlist() {
+    public Integer getTotalWaitlist() {
         return getTotalLinks() - getTotalCancelled() - 1;
     }
 

@@ -57,7 +57,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class OrganizerEventActivity extends AppCompatActivity {
 
     private int eventID;
-    private Event currentEvent;
+    private Event currentEvent = new Event();
     private EventUserLink currentEventUserLink;
 
     TextView previewGeolocation;
@@ -166,8 +166,10 @@ public class OrganizerEventActivity extends AppCompatActivity {
         String priceText = formatPrice(currentEvent.getPrice().toString());
         previewPrice.setText(priceText);
         // Handle capacity
-        String capacityText = formatCapacity(currentEvent.getCapacity().toString());
-        previewSpotsOpen.setText(capacityText);
+        String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                ? "All spots are filled!"
+                : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+        previewSpotsOpen.setText(spotsOpen);
         // Handle waiting list
         String waitingListText = formatWaitingList(currentEvent.getLinkIDs().toString());
         previewWaitingListCapacity.setText(waitingListText);
@@ -378,8 +380,12 @@ public class OrganizerEventActivity extends AppCompatActivity {
         previewTimeAndDay.setText(currentEvent.getTime());
         previewDateRange.setText(buildDateRange(currentEvent.getStartDate(), currentEvent.getEndDate()));
         previewDuration.setText(currentEvent.getDuration());
-        previewPrice.setText(currentEvent.getPrice().toString());
-        previewSpotsOpen.setText(currentEvent.getCapacity());
+        String priceText = formatPrice(currentEvent.getPrice().toString());
+        previewPrice.setText(priceText);
+        String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalWaitlist()) == 0
+                ? "All spots are filled!"
+                : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
+        previewSpotsOpen.setText(spotsOpen);
 
         // Populate sampled entrants
         populateEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
@@ -437,7 +443,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
                             }
                         });
                     }
-
 
                     Toast.makeText(OrganizerEventActivity.this,
                             "Filled spots successfully! Total: " + newlySampledUsers.size(),

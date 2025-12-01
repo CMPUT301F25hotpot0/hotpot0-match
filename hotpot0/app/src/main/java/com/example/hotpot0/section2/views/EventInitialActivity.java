@@ -36,7 +36,7 @@ import com.example.hotpot0.section2.controllers.EventActionHandler;
  * to join or leave the waitlist based on their current status.
  */
 public class EventInitialActivity extends AppCompatActivity {
-    private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft;
+    private TextView previewEventName, previewDescription, previewGuidelines, previewLocation, previewTimeAndDay, previewDateRange, previewDuration, previewPrice, previewSpotsOpen, previewDaysLeft, previewWaitingList;
     private ImageView eventImage;
     private Button joinLeaveButton, backButton;
     private TextView GeolocationStatus;
@@ -78,6 +78,7 @@ public class EventInitialActivity extends AppCompatActivity {
         previewDuration = findViewById(R.id.previewDuration);
         previewPrice = findViewById(R.id.previewPrice);
         previewSpotsOpen = findViewById(R.id.previewSpotsOpen);
+        previewWaitingList = findViewById(R.id.previewWaitingList);
         previewDaysLeft = findViewById(R.id.previewDaysLeft);
         GeolocationStatus = findViewById(R.id.GeolocationStatus);
         joinLeaveButton = findViewById(R.id.button_join_or_leave_waitlist);
@@ -98,12 +99,17 @@ public class EventInitialActivity extends AppCompatActivity {
                 previewEventName.setText(currentEvent.getName());
                 previewDescription.setText(currentEvent.getDescription());
                 previewGuidelines.setText(currentEvent.getGuidelines());
-                previewLocation.setText("Location: " + currentEvent.getLocation());
-                previewTimeAndDay.setText("Time: " + currentEvent.getTime());
-                // previewDateRange.setText("Date: " + currentEvent.getDate());
-                previewDuration.setText("Duration: " + currentEvent.getDuration());
-                previewPrice.setText("Price: $" + currentEvent.getPrice());
-                previewSpotsOpen.setText("Spots Open: " + currentEvent.getCapacity());
+                previewLocation.setText(currentEvent.getLocation());
+                previewTimeAndDay.setText(currentEvent.getTime());
+                previewDateRange.setText(buildDateRange(currentEvent.getStartDate(), currentEvent.getEndDate()));
+                previewDuration.setText(currentEvent.getDuration());
+                String priceText = formatPrice(currentEvent.getPrice().toString());
+                previewPrice.setText(priceText);
+                String spotsOpen = (currentEvent.getCapacity() - currentEvent.getTotalSampled()) == 0
+                        ? "All spots are filled!"
+                        : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalSampled());
+                previewSpotsOpen.setText(spotsOpen);
+                previewWaitingList.setText(currentEvent.getTotalWaitlist().toString());
                 // previewDaysLeft.setText("Registration Period: " + currentEvent.getRegistration_period());
 
                 // Handle geolocation status
@@ -250,5 +256,34 @@ public class EventInitialActivity extends AppCompatActivity {
                 }, Looper.getMainLooper());
             }
         });
+    }
+
+    private String buildDateRange(String startDate, String endDate) {
+        if (startDate != null && startDate.equals(endDate)) {
+            return startDate;
+        } else if (startDate != null && endDate != null && !endDate.isEmpty()) {
+            return startDate + " to " + endDate;
+        } else if (startDate != null) {
+            return startDate;
+        } else {
+            return "No dates specified";
+        }
+    }
+
+    private String formatPrice(String price) {
+        if (price == null || price.isEmpty()) {
+            return "Free";
+        }
+
+        try {
+            double priceValue = Double.parseDouble(price);
+            if (priceValue == 0) {
+                return "Free";
+            } else {
+                return String.format("$%.2f CAD", priceValue);
+            }
+        } catch (NumberFormatException e) {
+            return "Invalid price";
+        }
     }
 }

@@ -208,6 +208,17 @@
                 android:textSize="15sp"
                 android:layout_marginBottom="24dp" />
 
+            <Button
+                android:id="@+id/button_fillSpots"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fill_spots"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/text"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="24dp" />
+
             <!-- ===== SAMPLED ENTRANTS ===== -->
             <TextView
                 android:id="@+id/SampledEntrantsLabel"
