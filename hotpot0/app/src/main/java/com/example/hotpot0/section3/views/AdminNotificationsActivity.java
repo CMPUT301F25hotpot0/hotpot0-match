@@ -17,10 +17,6 @@ import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.Notification;
 import com.example.hotpot0.section2.controllers.EventActivityController;
-import com.example.hotpot0.section2.views.CreateEventActivity;
-import com.example.hotpot0.section2.views.HomeActivity;
-import com.example.hotpot0.section2.views.ProfileActivity;
-import com.example.hotpot0.section2.views.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.ParseException;
@@ -30,6 +26,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+/**
+ * Shows admin all notfications sent from organizers of events.
+ */
 public class AdminNotificationsActivity extends AppCompatActivity {
 
     private RecyclerView notificationsRecycler;
