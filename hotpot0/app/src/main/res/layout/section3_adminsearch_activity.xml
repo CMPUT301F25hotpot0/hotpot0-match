@@ -44,67 +44,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Info button + label -->
-            <LinearLayout
-                android:id="@+id/infoButtonLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/scanButtonLayout"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageButton
-                    android:id="@+id/infoButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Info"
-                    android:padding="6dp"
-                    android:src="@drawable/info_icon"
-                    app:tint="@color/text" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Info"
-                    android:textColor="@color/text"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Scan button + label -->
-            <LinearLayout
-                android:id="@+id/scanButtonLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageButton
-                    android:id="@+id/scanButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Scan QR"
-                    android:padding="6dp"
-                    android:src="@drawable/qr_code_scanner_icon"
-                    app:tint="@color/text" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Scan"
-                    android:textColor="@color/text"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Search Bar -->
@@ -129,46 +68,36 @@
                 android:textColorHint="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Filter Chips -->
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/filterChipGroup"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/filterButtons"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:selectionRequired="true"
-            app:singleSelection="true">
+            android:gravity="start"
+            android:layout_marginBottom="16dp">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/eventsChip"
+            <Button
+                android:id="@+id/eventsButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
                 android:text="Events"
-                app:checkedIconVisible="false"
-                app:chipBackgroundColor="@color/bar"
-                app:chipStrokeColor="@color/text"
-                app:chipStrokeWidth="1dp" />
+                android:backgroundTint="@color/bar"
+                android:textColor="@color/text"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="8dp"/>
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/profilesChip"
+            <Button
+                android:id="@+id/profilesButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Profiles"
-                app:checkedIconVisible="false"
-                app:chipBackgroundColor="@color/bar"
-                app:chipStrokeColor="@color/text"
-                app:chipStrokeWidth="1dp" />
+                android:backgroundTint="@color/bar"
+                android:textColor="@color/text"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
+        </LinearLayout>
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/organizersChip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Organizers"
-                app:checkedIconVisible="false"
-                app:chipBackgroundColor="@color/bar"
-                app:chipStrokeColor="@color/text"
-                app:chipStrokeWidth="1dp" />
-        </com.google.android.material.chip.ChipGroup>
 
         <!-- Results List -->
         <ListView
