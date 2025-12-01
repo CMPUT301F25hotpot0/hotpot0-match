@@ -476,7 +476,7 @@ public class EventActionHandler {
                 formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                 Date date = new Date();
                 String now = formatter.format(date);
-                Notification notif = new Notification(now, status, event.getName());
+                Notification notif = new Notification(now, status, event.getName(), event.getEventID());
 
                 eventUserLink.addNotification(notif);
 

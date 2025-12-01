@@ -30,6 +30,7 @@ public class Notification {
     private String text;
     private boolean customNotif;
     private boolean isResampledNotif;
+    private Integer eventID;
 
     /** Empty constructor */
     public Notification() {}
@@ -39,8 +40,10 @@ public class Notification {
      * @param dateTime
      * @param status
      * @param eventName
+     * @param eventID
      */
-    public Notification(String dateTime, Status status, String eventName) {
+    public Notification(String dateTime, Status status, String eventName, Integer eventID) {
+        this.eventID = eventID;
         this.eventName = eventName;
         this.dateTime = dateTime;
         this.status = status;
@@ -57,9 +60,11 @@ public class Notification {
      * @param status
      * @param text
      * @param eventName
+     * @param eventID
      * @param customNotif
      */
-    public Notification(String dateTime, Status status, String text, String eventName, boolean customNotif) {
+    public Notification(String dateTime, Status status, String text, String eventName, Integer eventID, boolean customNotif) {
+        this.eventID = eventID;
         this.eventName = eventName;
         this.dateTime = dateTime;
         this.status = status;
@@ -74,8 +79,10 @@ public class Notification {
      * @param status
      * @param isResampledNotif
      * @param eventName
+     * @param eventID
      */
-    public Notification(String dateTime, Status status, boolean isResampledNotif, String eventName) {
+    public Notification(String dateTime, Status status, boolean isResampledNotif, String eventName, Integer eventID) {
+        this.eventID = eventID;
         this.eventName = eventName;
         this.dateTime = dateTime;
         this.status = status;
@@ -104,6 +111,14 @@ public class Notification {
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public Integer getEventID() {
+        return eventID;
+    }
+
+    public void setEventID(Integer eventID) {
+        this.eventID = eventID;
     }
 
     public String getDateTime() {

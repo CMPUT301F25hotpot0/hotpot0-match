@@ -394,7 +394,7 @@ public class EventDB {
                         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                         Date date = new Date();
                         String now = formatter.format(date);
-                        Notification notif = new Notification(now, status, true, event.getName());
+                        Notification notif = new Notification(now, status, true, event.getName(), event.getEventID());
                         eventUserLinkDB.addSampledNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
                             @Override
                             public void onSuccess() {
@@ -416,7 +416,7 @@ public class EventDB {
                         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                         Date date = new Date();
                         String now = formatter.format(date);
-                        Notification notif = new Notification(now, status, event.getName());
+                        Notification notif = new Notification(now, status, event.getName(), event.getEventID());
                         eventUserLinkDB.addWaitlistNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
                             @Override
                             public void onSuccess() {
@@ -468,7 +468,7 @@ public class EventDB {
                     formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                     Date date = new Date();
                     String now = formatter.format(date);
-                    Notification notif = new Notification(now, status, true, event.getName());
+                    Notification notif = new Notification(now, status, true, event.getName(), event.getEventID());
                     eventUserLinkDB.addSampledNotification(linkID, notif, new EventUserLinkDB.ActionCallback() {
                         @Override
                         public void onSuccess() {

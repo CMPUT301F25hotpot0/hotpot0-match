@@ -448,7 +448,7 @@ public class Event {
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = new Date();
         String now = formatter.format(date);
-        Notification notif = new Notification(now, status, this.name);
+        Notification notif = new Notification(now, status, this.name, this.eventID);
         this.notifications.add(notif);
     }
 
@@ -462,7 +462,7 @@ public class Event {
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = new Date();
         String now = formatter.format(date);
-        Notification notif = new Notification(now, status, true, this.name);
+        Notification notif = new Notification(now, status, true, this.name, this.eventID);
         this.notifications.add(notif);
     }
 
@@ -476,7 +476,7 @@ public class Event {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         String now = formatter.format(date);
-        Notification notif = new Notification(now, status, text, this.name, true);
+        Notification notif = new Notification(now, status, text, this.name, this.eventID,true);
         this.notifications.add(notif);
     }
 
