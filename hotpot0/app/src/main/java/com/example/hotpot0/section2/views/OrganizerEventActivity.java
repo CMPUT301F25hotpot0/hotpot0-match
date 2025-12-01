@@ -1,20 +1,35 @@
 package com.example.hotpot0.section2.views;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -23,6 +38,7 @@ import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
+import com.example.hotpot0.models.PicturesDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
@@ -35,6 +51,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
 /**
@@ -66,6 +84,21 @@ public class OrganizerEventActivity extends AppCompatActivity {
     private ProfileDB profileDB = new ProfileDB();
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
     private EventActionHandler eventHandler = new EventActionHandler();
+
+    // Handling Image Uploads
+    private Uri selectedImageUri;
+    private final ActivityResultLauncher<Intent> imagePickerLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            selectedImageUri = result.getData().getData();
+                            if (selectedImageUri != null) {
+                                uploadImageToFirebase(selectedImageUri);
+                            }
+                        }
+                    }
+            );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +188,22 @@ public class OrganizerEventActivity extends AppCompatActivity {
         TextView mapTitle = findViewById(R.id.event_map_title);
         FrameLayout mapContainer = findViewById(R.id.map_container);
 
+        // Image Handling Buttons
+        Button uploadImageButton = findViewById(R.id.upload_image_button);
+        if (currentEvent.getImageURL() == null || currentEvent.getImageURL().isEmpty()) {
+            uploadImageButton.setVisibility(View.VISIBLE);
+        } else {
+            uploadImageButton.setVisibility(View.GONE);
+        }
+        Button deleteImageButton = findViewById(R.id.delete_image_button);
+        if (currentEvent.getImageURL() != null && !currentEvent.getImageURL().isEmpty()){
+            deleteImageButton.setVisibility(View.VISIBLE);
+        } else {
+            deleteImageButton.setVisibility(View.GONE);
+        }
+        uploadImageButton.setOnClickListener(v -> openImagePicker());
+        deleteImageButton.setOnClickListener(v -> deleteEventImage());
+
         // Populate Event Info
         previewEventName.setText(currentEvent.getName() != null ? currentEvent.getName() : "No name provided");
         previewDescription.setText(currentEvent.getDescription() != null ? currentEvent.getDescription() : "No description provided");
@@ -191,6 +240,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         } else {
             // Show the ImageView
             eventImage.setVisibility(View.VISIBLE);
+            eventImageCard.setVisibility(View.VISIBLE);
             // Load image using Glide
             Glide.with(this)
                     .load(imageURL)
@@ -622,7 +672,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
-
     private String buildDateRange(String startDate, String endDate) {
         if (startDate != null && startDate.equals(endDate)) {
             return startDate;
@@ -755,5 +804,172 @@ public class OrganizerEventActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    // Image Upload Helper
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        imagePickerLauncher.launch(intent);
+    }
+
+    private void uploadImageToFirebase(Uri imageUri) {
+
+        if (imageUri == null || imageUri.getPath() == null) {
+            Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+
+            PicturesDB picturesDB = new PicturesDB();
+
+            Uri localUri = getSafeUriForUpload(imageUri);
+
+            if (localUri != null) {
+
+                picturesDB.uploadEventImage(localUri, eventID, new PicturesDB.Callback<String>() {
+                    @Override
+                    public void onSuccess(String downloadURL) {
+                        new File(localUri.getPath()).delete();
+
+                        eventDB.updateEventImageURL(currentEvent, downloadURL, new EventDB.GetCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(OrganizerEventActivity.this,"Image Uploaded!", Toast.LENGTH_SHORT).show();
+                                refreshEventAndSetupLayout();
+                                // setupPreDrawLayout();
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(OrganizerEventActivity.this, "EventDB.updateEventImageURL failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(OrganizerEventActivity.this, "PicturesDB.uploadEventImage failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            } else {
+                Toast.makeText(OrganizerEventActivity.this, "Failed to prepare image for upload", Toast.LENGTH_LONG).show();
+            }
+
+        }
+    }
+
+    private void deleteEventImage() {
+
+        String imageURL = currentEvent.getImageURL();
+
+        if (imageURL == null || imageURL.isEmpty()) {
+            Toast.makeText(this, "No image to delete", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Modern progress indicator
+        AlertDialog progressDialog = new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .create();
+
+        ProgressBar progressBar = new ProgressBar(this);
+        progressDialog.setView(progressBar);
+
+        progressDialog.show();
+
+        StorageReference storageRef;
+        try {
+            storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageURL);
+        } catch (Exception e) {
+            progressDialog.dismiss();
+            Toast.makeText(this, "Invalid image URL", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        storageRef.delete()
+                .addOnSuccessListener(unused -> {
+
+                    // Update ONLY the imageURL field in Firestore
+                    eventDB.updateEventImageURL(currentEvent, null,
+                            new EventDB.GetCallback<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    progressDialog.dismiss();
+
+                                    Toast.makeText(OrganizerEventActivity.this,
+                                            "Image deleted", Toast.LENGTH_SHORT).show();
+
+                                    refreshEventAndSetupLayout();
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(OrganizerEventActivity.this,
+                                            "Failed to update event: " + e.getMessage(),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private Uri getSafeUriForUpload(Uri originalUri) {
+        if (originalUri == null) return null;
+
+        try {
+            Context context = OrganizerEventActivity.this;
+            if (context == null) return null;
+
+            File tempFile = new File(
+                    context.getCacheDir(),
+                    "event_upload_" + System.currentTimeMillis() + ".png"
+            );
+
+            try (InputStream in = context.getContentResolver().openInputStream(originalUri);
+                 OutputStream out = new FileOutputStream(tempFile)) {
+
+                if (in == null) return null;
+
+                byte[] buffer = new byte[1024];
+                int read;
+
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+            }
+
+            return Uri.fromFile(tempFile);
+
+        } catch (Exception e) {
+            Log.e("CreateEventHandler", "Error creating safe URI", e);
+            return null;
+        }
+    }
+
+    private void refreshEventAndSetupLayout() {
+        eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
+            @Override
+            public void onSuccess(Event updatedEvent) {
+                // Update currentEvent with fresh data
+                currentEvent = updatedEvent;
+                Log.d("CreateEventHandler", "Refreshed event: " + updatedEvent);
+
+                // Re-setup the current layout
+                setupPreDrawLayout();
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(OrganizerEventActivity.this,
+                        "Failed to refresh event: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
