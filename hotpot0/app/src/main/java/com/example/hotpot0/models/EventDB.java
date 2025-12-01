@@ -506,6 +506,12 @@ public class EventDB {
         });
     }
 
+    /** Updates the imageURL of an event in Firestore.
+     *
+     * @param event    the event to update
+     * @param imageURL the new image URL
+     * @param callback callback indicating completion status
+     */
     public void updateEventImageURL(Event event, String imageURL, GetCallback<Void> callback) {
         db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()))
@@ -514,7 +520,12 @@ public class EventDB {
                 .addOnFailureListener(callback::onFailure);
     }
 
-    // Firestore lookup by qrValue
+    /**
+     * Fetches an event by its QR code value.
+     *
+     * @param qrValue  the QR code value to search for
+     * @param callback callback returning the {@code Event} object or null if not found
+     */
     public void getEventByQrValue(String qrValue, GetCallback<Event> callback) {
 
         db.collection("Events")

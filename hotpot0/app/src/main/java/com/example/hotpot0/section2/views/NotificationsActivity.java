@@ -28,6 +28,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+/**
+ * Shows user all notifications sent from organizers of events.
+ */
 public class NotificationsActivity extends AppCompatActivity {
 
     private RecyclerView notificationsRecycler;
@@ -66,6 +69,8 @@ public class NotificationsActivity extends AppCompatActivity {
         setupBottomNavigation();
     }
 
+    /** Fetches notifications for the current user.
+     */
     private void fetchNotifications() {
         profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
             @Override
@@ -128,9 +133,7 @@ public class NotificationsActivity extends AppCompatActivity {
         });
     }
 
-    // -------------------------
-    // SORT USING SimpleDateFormat
-    // -------------------------
+    /** Sorts notifications by newest first based on their dateTime field. */
     private void sortNotificationsNewestFirst() {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -151,6 +154,8 @@ public class NotificationsActivity extends AppCompatActivity {
         }
     }
 
+    /** Adapter for displaying notifications in the RecyclerView.
+     */
     private class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
 
         private final List<Notification> notifications;

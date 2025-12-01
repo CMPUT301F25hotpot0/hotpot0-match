@@ -246,6 +246,13 @@ public class EventSampledActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Builds a date range string based on the provided start and end dates.
+     *
+     * @param startDate The start date of the event
+     * @param endDate   The end date of the event
+     * @return A formatted date range string
+     */
     private String buildDateRange(String startDate, String endDate) {
         if (startDate != null && startDate.equals(endDate)) {
             return startDate;
@@ -258,6 +265,12 @@ public class EventSampledActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Formats the price string for display.
+     *
+     * @param price The price string to format
+     * @return A formatted price string
+     */
     private String formatPrice(String price) {
         if (price == null || price.isEmpty()) {
             return "Free";

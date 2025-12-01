@@ -15,6 +15,9 @@ import com.example.hotpot0.models.UserProfile;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying user profiles in a list for admin users.
+ */
 public class AdminProfileAdapter extends ArrayAdapter<UserProfile> {
     private List<UserProfile> profileList;
     private Context context;
@@ -25,6 +28,14 @@ public class AdminProfileAdapter extends ArrayAdapter<UserProfile> {
         this.context = context;
     }
 
+    /**
+     * Provides a view for an AdapterView (ListView, GridView, etc.)
+     *
+     * @param position    The position of the item within the adapter's data set of the item whose view we want.
+     * @param convertView The old view to reuse, if possible.
+     * @param parent      The parent that this view will eventually be attached to.
+     * @return A View corresponding to the data at the specified position.
+     */
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {

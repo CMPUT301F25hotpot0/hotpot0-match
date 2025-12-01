@@ -19,6 +19,9 @@ import com.example.hotpot0.models.UserProfile;
 import com.example.hotpot0.section2.controllers.EventActionHandler;
 import com.google.android.material.button.MaterialButton;
 
+/**
+ * Activity for managing an event, including viewing details and removing the event.
+ */
 public class ManageEventActivity extends AppCompatActivity {
 
     private EventDB eventDB;
@@ -43,11 +46,17 @@ public class ManageEventActivity extends AppCompatActivity {
         loadEvent();
     }
 
+    /**
+     * Sets up the back button to finish the activity when clicked.
+     */
     private void setupBackButton() {
         ImageButton back = findViewById(R.id.backButton);
         back.setOnClickListener(v -> finish());
     }
 
+    /**
+     * Loads the event details and organizer profile from the database.
+     */
     private void loadEvent() {
         eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
             @Override
@@ -76,6 +85,12 @@ public class ManageEventActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Fills the UI elements with the event and organizer details.
+     *
+     * @param e                 The event to display.
+     * @param organizerProfile  The profile of the event organizer.
+     */
     private void fillUI(Event e, UserProfile organizerProfile) {
 
         ((TextView) findViewById(R.id.manageEventTitle)).setText(e.getName());
@@ -105,6 +120,9 @@ public class ManageEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets up the remove button to delete the event when clicked.
+     */
     private void setupRemoveButton() {
         MaterialButton removeBtn = findViewById(R.id.removeEventButton);
 

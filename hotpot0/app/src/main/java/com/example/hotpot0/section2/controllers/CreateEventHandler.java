@@ -151,6 +151,14 @@ public class CreateEventHandler {
         });
     }
 
+    /**
+     * Finalizes the event creation by linking the event to the organizer
+     * and updating both the event and organizer profile with the link ID.
+     *
+     * @param organizerID The ID of the organizer creating the event.
+     * @param event       The event that was created.
+     * @param callback    The callback to be invoked upon completion.
+     */
     private void finalizeEventCreation(int organizerID, Event event, EventDB.GetCallback<Event> callback) {
         int eventID = event.getEventID();
 
@@ -201,6 +209,12 @@ public class CreateEventHandler {
         });
     }
 
+    /**
+     * Creates a safe URI for uploading by copying the content to a temporary file.
+     *
+     * @param originalUri The original URI of the image.
+     * @return A URI pointing to a temporary file suitable for upload, or null on failure.
+     */
     private Uri getSafeUriForUpload(Uri originalUri) {
         if (originalUri == null) return null;
 

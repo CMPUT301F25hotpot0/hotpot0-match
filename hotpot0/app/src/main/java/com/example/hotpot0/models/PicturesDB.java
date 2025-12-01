@@ -24,7 +24,12 @@ public class PicturesDB {
         void onFailure(Exception e);
     }
 
-    // Upload a new event image
+    /** Upload event image
+     *
+     * @param imageUri URI of the image to upload
+     * @param eventID  ID of the event
+     * @param callback Callback to handle success or failure
+     */
     public void uploadEventImage(Uri imageUri, int eventID, Callback<String> callback) {
         if (imageUri == null) {
             callback.onFailure(new Exception("Image URI is null"));
@@ -74,6 +79,11 @@ public class PicturesDB {
         uploadEventImage(newImageUri, eventID, callback);
     }
 
+    /** Delete event image
+     *
+     * @param eventId  ID of the event
+     * @param callback Callback to handle success or failure
+     */
     public void deleteEventImage(int eventId, Callback<Void> callback) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -92,6 +102,10 @@ public class PicturesDB {
         }).addOnFailureListener(callback::onFailure);
     }
 
+    /** Get all event images
+     *
+     * @param callback Callback to handle success or failure
+     */
     public void getAllEventImages(Callback<List<String>> callback) {
         StorageReference eventsRef = storageRef.child("event_images/");
 

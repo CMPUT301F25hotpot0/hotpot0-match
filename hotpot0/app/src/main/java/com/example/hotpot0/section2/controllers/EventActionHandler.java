@@ -422,6 +422,7 @@ public class EventActionHandler {
             }
         });
     }
+
     /**
      * Allows an organizer to cancel their participation in an event.
      * <p>
@@ -507,6 +508,15 @@ public class EventActionHandler {
         });
     }
 
+    /**
+     * Sends a custom notification to a list of users associated with an event.
+     *
+     * @param message   the notification message
+     * @param status    the status associated with the notification
+     * @param linkIDs   the list of EventUserLink IDs representing the recipients
+     * @param event     the event object
+     * @param callback  callback invoked upon completion:
+     */
     public void sendCustomNotification(String message, String status, List<String> linkIDs, Event event, @NonNull EventUserLinkDB.ActionCallback callback) {
         for (String linkID : linkIDs) {
             eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
@@ -544,6 +554,14 @@ public class EventActionHandler {
         }
     }
 
+    /**
+     * Confirms a list of entrants for an event by updating their status to "Accepted"
+     * and adding a notification to their EventUserLink.
+     *
+     * @param linkIDs  the list of EventUserLink IDs representing the entrants
+     * @param event    the event object
+     * @param callback callback invoked upon completion:
+     */
     public void confirmEntrants(List<String> linkIDs, Event event, @NonNull EventUserLinkDB.ActionCallback callback) {
         for (String linkID : linkIDs) {
             eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
@@ -582,6 +600,17 @@ public class EventActionHandler {
         event.setJoinable(false);
     }
 
+    /**
+     * Exports a list of event entrants to a CSV format string.
+     *
+     * @param linkIDs   the list of EventUserLink IDs representing the entrants
+     * @param eventName the name of the event
+     * @param callback  callback invoked upon completion:
+     *                  <ul>
+     *                      <li>{@code onSuccess(csvData)} – successfully generated CSV data</li>
+     *                      <li>{@code onFailure(e)} – failure during export</li>
+     *                  </ul>
+     */
     public void exportEntrantsToCSV(List<String> linkIDs,
                                     String eventName,
                                     @NonNull ExportCallback callback) {
@@ -656,6 +685,16 @@ public class EventActionHandler {
             });
         }
     }
+
+    /**
+     * Checks if all operations are completed and invokes callback if yes.
+     *
+     * @param total      the total number of operations
+     * @param completed  the atomic integer tracking completed operations
+     * @param failed     the atomic boolean indicating if any operation failed
+     * @param csvRows    the list of CSV rows being constructed
+     * @param callback   the export callback to invoke upon completion
+     */
     private void checkCompletion(int total,
                                  AtomicInteger completed,
                                  AtomicBoolean failed,
@@ -667,12 +706,29 @@ public class EventActionHandler {
         }
     }
 
+    /**
+     * Escapes a string value for inclusion in a CSV file.
+     *
+     * @param value the string value to escape
+     * @return the escaped string
+     */
     private String csvEscape(String value) {
         if (value == null) return "";
         String escaped = value.replace("\"", "\"\"");
         return "\"" + escaped + "\"";
     }
 
+    /**
+     * Deletes all links associated with an event, including user links,
+     * profile references, and event images.
+     *
+     * @param eventID  the event's ID
+     * @param callback callback invoked upon completion:
+     *                 <ul>
+     *                     <li>{@code onSuccess()} – successfully deleted all links</li>
+     *                     <li>{@code onFailure(e)} – failure during deletion</li>
+     *                 </ul>
+     */
     public void deleteEventLinks(Integer eventID, EventDB.ActionCallback callback) {
         eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
             @Override

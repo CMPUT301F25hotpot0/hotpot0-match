@@ -17,7 +17,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-
+/**
+ * Activity for previewing event details before confirming creation.
+ */
 public class PreviewActivity extends AppCompatActivity {
 
     private CreateEventHandler eventHandler;
@@ -66,6 +68,9 @@ public class PreviewActivity extends AppCompatActivity {
                 registrationStart, registrationEnd, geolocationEnabled, imageUriString);
     }
 
+    /**
+     * Initializes the UI elements by binding them to their respective views.
+     */
     private void initializeViews() {
 
         eventImage = findViewById(R.id.eventImage);
@@ -85,6 +90,9 @@ public class PreviewActivity extends AppCompatActivity {
         backButton = findViewById(R.id.button_BottomBackPreviewEvent);
     }
 
+    /**
+     * Populates the preview fields with the provided event details.
+     */
     private void populatePreviewFields(String name, String description, String guidelines, String location, String time, String startDate,
                                        String endDate, String duration, String price, String capacity, String waitingList, String registrationStart, String registrationEnd,
                                        boolean geolocationEnabled, String imageUriString) {
@@ -125,6 +133,9 @@ public class PreviewActivity extends AppCompatActivity {
         loadEventImage(imageUriString);
     }
 
+    /**
+     * Sets up the button listeners for confirm and back actions.
+     */
     private void setupButtonListeners(int userID, String name, String description, String guidelines, String location, String time,
                                       String startDate, String endDate, String duration, String price, String capacity, String waitingList,
                                       String registrationStart, String registrationEnd, boolean geolocationEnabled, String imageUriString) {
@@ -147,6 +158,9 @@ public class PreviewActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates the event after validating the input data.
+     */
     private void createEventWithValidation(int userID, String name, String description, String guidelines, String location, String time,
                                            String startDate, String endDate, String duration, String price, String capacity, String waitingList,
                                            String registrationStart, String registrationEnd, boolean geolocationEnabled, String imageUriString) {
@@ -244,8 +258,11 @@ public class PreviewActivity extends AppCompatActivity {
         );
     }
 
-    // Helper Methods
-
+    /**
+     * Validates the required event data fields.
+     *
+     * @return true if all required fields are valid, false otherwise.
+     */
     private boolean validateEventData(String name, String description, String guidelines, String location, String time, String startDate,
                                       String duration, String price, String capacity, String registrationStart) {
 
@@ -302,11 +319,17 @@ public class PreviewActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Resets the confirm button state to its default.
+     */
     private void resetButtonState() {
         confirmButton.setEnabled(true);
         confirmButton.setText("Confirm");
     }
 
+    /**
+     * Builds a date range string based on start and end dates.
+     */
     private String buildDateRange(String startDate, String endDate) {
         if (startDate != null && startDate.equals(endDate)) {
             return startDate;
@@ -319,6 +342,9 @@ public class PreviewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Formats the price string for display.
+     */
     private String formatPrice(String price) {
         if (price == null || price.isEmpty()) {
             return "Free";
@@ -336,6 +362,9 @@ public class PreviewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Formats the capacity string for display.
+     */
     private String formatCapacity(String capacity) {
         if (capacity == null || capacity.isEmpty()) {
             return "Capacity not specified";
@@ -352,6 +381,9 @@ public class PreviewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Formats the waiting list capacity string for display.
+     */
     private String formatWaitingList(String waitingList) {
         if (waitingList == null || waitingList.isEmpty() || waitingList.equals("0")) {
             return "No Cap on waiting list";
@@ -368,6 +400,9 @@ public class PreviewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Builds a registration period string based on start and end dates.
+     */
     private String buildRegistrationPeriod(String registrationStart, String registrationEnd) {
         if (registrationStart != null && registrationStart.equals(registrationEnd)) {
             return registrationStart;
@@ -380,6 +415,9 @@ public class PreviewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Updates the geolocation status display.
+     */
     private void updateGeolocationStatus(boolean geolocationEnabled) {
         if (geolocationEnabled) {
             previewGeolocation.setText("NOTE: Geolocation tracking enabled");
@@ -389,6 +427,9 @@ public class PreviewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Loads the event image from the provided URI string.
+     */
     private void loadEventImage(String imageUriString) {
         if (imageUriString != null && !imageUriString.isEmpty()) {
             try {
@@ -404,6 +445,12 @@ public class PreviewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creates a safe URI for uploading by copying the content to a temporary file.
+     *
+     * @param originalUri The original URI of the image.
+     * @return A URI pointing to a temporary file suitable for upload.
+     */
     private Uri getSafeUriForUpload(Uri originalUri) {
         if (originalUri == null) return null;
 

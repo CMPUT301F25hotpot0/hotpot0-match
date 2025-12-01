@@ -15,6 +15,9 @@ import com.example.hotpot0.models.Event;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying events in a list for admin users.
+ */
 public class AdminEventAdapter extends ArrayAdapter<Event> {
 
     private final List<Event> eventList;
@@ -26,6 +29,14 @@ public class AdminEventAdapter extends ArrayAdapter<Event> {
         this.context = context;
     }
 
+    /**
+     * Provides a view for an AdapterView (ListView, GridView, etc.)
+     *
+     * @param position    The position of the item within the adapter's data set of the item whose view we want.
+     * @param convertView The old view to reuse, if possible.
+     * @param parent      The parent that this view will eventually be attached to.
+     * @return A View corresponding to the data at the specified position.
+     */
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {

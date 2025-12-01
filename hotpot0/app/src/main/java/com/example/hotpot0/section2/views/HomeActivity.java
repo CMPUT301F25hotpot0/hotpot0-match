@@ -148,7 +148,9 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    // Trying to ensure data is refreshed when returning to HomeActivity & Navigation Bar is updated
+    /**Refreshes the event data by clearing existing adapters
+     * and reloading the user events.
+     */
     private void refreshData() {
         // Clear existing lists and reload fresh data
         if (confirmedList != null) confirmedList.setAdapter(null);
@@ -215,7 +217,8 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
     }
-    // Expand ListView to show all items
+
+    /** Expands a ListView to fit all its items */
     private void expandListView(ListView listView) {
         android.widget.ListAdapter adapter = listView.getAdapter();
         if (adapter == null) return;
@@ -235,7 +238,6 @@ public class HomeActivity extends AppCompatActivity {
         listView.setLayoutParams(params);
         listView.requestLayout();
     }
-    // Animation
     private void fadeIn(View view) {
         view.setAlpha(0f);
         view.animate().alpha(1f).setDuration(300).start();

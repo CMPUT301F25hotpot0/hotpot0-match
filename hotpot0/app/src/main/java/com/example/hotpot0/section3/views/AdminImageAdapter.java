@@ -58,6 +58,12 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds data to the ViewHolder at the specified position.
+     *
+     * @param holder   The ViewHolder to bind data to.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String url = urls.get(position);
@@ -81,11 +87,17 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
 
     }
 
+    /**
+     * Returns the total number of items in the data set held by the adapter.
+     */
     @Override
     public int getItemCount() {
         return urls.size();
     }
 
+    /**
+     * ViewHolder for image items.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView filename;

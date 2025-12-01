@@ -27,9 +27,7 @@ public class AdminLoginVerifier {
      * Because checking the database can take time, we don't get an answer immediately.
      * So, instead, the result is sent back later through these two methods:
      */
-    // Any class or object that wants to listen to the login result must have these two methods implemented.
-    // If you want me (AdminLoginVerifier) to tell you when login finishes,
-    // then give me an object that knows what to do for success and failure.
+
     public interface AuthCallback {
         void onSuccess(AdminProfile admin); // called when login is successful
         void onFailure(Exception e);        // called when login fails (error or invalid)
@@ -42,7 +40,7 @@ public class AdminLoginVerifier {
      */
     public void verifyCredentials(final String username, final String password, final AuthCallback callback) {
 
-        // STEP 1: Basic input validation
+        // Basic input validation
 
         // Check if username is empty or null
         if (username == null || username.trim().isEmpty()) {
@@ -77,7 +75,7 @@ public class AdminLoginVerifier {
             return;
         }
 
-        // STEP 2: If validation passes, authenticate with ProfileDB
+        // Authenticate with ProfileDB
 
         // Call the ProfileDB method that checks if the username and password exist and match
         profileDB.authenticateAdmin(username, password, new ProfileDB.GetCallback<AdminProfile>() {

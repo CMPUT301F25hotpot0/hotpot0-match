@@ -643,7 +643,9 @@ public class CreateEventActivity extends AppCompatActivity {
         return cal.getTimeInMillis();
     }
 
-    // Enable/disable preview button based on required fields
+    /**
+     * Sets up text watchers on required fields to enable/disable the preview button.
+     */
     private void setupFieldWatchers() {
         TextWatcher watcher = new TextWatcher() {
             @Override
@@ -671,6 +673,10 @@ public class CreateEventActivity extends AppCompatActivity {
         inputRegistrationStartDate.addTextChangedListener(watcher);
         inputRegistrationEndDate.addTextChangedListener(watcher);
     }
+
+    /**
+     * Checks if all required fields are filled and enables/disables the preview button accordingly.
+     */
     private void checkRequiredFields() {
         boolean allFilled = !TextUtils.isEmpty(name.getText().toString().trim())
                 && !TextUtils.isEmpty(description.getText().toString().trim())
@@ -687,7 +693,14 @@ public class CreateEventActivity extends AppCompatActivity {
         previewButton.setEnabled(allFilled);
     }
 
-    // Utility method to scale bitmap to make sure app can handle large images
+    /**
+     * Scales a bitmap to fit within the specified max width and height while maintaining aspect ratio.
+     *
+     * @param original The original bitmap to scale.
+     * @param maxWidth The maximum width.
+     * @param maxHeight The maximum height.
+     * @return The scaled bitmap.
+     */
     private Bitmap scaleBitmap(Bitmap original, int maxWidth, int maxHeight) {
         try {
             int originalWidth = original.getWidth();

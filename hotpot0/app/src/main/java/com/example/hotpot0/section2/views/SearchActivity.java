@@ -419,6 +419,12 @@ public class SearchActivity extends AppCompatActivity {
         datePicker.show();
     }
 
+    /**
+     * Filters a list of events based on the selected date range.
+     *
+     * @param events the list of events to filter
+     * @return the filtered list of events
+     */
     private List<Event> filterByDateRange(List<Event> events) {
         List<Event> result = new ArrayList<>();
 
@@ -445,6 +451,10 @@ public class SearchActivity extends AppCompatActivity {
         return result;
     }
 
+    /**
+     * Applies all active filters (search query, registration status, date range)
+     * to the list of events and updates the ListView with the filtered results.
+     */
     private void applyCombinedFilters() {
         String query = searchEditText.getText().toString().toLowerCase();
 
@@ -488,6 +498,11 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
+    /** Parses a date string into a Date object.
+     *
+     * @param dateString the date string to parse
+     * @return the parsed Date object, or null if parsing fails
+     */
     private Date parseEventDate(String dateString) {
         if (dateString == null || dateString.trim().isEmpty()) return null;
 
@@ -498,8 +513,10 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-    // Registration Status Filter
-
+    /** Registration Status Filter
+     *
+     * @param dateString
+     */
     private Date parseRegDate(String dateString) {
         if (dateString == null || dateString.trim().isEmpty()) return null;
         try {
@@ -509,6 +526,12 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if an event matches the selected registration status filter.
+     *
+     * @param event the event to check
+     * @return true if the event matches the filter, false otherwise
+     */
     private boolean matchesRegStatus(Event event) {
         if (!Boolean.TRUE.equals(event.getIsEventActive())) return false; // Only active events
 

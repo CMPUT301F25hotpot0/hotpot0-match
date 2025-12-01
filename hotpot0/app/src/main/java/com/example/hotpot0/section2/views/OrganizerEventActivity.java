@@ -190,6 +190,10 @@ public class OrganizerEventActivity extends AppCompatActivity {
     }
 
     // ------------------ PRE-DRAW LAYOUT ------------------
+    /**
+     * Sets up the pre-draw layout for organizers.
+     * Displays event details and allows generating a random sample of participants.
+     */
     private void setupPreDrawLayout() {
 
         // View bindings
@@ -658,7 +662,12 @@ public class OrganizerEventActivity extends AppCompatActivity {
     }
 
     // HELPER METHODS
-
+    /**
+     * Populates the given container with entrant profile blobs based on the provided link IDs.
+     *
+     * @param container the LinearLayout container to populate
+     * @param linkIDs   the list of link IDs representing entrants
+     */
     private void populateEntrants(LinearLayout container, List<String> linkIDs) {
         container.removeAllViews();
         if (linkIDs == null || linkIDs.isEmpty()) {
@@ -693,6 +702,13 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Populates the given container with sampled entrant profile blobs based on the provided link IDs.
+     * Each blob includes a cancel button to remove the entrant from the event.
+     *
+     * @param container the LinearLayout container to populate
+     * @param linkIDs   the list of link IDs representing sampled entrants
+     */
     private void populateSampledEntrants(LinearLayout container, List<String> linkIDs) {
         container.removeAllViews();
         if (linkIDs == null || linkIDs.isEmpty()) {
@@ -746,6 +762,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Helper method for formatting and building strings */
     private String buildDateRange(String startDate, String endDate) {
         if (startDate != null && startDate.equals(endDate)) {
             return startDate;
@@ -758,6 +775,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Helper method for formatting price */
     private String formatPrice(String price) {
         if (price == null || price.isEmpty()) {
             return "Free";
@@ -775,6 +793,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Helper method for formatting capacity */
     private String formatCapacity(String capacity) {
         if (capacity == null || capacity.isEmpty()) {
             return "Capacity not specified";
@@ -788,6 +807,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Helper method for formatting waiting list capacity */
     private String formatWaitingList(String waitingList) {
         if (waitingList == null || waitingList.isEmpty() || waitingList.equals("0")) {
             return "No Cap on waiting list";
@@ -800,6 +820,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Helper method for building registration period string */
     private String buildRegistrationPeriod(String registrationStart, String registrationEnd) {
         if (registrationStart != null && registrationStart.equals(registrationEnd)) {
             return registrationStart;
@@ -812,6 +833,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Helper method for updating geolocation status */
     private void updateGeolocationStatus(boolean geolocationEnabled) {
         if (geolocationEnabled) {
             previewGeolocation.setText("NOTE: Geolocation tracking enabled");
@@ -821,6 +843,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Map Helper Methods */
     private void plotEntrantsOnMap(GoogleMap googleMap, List<String> linkIDs, FrameLayout mapContainer) {
 
         if (linkIDs == null || linkIDs.isEmpty()) {
@@ -879,13 +902,16 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
-    // Image Upload Helper
-
+    /** Image Upload Helper */
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         imagePickerLauncher.launch(intent);
     }
 
+    /** Uploads the selected image to Firebase Storage and updates the event's imageURL in Firestore.
+     *
+     * @param imageUri The URI of the selected image.
+     */
     private void uploadImageToFirebase(Uri imageUri) {
 
         if (imageUri == null || imageUri.getPath() == null) {
@@ -932,6 +958,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Deletes the current event image from Firebase Storage and updates the event's imageURL in Firestore to null. */
     private void deleteEventImage() {
 
         String imageURL = currentEvent.getImageURL();
@@ -991,6 +1018,11 @@ public class OrganizerEventActivity extends AppCompatActivity {
                 });
     }
 
+    /** Creates a temporary local copy of the image for safe upload.
+     *
+     * @param originalUri The original URI of the selected image.
+     * @return A URI pointing to the temporary local copy, or null if an error occurs.
+     */
     private Uri getSafeUriForUpload(Uri originalUri) {
         if (originalUri == null) return null;
 
@@ -1024,6 +1056,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Refreshes the current event data and re-sets up the layout. */
     private void refreshEventAndSetupLayout() {
         eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
             @Override
@@ -1046,6 +1079,12 @@ public class OrganizerEventActivity extends AppCompatActivity {
         });
     }
 
+    /** Shows a custom message dialog for sending notifications to users with a specific status.
+     *
+     * @param status        The status of users to send the notification to (e.g., "Sampled", "Accepted").
+     * @param targetLinkIDs The list of link IDs representing the target users.
+     * @param event         The event associated with the notification.
+     */
     private void showCustomMessageDialog(String status, List<String> targetLinkIDs, Event event) {
         // Inflate custom layout
         View dialogView = LayoutInflater.from(this)
@@ -1082,6 +1121,11 @@ public class OrganizerEventActivity extends AppCompatActivity {
                 .show();
     }
 
+    /** Updates the post-draw UI with the accepted and sampled entrant IDs.
+     *
+     * @param acceptedIDs List of accepted entrant link IDs.
+     * @param sampledIDs  List of sampled entrant link IDs.
+     */
     private void updatePostDrawUI(List<String> acceptedIDs, List<String> sampledIDs) {
         Log.d("OrganizerEventActivity", "Final accepted IDs: " + acceptedIDs);
 
@@ -1090,6 +1134,11 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
     }
 
+    /** Opens a dialog to confirm the final list of accepted entrants and displays the final list with export option.
+     *
+     * @param acceptedIDs List of accepted entrant link IDs.
+     * @param event       The event associated with the entrants.
+     */
     private void openFinalListDialog(List<String> acceptedIDs, Event event) {
         // Inflate your custom layout
         View dialogView = LayoutInflater.from(this)
@@ -1200,6 +1249,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /** RecyclerView Adapter for displaying final participant profiles. */
     private static class FinalParticipantAdapter extends RecyclerView.Adapter<FinalParticipantAdapter.ViewHolder> {
         private List<UserProfile> profiles;
         private final Context context;

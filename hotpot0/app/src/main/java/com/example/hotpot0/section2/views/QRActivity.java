@@ -11,6 +11,9 @@ import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.section2.controllers.EventActivityController;
 import com.journeyapps.barcodescanner.CompoundBarcodeView;
 
+/**
+ * Activity for scanning QR codes to find events.
+ */
 public class QRActivity extends AppCompatActivity {
 
     private CompoundBarcodeView barcodeView;
@@ -35,8 +38,6 @@ public class QRActivity extends AppCompatActivity {
             }
         });
     }
-
-    // Your handleQrValue() method here
 
     @Override
     protected void onResume() {
@@ -87,6 +88,11 @@ public class QRActivity extends AppCompatActivity {
 //            }
 //        });
 //    }
+    /**
+     * Handles the scanned QR code value.
+     *
+     * @param qrValue The scanned QR code value.
+     */
     private void handleQrValue(String qrValue) {
 
         // Validate QR code format: event:<number>

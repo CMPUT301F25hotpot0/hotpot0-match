@@ -14,6 +14,9 @@ import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
 import com.example.hotpot0.section2.controllers.ProfileEditHandler;
 
+/**
+ * Activity for admin to view and manage a user profile.
+ */
 public class AdminProfileActivity extends AppCompatActivity {
 
     private TextView profileName, profileEmail, profilePhone, profileUserID;
@@ -64,6 +67,9 @@ public class AdminProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Loads the user profile from the database.
+     */
     private void loadProfile() {
         profileDB.getUserByID(profileID, new ProfileDB.GetCallback<UserProfile>() {
             @Override
@@ -80,6 +86,9 @@ public class AdminProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Updates the UI with the loaded profile details.
+     */
     private void updateUI() {
         if (currentProfile != null) {
             profileName.setText(currentProfile.getName());
@@ -89,6 +98,9 @@ public class AdminProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Removes the user profile from the database.
+     */
     private void removeProfile() {
         profileHandler.deleteUserProfile(currentProfile.getUserID(), new ProfileDB.ActionCallback() {
             @Override

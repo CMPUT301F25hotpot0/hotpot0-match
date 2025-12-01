@@ -92,7 +92,9 @@ public class AdminNotificationsActivity extends AppCompatActivity {
         });
     }
 
-    // Sorting using SimpleDateFormat (API 24 compatible)
+    /**
+     * Sorts notifications by date, newest first.
+     */
     private void sortNotificationsNewestFirst() {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -121,6 +123,9 @@ public class AdminNotificationsActivity extends AppCompatActivity {
             this.notifications = notifications;
         }
 
+        /**
+         * Inflates the notification item layout.
+         */
         @NonNull
         @Override
         public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -128,6 +133,9 @@ public class AdminNotificationsActivity extends AppCompatActivity {
             return new NotificationViewHolder(view);
         }
 
+        /**
+         * Binds notification data to the view holder.
+         */
         @Override
         public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
             Notification notif = notifications.get(position);
@@ -159,6 +167,9 @@ public class AdminNotificationsActivity extends AppCompatActivity {
             return notifications.size();
         }
 
+        /**
+         * ViewHolder for notification items.
+         */
         class NotificationViewHolder extends RecyclerView.ViewHolder {
             TextView title, time, preview, fullText;
             View expandedLayout;

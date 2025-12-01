@@ -159,18 +159,22 @@ public class Event {
         this.time = time;
     }
 
+    /** @return the start date of the event */
     public String getStartDate() {
         return startDate;
     }
 
+    /** @param startDate the start date of the event */
     public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
+    /** @return the end date of the event */
     public String getEndDate() {
         return endDate;
     }
 
+    /** @param endDate the end date of the event */
     public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
@@ -185,18 +189,22 @@ public class Event {
         this.duration = duration;
     }
 
+    /** @return the start time for event registration */
     public String getRegistrationStart() {
         return registrationStart;
     }
 
+    /** @param registrationStart the start time for event registration */
     public void setRegistrationStart(String registrationStart) {
         this.registrationStart = registrationStart;
     }
 
+    /** @return the end time for event registration */
     public String getRegistrationEnd() {
         return registrationEnd;
     }
 
+    /** @param registrationEnd the end time for event registration */
     public void setRegistrationEnd(String registrationEnd) {
         this.registrationEnd = registrationEnd;
     }
@@ -291,26 +299,32 @@ public class Event {
         this.cancelledIDs = cancelledIDs;
     }
 
+    /** @return the waiting list capacity */
     public Integer getWaitingListCapacity() {
         return waitingListCapacity;
     }
 
+    /** @param waitingListCapacity the maximum size of the waiting list */
     public void setWaitingListCapacity(Integer waitingListCapacity) {
         this.waitingListCapacity = waitingListCapacity;
     }
 
+    /** @return the QR code value associated with the event */
     public String getQrValue() {
         return qrValue;
     }
 
+    /** @param qrValue the QR code value associated with the event */
     public void setQrValue(String qrValue) {
         this.qrValue = qrValue;
     }
 
+    /** @return list of notifications related to the event */
     public ArrayList<Notification> getNotifications() {
         return notifications;
     }
 
+    /** @param notifications list of notifications related to the event */
     public void setNotifications(ArrayList<Notification> notifications) {
         this.notifications = notifications;
     }

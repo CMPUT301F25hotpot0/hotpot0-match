@@ -262,6 +262,10 @@ public class EventInitialActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Fetches the current location of the device.
+     * Requests location permission if not already granted.
+     */
     private void fetchCurrentLocation() {
         // Check for location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -299,6 +303,13 @@ public class EventInitialActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Builds a date range string based on start and end dates.
+     *
+     * @param startDate The start date of the event.
+     * @param endDate   The end date of the event.
+     * @return A formatted date range string.
+     */
     private String buildDateRange(String startDate, String endDate) {
         if (startDate != null && startDate.equals(endDate)) {
             return startDate;
@@ -311,6 +322,12 @@ public class EventInitialActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Formats the price string for display.
+     *
+     * @param price The price as a string.
+     * @return Formatted price string.
+     */
     private String formatPrice(String price) {
         if (price == null || price.isEmpty()) {
             return "Free";

@@ -49,7 +49,6 @@ public class ProfileDB {
     }
 
     // UTILITY METHODS
-    // ===============
 
     /**
      * Utility method to convert an ArrayList<String> of linkIDs in UserProfile

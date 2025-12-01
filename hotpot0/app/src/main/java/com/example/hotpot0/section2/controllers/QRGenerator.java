@@ -8,6 +8,9 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+/**
+ * Generates QR codes for given data.
+ */
 public class QRGenerator {
 
     public QRGenerator() {}
@@ -17,7 +20,12 @@ public class QRGenerator {
         void onFailure(Exception e);
     }
 
-    // Generate QR bitmap
+    /**
+     * Generates a QR code bitmap for the provided data string.
+     *
+     * @param data The string data to encode in the QR code.
+     * @return A Bitmap representing the QR code, or null if generation fails.
+     */
     public Bitmap generateQR(String data) {
         try {
             QRCodeWriter writer = new QRCodeWriter();

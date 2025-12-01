@@ -23,6 +23,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for admin to search and manage events and user profiles.
+ */
 public class AdminSearchActivity extends AppCompatActivity {
 
     private EventDB eventDB;
@@ -103,6 +106,9 @@ public class AdminSearchActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Loads all events from the database and initializes the event adapter.
+     */
     private void loadEvents() {
         eventDB.getAllEvents(new EventDB.GetCallback<List<Event>>() {
             @Override
@@ -121,6 +127,9 @@ public class AdminSearchActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Loads all user profiles from the database and initializes the profile adapter.
+     */
     private void loadProfiles() {
         ProfileDB profileDB = new ProfileDB();
 
@@ -140,6 +149,9 @@ public class AdminSearchActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sets up the search bar to filter events or profiles based on user input.
+     */
     private void setupSearchFilter() {
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -176,6 +188,9 @@ public class AdminSearchActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sets up item click listener for the list view to navigate to event or profile management.
+     */
     private void setupItemClick() {
         listView.setOnItemClickListener((parent, view, position, id) -> {
 

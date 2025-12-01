@@ -56,6 +56,9 @@ public class ManageImageActivity extends AppCompatActivity {
         removeButton.setOnClickListener(v -> deleteImage());
     }
 
+    /**
+     * Deletes the image from the database and notifies the admin.
+     */
     private void deleteImage() {
         if (imageUrl == null) {
             return;
@@ -87,6 +90,12 @@ public class ManageImageActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Extracts the event ID from the image URL.
+     *
+     * @param url The image URL.
+     * @return The extracted event ID, or -1 if not found.
+     */
     private int extractEventId(String url) {
         try {
             String filename = android.net.Uri.parse(url).getLastPathSegment();
