@@ -55,7 +55,7 @@ public class AdminImageActivity extends AppCompatActivity {
                     intent.putExtra("image_url", url);
                     int eventId = extractEventId(url);
                     intent.putExtra("event_name", eventNames.getOrDefault(eventId, "Unknown Event"));
-                    startActivityForResult(intent, 100);
+                    startActivity(intent);
                 },
                 eventNames,
                 this::extractEventId
@@ -78,7 +78,6 @@ public class AdminImageActivity extends AppCompatActivity {
                 filteredImageUrls.clear();
                 filteredImageUrls.addAll(allImageUrls);
 
-                // Collect unique event IDs
                 List<Integer> eventIds = new ArrayList<>();
                 for (String url : allImageUrls) {
                     int eventId = extractEventId(url);
@@ -92,7 +91,7 @@ public class AdminImageActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Fetch all event names in one go
+                // Fetch all event names
                 final int[] loadedCount = {0};
                 for (int eventId : eventIds) {
                     eventDB.getEventByID(eventId, new EventDB.GetCallback<Event>() {
@@ -107,8 +106,6 @@ public class AdminImageActivity extends AppCompatActivity {
                             loadedCount[0]++;
                             if (loadedCount[0] == eventIds.size()) runOnUiThread(() -> adapter.notifyDataSetChanged());
                         }
-
-
 
                         @Override
                         public void onFailure(Exception e) {
@@ -163,18 +160,24 @@ public class AdminImageActivity extends AppCompatActivity {
 
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.admin_images) return true;
-
-            Intent intent = null;
-            if (id == R.id.admin_search) intent = new Intent(this, AdminSearchActivity.class);
-            else if (id == R.id.admin_home) intent = new Intent(this, AdminHomeActivity.class);
-            else if (id == R.id.admin_settings) intent = new Intent(this, AdminSettingsActivity.class);
-
-            if (intent != null) {
-                startActivity(intent);
-                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+            if (id == R.id.admin_images) {
+                // Already on image
+                return true;
+            } else if (id == R.id.admin_search) {
+                Intent searchIntent = new Intent(AdminImageActivity.this, AdminSearchActivity.class);
+                startActivity(searchIntent);
+                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+                return true;
+            } else if (id == R.id.admin_home) {
+                startActivity(new Intent(AdminImageActivity.this, AdminHomeActivity.class));
+                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+                return true;
+            } else if (id == R.id.admin_settings) {
+                startActivity(new Intent(AdminImageActivity.this, AdminSettingsActivity.class));
+                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+                return true;
             }
-            return true;
+            return false;
         });
     }
 
@@ -193,6 +196,7 @@ public class AdminImageActivity extends AppCompatActivity {
         return -1;
     }
 
+    /** After delete pressed */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

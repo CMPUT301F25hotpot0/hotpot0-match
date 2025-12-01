@@ -36,7 +36,7 @@ public class ManageImageActivity extends AppCompatActivity {
 
         // Get image URL passed from AdminImageActivity
         imageUrl = getIntent().getStringExtra("image_url");
-        String eventName = getIntent().getStringExtra("name");
+        String eventName = getIntent().getStringExtra("event_name");
         if (imageUrl != null) {
             Glide.with(this).load(imageUrl).into(selectedImageView);
 
@@ -49,10 +49,7 @@ public class ManageImageActivity extends AppCompatActivity {
             }
         }
 
-        // Back button
         backButton.setOnClickListener(v -> finish());
-
-        // Remove image button
         removeButton.setOnClickListener(v -> deleteImage());
     }
 
@@ -71,7 +68,6 @@ public class ManageImageActivity extends AppCompatActivity {
             public void onSuccess(Void result) {
                 Toast.makeText(ManageImageActivity.this, "Image deleted", Toast.LENGTH_SHORT).show();
 
-                // send result back
                 Intent intent = new Intent();
                 intent.putExtra("deleted_image_url", imageUrl);
                 setResult(RESULT_OK, intent);

@@ -64,7 +64,6 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
         int eventId = extractEventId.apply(url);
         String eventName = eventNames.get(eventId);
 
-        // Safely set text
         if (eventName != null) {
             holder.filename.setText(eventName);
         } else if (eventId != -1) {
