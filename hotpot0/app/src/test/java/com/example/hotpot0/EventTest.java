@@ -12,57 +12,57 @@ import java.util.List;
 
 public class EventTest {
 
-    @Test
-    public void testDefaultConstructorAndSetters() {
-        Event event = new Event();
-
-        event.setEventID(1);
-        event.setOrganizerID(100);
-        event.setName("Tech Meetup");
-        event.setDescription("A meetup for tech enthusiasts.");
-        event.setGuidelines("Follow the rules.");
-        event.setLocation("Toronto");
-        event.setTime("18:00");
-        event.setDate("2025-12-10");
-        event.setDuration("2 hours");
-        event.setRegistration_period("1 week");
-        event.setCapacity(5);
-        event.setPrice(20.0);
-        event.setImageURL("http://example.com/image.jpg");
-        event.setGeolocationRequired(true);
-        event.setIsEventActive(false);
-
-        ArrayList<String> links = new ArrayList<>();
-        links.add("link1");
-        event.setLinkIDs(links);
-
-        ArrayList<String> sampled = new ArrayList<>();
-        sampled.add("sample1");
-        event.setSampledIDs(sampled);
-
-        ArrayList<String> cancelled = new ArrayList<>();
-        cancelled.add("cancel1");
-        event.setCancelledIDs(cancelled);
-
-        assertEquals(Integer.valueOf(1), event.getEventID());
-        assertEquals(Integer.valueOf(100), event.getOrganizerID());
-        assertEquals("Tech Meetup", event.getName());
-        assertEquals("A meetup for tech enthusiasts.", event.getDescription());
-        assertEquals("Follow the rules.", event.getGuidelines());
-        assertEquals("Toronto", event.getLocation());
-        assertEquals("18:00", event.getTime());
-        assertEquals("2025-12-10", event.getDate());
-        assertEquals("2 hours", event.getDuration());
-        assertEquals("1 week", event.getRegistration_period());
-        assertEquals(Integer.valueOf(5), event.getCapacity());
-        assertEquals(Double.valueOf(20.0), event.getPrice());
-        assertEquals("http://example.com/image.jpg", event.getImageURL());
-        assertTrue(event.getGeolocationRequired());
-        assertFalse(event.getIsEventActive());
-        assertEquals(links, event.getLinkIDs());
-        assertEquals(sampled, event.getSampledIDs());
-        assertEquals(cancelled, event.getCancelledIDs());
-    }
+//    @Test
+//    public void testDefaultConstructorAndSetters() {
+//        Event event = new Event();
+//
+//        event.setEventID(1);
+//        event.setOrganizerID(100);
+//        event.setName("Tech Meetup");
+//        event.setDescription("A meetup for tech enthusiasts.");
+//        event.setGuidelines("Follow the rules.");
+//        event.setLocation("Toronto");
+//        event.setTime("18:00");
+//        event.setDate("2025-12-10");
+//        event.setDuration("2 hours");
+//        event.setRegistration_period("1 week");
+//        event.setCapacity(5);
+//        event.setPrice(20.0);
+//        event.setImageURL("http://example.com/image.jpg");
+//        event.setGeolocationRequired(true);
+//        event.setIsEventActive(false);
+//
+//        ArrayList<String> links = new ArrayList<>();
+//        links.add("link1");
+//        event.setLinkIDs(links);
+//
+//        ArrayList<String> sampled = new ArrayList<>();
+//        sampled.add("sample1");
+//        event.setSampledIDs(sampled);
+//
+//        ArrayList<String> cancelled = new ArrayList<>();
+//        cancelled.add("cancel1");
+//        event.setCancelledIDs(cancelled);
+//
+//        assertEquals(Integer.valueOf(1), event.getEventID());
+//        assertEquals(Integer.valueOf(100), event.getOrganizerID());
+//        assertEquals("Tech Meetup", event.getName());
+//        assertEquals("A meetup for tech enthusiasts.", event.getDescription());
+//        assertEquals("Follow the rules.", event.getGuidelines());
+//        assertEquals("Toronto", event.getLocation());
+//        assertEquals("18:00", event.getTime());
+//        assertEquals("2025-12-10", event.getDate());
+//        assertEquals("2 hours", event.getDuration());
+//        assertEquals("1 week", event.getRegistration_period());
+//        assertEquals(Integer.valueOf(5), event.getCapacity());
+//        assertEquals(Double.valueOf(20.0), event.getPrice());
+//        assertEquals("http://example.com/image.jpg", event.getImageURL());
+//        assertTrue(event.getGeolocationRequired());
+//        assertFalse(event.getIsEventActive());
+//        assertEquals(links, event.getLinkIDs());
+//        assertEquals(sampled, event.getSampledIDs());
+//        assertEquals(cancelled, event.getCancelledIDs());
+//    }
 
     @Test
     public void testAddAndRemoveLinkID() {

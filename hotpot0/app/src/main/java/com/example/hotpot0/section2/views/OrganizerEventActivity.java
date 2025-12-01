@@ -1190,7 +1190,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private class FinalParticipantAdapter extends RecyclerView.Adapter<FinalParticipantAdapter.ViewHolder> {
+    private static class FinalParticipantAdapter extends RecyclerView.Adapter<FinalParticipantAdapter.ViewHolder> {
         private List<UserProfile> profiles;
         private final Context context;
 
