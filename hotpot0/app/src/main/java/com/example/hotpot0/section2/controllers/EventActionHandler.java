@@ -16,10 +16,14 @@ import com.example.hotpot0.models.UserProfile;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Handles user actions related to events such as joining or leaving waitlists,
@@ -46,6 +50,11 @@ public class EventActionHandler {
         profileDB = new ProfileDB();
         eventDB = new EventDB();
         eventUserLinkDB = new EventUserLinkDB();
+    }
+
+    public EventActionHandler(EventUserLinkDB eventUserLinkDB, ProfileDB profileDB) {
+        this.eventUserLinkDB = eventUserLinkDB;
+        this.profileDB = profileDB;
     }
 
     public interface ExportCallback {
@@ -578,26 +587,19 @@ public class EventActionHandler {
             return;
         }
 
-        StringBuilder csvBuilder = new StringBuilder();
-
-        // Optional: add event name as first line
-        csvBuilder.append("Event: ").append(csvEscape(eventName)).append("\n");
-
-        // Header row
-        csvBuilder.append("Name,Email,Status,UserID,LinkID\n");
-
+        final List<String> csvRows = Collections.synchronizedList(new ArrayList<>());
         final int total = linkIDs.size();
-        final int[] completed = {0};
-        final boolean[] failed = {false};
+        final AtomicInteger completed = new AtomicInteger(0);
+        final AtomicBoolean failed = new AtomicBoolean(false);
+
+        // Add header
+        csvRows.add("Event: " + csvEscape(eventName));
+        csvRows.add("Name,Email,Status,UserID,LinkID");
 
         for (String linkID : linkIDs) {
-            // Extract userID from linkID like "eventId_userId"
             String[] parts = linkID.split("_");
             if (parts.length < 2) {
-                // Skip malformed IDs but still count them as completed
-                if (++completed[0] == total && !failed[0]) {
-                    callback.onSuccess(csvBuilder.toString());
-                }
+                checkCompletion(total, completed, failed, csvRows, callback);
                 continue;
             }
 
@@ -605,9 +607,7 @@ public class EventActionHandler {
             try {
                 userId = Integer.parseInt(parts[1]);
             } catch (NumberFormatException e) {
-                if (++completed[0] == total && !failed[0]) {
-                    callback.onSuccess(csvBuilder.toString());
-                }
+                checkCompletion(total, completed, failed, csvRows, callback);
                 continue;
             }
 
@@ -615,39 +615,32 @@ public class EventActionHandler {
                 @Override
                 public void onSuccess(EventUserLink link) {
                     if (link == null) {
-                        if (++completed[0] == total && !failed[0]) {
-                            callback.onSuccess(csvBuilder.toString());
-                        }
+                        checkCompletion(total, completed, failed, csvRows, callback);
                         return;
                     }
 
                     profileDB.getUserByID(userId, new ProfileDB.GetCallback<UserProfile>() {
                         @Override
                         public void onSuccess(UserProfile profile) {
-                            String name = profile != null && profile.getName() != null
-                                    ? profile.getName() : "";
-                            String email = profile != null && profile.getEmailID() != null
-                                    ? profile.getEmailID() : "";
-                            String status = link.getStatus() != null
-                                    ? link.getStatus() : "";
+                            String name = profile != null && profile.getName() != null ? profile.getName() : "";
+                            String email = profile != null && profile.getEmailID() != null ? profile.getEmailID() : "";
+                            String status = link.getStatus() != null ? link.getStatus() : "";
 
-                            // Append CSV row
-                            csvBuilder
-                                    .append(csvEscape(name)).append(",")
-                                    .append(csvEscape(email)).append(",")
-                                    .append(csvEscape(status)).append(",")
-                                    .append(csvEscape(String.valueOf(userId))).append(",")
-                                    .append(csvEscape(linkID))
-                                    .append("\n");
+                            String row = String.join(",",
+                                    csvEscape(name),
+                                    csvEscape(email),
+                                    csvEscape(status),
+                                    csvEscape(String.valueOf(userId)),
+                                    csvEscape(linkID)
+                            );
 
-                            if (++completed[0] == total && !failed[0]) {
-                                callback.onSuccess(csvBuilder.toString());
-                            }
+                            csvRows.add(row);
+                            checkCompletion(total, completed, failed, csvRows, callback);
                         }
 
                         @Override
                         public void onFailure(Exception e) {
-                            failed[0] = true;
+                            failed.set(true);
                             callback.onFailure(e);
                         }
                     });
@@ -655,18 +648,26 @@ public class EventActionHandler {
 
                 @Override
                 public void onFailure(Exception e) {
-                    failed[0] = true;
+                    failed.set(true);
                     callback.onFailure(e);
                 }
             });
         }
     }
+    private void checkCompletion(int total,
+                                 AtomicInteger completed,
+                                 AtomicBoolean failed,
+                                 List<String> csvRows,
+                                 ExportCallback callback) {
+        if (completed.incrementAndGet() == total && !failed.get()) {
+            String csvData = String.join("\n", csvRows);
+            callback.onSuccess(csvData);
+        }
+    }
 
     private String csvEscape(String value) {
         if (value == null) return "";
-        // Escape " by ""
         String escaped = value.replace("\"", "\"\"");
-        // Wrap in quotes to be safe against commas, newlines, etc.
         return "\"" + escaped + "\"";
     }
 }

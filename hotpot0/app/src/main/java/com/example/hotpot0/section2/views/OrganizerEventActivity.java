@@ -94,6 +94,8 @@ public class OrganizerEventActivity extends AppCompatActivity {
     private EventUserLinkDB eventUserLinkDB = new EventUserLinkDB();
     private EventActionHandler eventHandler = new EventActionHandler();
 
+    private String csvDataToSave;
+
     // Handling Image Uploads
     private Uri selectedImageUri;
     private final ActivityResultLauncher<Intent> imagePickerLauncher =
@@ -108,6 +110,22 @@ public class OrganizerEventActivity extends AppCompatActivity {
                         }
                     }
             );
+
+    private final ActivityResultLauncher<Intent> createCsvLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri uri = result.getData().getData();
+                    if (uri != null) {
+                        try (OutputStream outputStream = getContentResolver().openOutputStream(uri)) {
+                            outputStream.write(csvDataToSave.getBytes());
+                            Toast.makeText(this, "CSV saved successfully!", Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(this, "Failed to save CSV: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1104,6 +1122,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
                     List<UserProfile> acceptedProfiles = new ArrayList<>();
                     final int total = acceptedIDs.size();
                     final int[] completed = {0};
+
                     for (String linkID : acceptedIDs) {
                         String userIDStr = linkID.split("_")[1];
                         profileDB.getUserByID(Integer.parseInt(userIDStr), new ProfileDB.GetCallback<UserProfile>() {
@@ -1140,28 +1159,19 @@ public class OrganizerEventActivity extends AppCompatActivity {
                                     .create();
                     finalListDialog.show();
 
-                    buttonExportCSV.setOnClickListener(v -> {
+                    buttonExportCSV.setOnClickListener(v2 -> {
                         eventHandler.exportEntrantsToCSV(acceptedIDs, event.getName(), new EventActionHandler.ExportCallback() {
                             @Override
                             public void onSuccess(String csvData) {
-                                // Save CSV to device
-                                try {
-                                    String fileName = event.getName().replaceAll("\\s+", "_") + "_Final_Entrants.csv";
-                                    File csvFile = new File(
-                                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                                            fileName
-                                    );
-                                    try (FileOutputStream fos = new FileOutputStream(csvFile)) {
-                                        fos.write(csvData.getBytes());
-                                    }
-                                    Toast.makeText(OrganizerEventActivity.this,
-                                            "CSV exported to Downloads/" + fileName,
-                                            Toast.LENGTH_LONG).show();
-                                } catch (Exception e) {
-                                    Toast.makeText(OrganizerEventActivity.this,
-                                            "Failed to save CSV: " + e.getMessage(),
-                                            Toast.LENGTH_LONG).show();
-                                }
+                                csvDataToSave = csvData;
+                                String defaultFileName = event.getName().replaceAll("\\s+", "_") + "_Final_Entrants.csv";
+
+                                // Open file picker to save CSV
+                                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                                intent.setType("text/csv");
+                                intent.putExtra(Intent.EXTRA_TITLE, defaultFileName);
+                                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                createCsvLauncher.launch(intent);
                             }
 
                             @Override
