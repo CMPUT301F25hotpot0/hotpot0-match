@@ -728,7 +728,6 @@ public class OrganizerEventActivity extends AppCompatActivity {
         if (waitingList == null || waitingList.isEmpty() || waitingList.equals("0")) {
             return "No Cap on waiting list";
         }
-
         try {
             int waitingListValue = Integer.parseInt(waitingList);
             return waitingListValue + " waiting list spots";
@@ -845,11 +844,8 @@ public class OrganizerEventActivity extends AppCompatActivity {
                             Toast.makeText(OrganizerEventActivity.this, "Failed to send notification: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-
-                    Toast.makeText(this, "Confirmed: " + message, Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
-                    // ❌ Just dismiss – this "negates the click"
                     dialog.dismiss();
                 })
                 .show();

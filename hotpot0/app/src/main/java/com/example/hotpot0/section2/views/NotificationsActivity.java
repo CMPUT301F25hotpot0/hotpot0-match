@@ -208,6 +208,8 @@ public class NotificationsActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         if (bottomNav == null) return;
 
+        bottomNav.setSelectedItemId(R.id.nav_notifications);
+
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
