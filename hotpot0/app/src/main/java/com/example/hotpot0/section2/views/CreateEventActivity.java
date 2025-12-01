@@ -425,6 +425,7 @@ public class CreateEventActivity extends AppCompatActivity {
         Intent intent = new Intent(this, PreviewActivity.class);
 
         // Pass all data to preview activity
+        intent.putExtra("imageUri", eventImageUri != null ? eventImageUri.toString() : null);
         intent.putExtra("name", name.getText().toString().trim());
         intent.putExtra("description", description.getText().toString().trim());
         intent.putExtra("guidelines", guidelines.getText().toString().trim());
