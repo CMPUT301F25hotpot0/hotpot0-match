@@ -2,6 +2,7 @@ package com.example.hotpot0.section2.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -143,7 +144,8 @@ public class NotificationsActivity extends AppCompatActivity {
             // Go to event button
             holder.goToEventBtn.setOnClickListener(v -> {
                 controller = new EventActivityController(NotificationsActivity.this);
-                controller.navigateToEventActivity(eventID, userID);
+                Log.d("NotificationsActivity", "Navigating to event ID: " + notif.getEventID() + " for user ID: " + userID);
+                controller.navigateToEventActivity(notif.getEventID(), userID);
             });
         }
 

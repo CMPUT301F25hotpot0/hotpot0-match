@@ -159,6 +159,8 @@ public class EventSampledActivity extends AppCompatActivity {
                     showStatusMessage("You have confirmed this event.");
                 } else if ("Declined".equalsIgnoreCase(status)) {
                     showStatusMessage("You have declined this event.");
+                } else if ("Cancelled".equalsIgnoreCase(status)) {
+                    showStatusMessage("You have been cancelled from this event.");
                 } else {
                     setupButtonListeners();
                 }
