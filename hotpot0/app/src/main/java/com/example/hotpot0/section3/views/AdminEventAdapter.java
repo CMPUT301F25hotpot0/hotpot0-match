@@ -1,4 +1,4 @@
-package com.example.hotpot0.section3.adapters;
+package com.example.hotpot0.section3.views;
 
 import android.content.Context;
 import android.view.LayoutInflater;
