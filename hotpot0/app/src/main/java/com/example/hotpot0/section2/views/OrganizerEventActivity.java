@@ -3,10 +3,13 @@ package com.example.hotpot0.section2.views;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,6 +18,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -348,7 +353,13 @@ public class OrganizerEventActivity extends AppCompatActivity {
         TextView previewPrice = findViewById(R.id.previewPrice);
         TextView previewSpotsOpen = findViewById(R.id.previewSpotsOpen);
 
+        ImageView sampledSendCustomNotif = findViewById(R.id.SampledSendCustomNotif);
+        ImageView acceptedSendCustomNotif = findViewById(R.id.AcceptedSendCustomNotif);
+        ImageView cancelledSendCustomNotif = findViewById(R.id.CancelledSendCustomNotif);
+        ImageView allSendCustomNotif = findViewById(R.id.AllSendCustomNotif);
+
         LinearLayout sampledEntrantsContainer = findViewById(R.id.sampled_entrants_container);
+        LinearLayout acceptedEntrantsContainer = findViewById(R.id.accepted_entrants_container);
         LinearLayout cancelledEntrantsContainer = findViewById(R.id.cancelled_entrants_container);
         LinearLayout allEntrantsContainer = findViewById(R.id.all_entrants_container);
 
@@ -412,7 +423,39 @@ public class OrganizerEventActivity extends AppCompatActivity {
             buttonConfirm.setEnabled(false);
         }
 
-        populateSampledEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
+        List<String> acceptedIDs = new ArrayList<>();
+        List<String> sampledIDs = new ArrayList<>();
+
+        int total = currentEvent.getSampledIDs().size();
+        AtomicInteger completed = new AtomicInteger(0);
+
+        for (String id : currentEvent.getSampledIDs()) {
+            eventUserLinkDB.getEventUserLinkByID(id, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink eventUserLink) {
+                    if (eventUserLink != null) {
+                        if ("Accepted".equals(eventUserLink.getStatus())) {
+                            acceptedIDs.add(id);
+                        } else if ("Sampled".equals(eventUserLink.getStatus())) {
+                            sampledIDs.add(id);
+                        }
+                    }
+
+                    if (completed.incrementAndGet() == total) {
+                        // Update UI
+                        updatePostDrawUI(acceptedIDs, sampledIDs);
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    if (completed.incrementAndGet() == total) {
+                        updatePostDrawUI(acceptedIDs, sampledIDs);
+                    }
+                }
+            });
+        }
+
         populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
         populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
 
@@ -491,6 +534,22 @@ public class OrganizerEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Entrants confirmed!", Toast.LENGTH_SHORT).show();
             // TODO: Call eventHandler.confirmEntrants(eventID)
             buttonConfirm.setEnabled(false);
+        });
+
+        sampledSendCustomNotif.setOnClickListener(v -> {
+            showCustomMessageDialog("Sampled", sampledIDs, currentEvent);
+        });
+
+        acceptedSendCustomNotif.setOnClickListener(v -> {
+            showCustomMessageDialog("Accepted", acceptedIDs, currentEvent);
+        });
+
+        cancelledSendCustomNotif.setOnClickListener(v -> {
+            showCustomMessageDialog("Cancelled", currentEvent.getCancelledIDs(), currentEvent);
+        });
+
+        allSendCustomNotif.setOnClickListener(v -> {
+            showCustomMessageDialog("All", currentEvent.getLinkIDs(), currentEvent);
         });
 
         setupBottomNavigation();
@@ -756,4 +815,52 @@ public class OrganizerEventActivity extends AppCompatActivity {
             });
         }
     }
+
+    private void showCustomMessageDialog(String status, List<String> targetLinkIDs, Event event) {
+        // Inflate custom layout
+        View dialogView = LayoutInflater.from(this)
+                .inflate(R.layout.custom_message_popout, null);
+
+        EditText messageEditText = dialogView.findViewById(R.id.customMessageEditText);
+
+        new androidx.appcompat.app.AlertDialog.Builder(this, R.style.CustomAlertDialog)
+                .setView(dialogView)
+                .setCancelable(true)
+                .setPositiveButton("Confirm", (dialog, which) -> {
+                    String message = messageEditText.getText().toString().trim();
+
+                    if (message.isEmpty()) {
+                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                        return; // do nothing else
+                    }
+
+                    eventHandler.sendCustomNotification(message, status, targetLinkIDs, event, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(OrganizerEventActivity.this, "Custom notification sent to " + status + " users.", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(OrganizerEventActivity.this, "Failed to send notification: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    Toast.makeText(this, "Confirmed: " + message, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // ❌ Just dismiss – this "negates the click"
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void updatePostDrawUI(List<String> acceptedIDs, List<String> sampledIDs) {
+        Log.d("OrganizerEventActivity", "Final accepted IDs: " + acceptedIDs);
+
+        populateSampledEntrants(findViewById(R.id.sampled_entrants_container), sampledIDs);
+        populateEntrants(findViewById(R.id.accepted_entrants_container), acceptedIDs);
+
+    }
+
 }
