@@ -412,4 +412,20 @@ public class ProfileDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
+
+    /**
+     * Gets organizers from database
+     * @param callback callback to notify success or failure
+     */
+    public void getOrganizers(@NonNull GetCallback<Integer> callback) {
+        db.collection(USERS_COLLECTION)
+                .whereEqualTo("status", "organizer")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    int count = querySnapshot.size();
+                    callback.onSuccess(count);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
 }

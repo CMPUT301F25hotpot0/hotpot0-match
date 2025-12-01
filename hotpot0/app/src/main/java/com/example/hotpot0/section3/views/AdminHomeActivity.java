@@ -4,23 +4,35 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotpot0.R;
+import com.example.hotpot0.models.Event;
+import com.example.hotpot0.models.EventDB;
+import com.example.hotpot0.models.PicturesDB;
+import com.example.hotpot0.models.ProfileDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.List;
+
+/**
+ * Shows admin details on current activity of app.
+ */
 public class AdminHomeActivity extends AppCompatActivity {
 
     // Stats TextViews
     private TextView activeEventsCount, activeProfilesCount, activeOrganizersCount, imagesStoredCount;
+    private EventDB eventDB;
+    private ProfileDB profileDB;
+    private PicturesDB picturesDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Use your XML layout
         setContentView(R.layout.section3_adminhome_activity);
 
         // Retrieve adminID from the Intent if needed
@@ -32,16 +44,14 @@ public class AdminHomeActivity extends AppCompatActivity {
         activeOrganizersCount = findViewById(R.id.activeOrganizersCount);
         imagesStoredCount = findViewById(R.id.imagesStoredCount);
 
-        // Optional: set default values or fetch from DB
-        activeEventsCount.setText("55");        // Replace with real data
-        activeProfilesCount.setText("120");     // Replace with real data
-        activeOrganizersCount.setText("25");    // Replace with real data
-        imagesStoredCount.setText("50");        // Replace with real data
+        eventDB = new EventDB();
+        profileDB = new ProfileDB();
+        picturesDB = new PicturesDB();
+
+        loadStats();
 
         // Set Home as selected by default
         BottomNavigationView bottomNav = findViewById(R.id.adminBottomNavigationView);
-
-        // Optional: highlight "Home" as selected initially
         bottomNav.setSelectedItemId(R.id.admin_home);
 
         bottomNav.setOnItemSelectedListener(item -> {
@@ -66,4 +76,72 @@ public class AdminHomeActivity extends AppCompatActivity {
             return false;
         });
     }
+
+    private void loadStats() {
+        // Active Events
+        eventDB.getAllActiveEvents(new EventDB.GetCallback<List<Event>>() {
+            @Override
+            public void onSuccess(List<Event> events) {
+                activeEventsCount.setText(String.valueOf(events.size()));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(AdminHomeActivity.this, "Failed to load events", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Active Profiles
+        profileDB.generateNewID("users", new ProfileDB.GetCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer result) {
+                // Instead of generating, we count docs:
+                profileDB.getUserByID(result, new ProfileDB.GetCallback<com.example.hotpot0.models.UserProfile>() {
+                    @Override
+                    public void onSuccess(com.example.hotpot0.models.UserProfile userProfile) {
+                        activeProfilesCount.setText(String.valueOf(result - 1));
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        activeProfilesCount.setText("0");
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                activeProfilesCount.setText("0");
+            }
+        });
+
+        // Active Organizers
+        profileDB.getOrganizers(new ProfileDB.GetCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer count) {
+                activeOrganizersCount.setText(String.valueOf(count));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(AdminHomeActivity.this, "Failed to load organizers", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        });
+
+        // Images Stored
+        picturesDB.getAllEventImages(new PicturesDB.Callback<List<String>>() {
+            @Override
+            public void onSuccess(List<String> result) {
+                imagesStoredCount.setText(String.valueOf(result.size()));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                imagesStoredCount.setText("0");
+            }
+        });
+    }
 }
+
+
