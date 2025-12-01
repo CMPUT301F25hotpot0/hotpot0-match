@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLinkDB;
+import com.example.hotpot0.models.PicturesDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.example.hotpot0.models.UserProfile;
 
@@ -27,6 +28,7 @@ public class ProfileEditHandler {
     private ProfileDB profileDB;
     private EventUserLinkDB eventUserLinkDB;
     private EventDB eventDB;
+    private PicturesDB picturesDB;
 
     /**
      * Constructs a new {@code ProfileEditHandler}.
@@ -38,6 +40,7 @@ public class ProfileEditHandler {
         profileDB = new ProfileDB(); // Initialize ProfileDB to interact with Firestore
         eventUserLinkDB = new EventUserLinkDB();
         eventDB = new EventDB();
+        picturesDB = new PicturesDB();
     }
 
     /**
@@ -192,17 +195,28 @@ public class ProfileEditHandler {
                                                                     @Override
                                                                     public void onSuccess(Void aVoid) {
                                                                         // Successfully removed linkID from user profile
-                                                                        // Delete all events where user is an organizer
-                                                                        eventDB.deleteEvent(eventUserLink.getEventID(), new ProfileDB.ActionCallback() {
+                                                                        // Remove Event Image from Storage if exists
+                                                                        picturesDB.deleteEventImage(eventUserLink.getEventID(), new PicturesDB.Callback<Void>() {
                                                                             @Override
-                                                                            public void onSuccess() {
-                                                                                // Successfully deleted the event
-                                                                                Log.d("ProfileEditHandler", "Deleted event with ID: " + eventUserLink.getEventID());
+                                                                            public void onSuccess(Void result) {
+                                                                                Log.d("EventDB", "Event image deleted successfully for event ID: " + eventUserLink.getEventID());
+                                                                                // Delete all events where user is an organizer
+                                                                                eventDB.deleteEvent(eventUserLink.getEventID(), new ProfileDB.ActionCallback() {
+                                                                                    @Override
+                                                                                    public void onSuccess() {
+                                                                                        // Successfully deleted the event
+                                                                                        Log.d("ProfileEditHandler", "Deleted event with ID: " + eventUserLink.getEventID());
+                                                                                    }
+                                                                                    @Override
+                                                                                    public void onFailure(Exception e) {
+                                                                                        // Log the failure but continue
+                                                                                        e.printStackTrace();
+                                                                                    }
+                                                                                });
                                                                             }
                                                                             @Override
                                                                             public void onFailure(Exception e) {
-                                                                                // Log the failure but continue
-                                                                                e.printStackTrace();
+                                                                                Log.e("EventDB", "Failed to delete event image for event ID: " + eventUserLink.getEventID(), e);
                                                                             }
                                                                         });
                                                                     }
