@@ -146,12 +146,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
         TextView previewCurrentlyWaiting = findViewById(R.id.previewCurrentlyWaiting);
         TextView previewDaysLeft = findViewById(R.id.previewDaysLeft);
         Button generateSampleButton = findViewById(R.id.generate_sample_button);
-
-        if (currentEvent.getTotalSampled() != 0) {
-            generateSampleButton.setEnabled(true);
-        } else {
-            generateSampleButton.setEnabled(false);
-        }
+        generateSampleButton.setEnabled(currentEvent.getTotalSampled() == 0);
         LinearLayout entrantsContainer = findViewById(R.id.entrants_container);
         previewGeolocation = findViewById(R.id.GeolocationStatus);
         ImageView qrCodeImage = findViewById(R.id.qr_code_image);
