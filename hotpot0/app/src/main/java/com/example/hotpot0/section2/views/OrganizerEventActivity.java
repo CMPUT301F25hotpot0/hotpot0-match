@@ -250,7 +250,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
                 : Integer.toString(currentEvent.getCapacity() - currentEvent.getTotalWaitlist());
         previewSpotsOpen.setText(spotsOpen);
         // Handle waiting list
-        String waitingListText = formatWaitingList(currentEvent.getLinkIDs().toString());
+        String waitingListText = formatWaitingList(currentEvent.getWaitingListCapacity().toString());
         previewWaitingListCapacity.setText(waitingListText);
         // Handle registration period
         String registrationText = buildRegistrationPeriod(currentEvent.getRegistrationStart(), currentEvent.getRegistrationEnd());
