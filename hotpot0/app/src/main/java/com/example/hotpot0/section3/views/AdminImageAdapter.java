@@ -1,7 +1,6 @@
 package com.example.hotpot0.section3.views;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,6 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
     private Map<Integer, String> eventNames;
     private java.util.function.Function<String, Integer> extractEventId;
 
-
     public AdminImageAdapter(Context context,
                              ArrayList<String> urls,
                              DeleteCallback deleteCallback,
@@ -49,7 +47,6 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
         this.eventNames = eventNames;
         this.extractEventId = extractEventId;
     }
-
 
     @NonNull
     @Override
@@ -66,19 +63,22 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
 
         int eventId = extractEventId.apply(url);
         String eventName = eventNames.get(eventId);
+
+        // Safely set text
         if (eventName != null) {
             holder.filename.setText(eventName);
-        } else {
+        } else if (eventId != -1) {
             holder.filename.setText(String.valueOf(eventId));
+        } else {
+            holder.filename.setText("Unknown Event");
         }
 
-
-        // Click on the entire item
+        // Click listener
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) clickListener.onItemClick(url);
         });
 
-        // Delete button
+        // Delete button listener
         if (holder.deleteBtn != null) {
             holder.deleteBtn.setOnClickListener(v -> {
                 if (deleteCallback != null) deleteCallback.onDelete(url);
@@ -100,7 +100,8 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             filename = itemView.findViewById(R.id.imageTitleTextView);
-            deleteBtn = itemView.findViewById(R.id.remove_image_button); // make sure your row XML has this button
+            deleteBtn = itemView.findViewById(R.id.remove_image_button);
         }
     }
 }
+

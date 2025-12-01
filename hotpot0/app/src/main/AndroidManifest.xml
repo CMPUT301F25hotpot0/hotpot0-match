@@ -45,13 +45,15 @@
         <activity android:name=".section3.views.ManageEventActivity" />
         <activity android:name=".section3.views.AdminImageActivity" />
         <activity android:name=".section3.views.ManageImageActivity" />
+        <activity android:name=".section3.views.AdminSettingsActivity" />
         <activity android:name=".section2.views.ProfileActivity"/>
         <activity android:name=".section2.views.NotificationsActivity"/>
         <activity android:name=".section2.views.SearchActivity"/>
         <activity android:name=".section2.views.EventInitialActivity"/>
         <activity android:name=".section2.views.OrganizerEventActivity" />
         <activity android:name=".section2.views.EventSampledActivity" />
-        <activity android:name=".section2.views.QRActivity" android:exported="false"/>
+        <activity android:name=".section2.views.QRActivity"
+            android:exported="false"/>
 
         <meta-data
             android:name="preloaded_fonts"

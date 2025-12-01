@@ -35,12 +35,17 @@ public class ManageImageActivity extends AppCompatActivity {
 
         // Get image URL passed from AdminImageActivity
         imageUrl = getIntent().getStringExtra("image_url");
+        String eventName = getIntent().getStringExtra("name");
         if (imageUrl != null) {
             Glide.with(this).load(imageUrl).into(selectedImageView);
 
-            // Extract filename from URL
-            String filename = android.net.Uri.parse(imageUrl).getLastPathSegment();
-            filenameTextView.setText(filename);
+            if (eventName != null) {
+                filenameTextView.setText(eventName);
+            } else {
+                // Fallback: show filename if event name not passed
+                String filename = android.net.Uri.parse(imageUrl).getLastPathSegment();
+                filenameTextView.setText(filename);
+            }
         }
 
         // Back button

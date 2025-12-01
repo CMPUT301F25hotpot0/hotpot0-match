@@ -52,7 +52,7 @@ public class AdminSearchActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.adminBottomNavigationView);
 
         // Optional: highlight "Home" as selected initially
-        bottomNav.setSelectedItemId(R.id.admin_home);
+        bottomNav.setSelectedItemId(R.id.admin_search);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -69,8 +69,8 @@ public class AdminSearchActivity extends AppCompatActivity {
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 return true;
             } else if (id == R.id.admin_settings) {
-//                startActivity(new Intent(AdminSearchActivity.this, AdminSettingsActivity.class));
-//                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                startActivity(new Intent(AdminSearchActivity.this, AdminSettingsActivity.class));
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 return true;
             }
             return false;
