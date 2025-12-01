@@ -2,139 +2,199 @@ package com.example.hotpot0.section2.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hotpot0.R;
+import com.example.hotpot0.models.EventUserLink;
+import com.example.hotpot0.models.EventUserLinkDB;
+import com.example.hotpot0.models.Notification;
+import com.example.hotpot0.models.ProfileDB;
+import com.example.hotpot0.models.UserProfile;
+import com.example.hotpot0.section2.controllers.EventActivityController;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This view shows the Notifications the user receives. It shows current invitations
- * and other updates.
- * */
 public class NotificationsActivity extends AppCompatActivity {
-    private ListView currentInvitationsList, otherUpdatesList;
-    private BottomNavigationView bottomNavigationView;
-    private ArrayAdapter<String> currentInvitationsAdapter;
-    private ArrayAdapter<String> otherUpdatesAdapter;
-    private List<String> currentInvitations;
-    private List<String> otherUpdates;
+
+    private RecyclerView notificationsRecycler;
+    private TextView emptyInvitationsText;
+    private NotificationAdapter adapter;
+    private List<Notification> notifications = new ArrayList<>();
+
+    private EventUserLinkDB eventUserLinkDB;
+    private ProfileDB profileDB;
+    private String userLinkID; // Set this via intent extra or saved preferences
+    private Integer userID;
+    private EventActivityController controller;
+    private Integer eventID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.section2_notifications_activity);
 
-        // Initialize UI elements
-        currentInvitationsList = findViewById(R.id.current_invitations_list);
-        otherUpdatesList = findViewById(R.id.other_updates_list);
-        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        notificationsRecycler = findViewById(R.id.notifications_recycler);
+        emptyInvitationsText = findViewById(R.id.emptyInvitationsText);
+
+        notificationsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new NotificationAdapter(notifications);
+        notificationsRecycler.setAdapter(adapter);
+
+        eventUserLinkDB = new EventUserLinkDB();
+        profileDB = new ProfileDB();
+        userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
+
+        if (userID == null) {
+            emptyInvitationsText.setText("Usser not found.");
+            emptyInvitationsText.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        fetchNotifications();
         setupBottomNavigation();
+    }
 
-        currentInvitations = new ArrayList<>();
-        otherUpdates = new ArrayList<>();
-
-        // Set adapters for ListViews
-        currentInvitationsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, currentInvitations);
-        currentInvitationsList.setAdapter(currentInvitationsAdapter);
-
-        otherUpdatesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, otherUpdates);
-        otherUpdatesList.setAdapter(otherUpdatesAdapter);
-
-        // Handle ListView item clicks
-        currentInvitationsList.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedItem = currentInvitations.get(position);
-            // want it to do something??
-        });
-
-        otherUpdatesList.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedItem = otherUpdates.get(position);
-            // want it to do something?
-        });
-
-        // Bottom Navigation behavior
-        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+    private void fetchNotifications() {
+        profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_home) {
-                    Intent intent = new Intent(NotificationsActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    return true;
-                } else if (id == R.id.nav_profile) {
-                    Intent intent = new Intent(NotificationsActivity.this, ProfileActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    return true;
-                } else if (id == R.id.nav_search) {
-                    Intent intent = new Intent(NotificationsActivity.this, SearchActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    return true;
-                } else if (id == R.id.nav_events) {
-                    Intent intent = new Intent(NotificationsActivity.this, CreateEventActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    return true;
-                } else if (id == R.id.nav_notifications) {
-                    return true;
+            public void onSuccess(UserProfile userProfile) {
+                if (userProfile.getLinkIDs() == null || userProfile.getLinkIDs().isEmpty()) {
+                    emptyInvitationsText.setVisibility(View.VISIBLE);
+                    return;
                 }
 
-                return false;
+                List<String> linkIDs = userProfile.getLinkIDs();
+                for (String linkID : linkIDs) {
+                    eventID = Integer.parseInt(linkID.split("_")[0]);
+                    eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                        @Override
+                        public void onSuccess(EventUserLink eventUserLink) {
+                            List<Notification> notifs = eventUserLink.getNotifications();
+                            if (notifs != null) {
+                                notifications.addAll(notifs);
+                                adapter.notifyDataSetChanged();
+                            }
+                            if (notifications.isEmpty()) {
+                                emptyInvitationsText.setVisibility(View.VISIBLE);
+                            } else {
+                                emptyInvitationsText.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Handle failure
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Handle failure
             }
         });
     }
 
-    private void setupBottomNavigation() {
-        bottomNavigationView.setSelectedItemId(R.id.nav_notifications);
-        // Handling Bottom Navigation Bar
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
+    // RecyclerView Adapter for notifications
+    private class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
 
+        private final List<Notification> notifications;
+
+        public NotificationAdapter(List<Notification> notifications) {
+            this.notifications = notifications;
+        }
+
+        @NonNull
+        @Override
+        public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = getLayoutInflater().inflate(R.layout.notification_item, parent, false);
+            return new NotificationViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
+            Notification notif = notifications.get(position);
+            holder.title.setText(notif.getEventName());
+            holder.time.setText(notif.getDateTime());
+            holder.preview.setText(notif.getText());
+            holder.fullText.setText(notif.getText());
+
+            // Expand/collapse toggle
+            holder.itemView.setOnClickListener(v -> {
+                if (holder.expandedLayout.getVisibility() == View.GONE) {
+                    holder.expandedLayout.setVisibility(View.VISIBLE);
+                    holder.preview.setVisibility(View.GONE);
+                } else {
+                    holder.expandedLayout.setVisibility(View.GONE);
+                    holder.preview.setVisibility(View.VISIBLE);
+                }
+            });
+
+            // Go to event button
+            holder.goToEventBtn.setOnClickListener(v -> {
+                controller = new EventActivityController(NotificationsActivity.this);
+                controller.navigateToEventActivity(eventID, userID);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return notifications.size();
+        }
+
+        class NotificationViewHolder extends RecyclerView.ViewHolder {
+            TextView title, time, preview, fullText;
+            View expandedLayout;
+            View goToEventBtn;
+
+            public NotificationViewHolder(@NonNull View itemView) {
+                super(itemView);
+                title = itemView.findViewById(R.id.notification_title);
+                time = itemView.findViewById(R.id.notification_time);
+                preview = itemView.findViewById(R.id.notification_preview);
+                fullText = itemView.findViewById(R.id.notification_full_text);
+                expandedLayout = itemView.findViewById(R.id.notification_expanded);
+                goToEventBtn = itemView.findViewById(R.id.go_to_event_btn);
+            }
+        }
+    }
+
+    private void setupBottomNavigation() {
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
+        if (bottomNav == null) return;
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
             if (id == R.id.nav_home) {
                 startActivity(new Intent(NotificationsActivity.this, HomeActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
                 return true;
             }
-
-            if (id == R.id.nav_search) {
-                startActivity(new Intent(NotificationsActivity.this, SearchActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
-                return true;
-            }
-
-            if (id == R.id.nav_events) {
-                startActivity(new Intent(NotificationsActivity.this, CreateEventActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
-                return true;
-            }
-
             if (id == R.id.nav_profile) {
                 startActivity(new Intent(NotificationsActivity.this, ProfileActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
                 return true;
             }
-
             if (id == R.id.nav_notifications) {
-                // Already on this activity, do nothing
+                startActivity(new Intent(NotificationsActivity.this, NotificationsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 return true;
             }
-
+            if (id == R.id.nav_events) {
+                startActivity(new Intent(NotificationsActivity.this, CreateEventActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                return true;
+            }
             return false;
         });
     }

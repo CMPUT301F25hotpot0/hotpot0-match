@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:padding="20dp"/>
+        android:padding="20dp" />
 
     <!-- Title: Notifications -->
     <TextView
@@ -28,19 +29,21 @@
         android:textColor="@color/text"
         android:textSize="26sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/toolbar2"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
 
     <!-- Scrollable content -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/notifications_scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar2"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/toolbar2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView">
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,52 +51,50 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Current Invitations Section -->
+            <!-- Received Notifications Section -->
             <TextView
                 android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/current_invitations"
+                android:text="Received Notifications"
                 android:textStyle="bold"
                 android:textColor="@color/text"
                 android:textSize="16sp"
                 android:paddingBottom="8dp" />
 
-            <!-- Empty state for current invitations -->
+            <!-- Empty state -->
             <TextView
                 android:id="@+id/emptyInvitationsText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No current invitations"
+                android:text="No notifications"
                 android:textColor="@color/text"
                 android:textSize="14sp"
                 android:gravity="center"
                 android:padding="16dp"
                 android:visibility="gone" />
 
-            <!-- Current Invitations List -->
-            <ListView
-                android:id="@+id/current_invitations_list"
+            <!-- RecyclerView for notifications (use adapter to bind notification_item.xml) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/notifications_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:dividerHeight="12dp"
+                android:nestedScrollingEnabled="false"
                 android:layout_marginBottom="16dp"
-                android:background="@android:color/transparent"
-                android:divider="@android:color/transparent" />
+                android:clipToPadding="false" />
 
-            <!-- Other Updates Section -->
+            <!-- Other Updates Section (HIDDEN) -->
             <TextView
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/other_updates"
+                android:text="Other Updates"
                 android:textStyle="bold"
                 android:textColor="@color/text"
                 android:textSize="16sp"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="8dp"
+                android:visibility="gone" />
 
-            <!-- Empty state for other updates -->
             <TextView
                 android:id="@+id/emptyUpdatesText"
                 android:layout_width="match_parent"
@@ -105,19 +106,15 @@
                 android:padding="16dp"
                 android:visibility="gone" />
 
-            <!-- Other Updates List -->
-            <ListView
-                android:id="@+id/other_updates_list"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/other_updates_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:dividerHeight="12dp"
-                android:layout_marginBottom="16dp"
-                android:background="@android:color/transparent"
-                android:divider="@android:color/transparent" />
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Bottom navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
