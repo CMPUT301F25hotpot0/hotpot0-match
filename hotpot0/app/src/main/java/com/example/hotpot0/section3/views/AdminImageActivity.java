@@ -182,6 +182,10 @@ public class AdminImageActivity extends AppCompatActivity {
                 startActivity(new Intent(AdminImageActivity.this, AdminHomeActivity.class));
 //                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
+            } else if (id == R.id.admin_notif) {
+                startActivity(new Intent(AdminImageActivity.this, AdminNotificationsActivity.class));
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+                return true;
             } else if (id == R.id.admin_settings) {
                 startActivity(new Intent(AdminImageActivity.this, AdminSettingsActivity.class));
 //                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);

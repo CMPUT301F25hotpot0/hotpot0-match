@@ -68,6 +68,10 @@ public class AdminHomeActivity extends AppCompatActivity {
                 startActivity(new Intent(AdminHomeActivity.this, AdminImageActivity.class));
 //                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
+            } else if (id == R.id.admin_notif) {
+                startActivity(new Intent(AdminHomeActivity.this, AdminNotificationsActivity.class));
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+                return true;
             } else if (id == R.id.admin_settings) {
                 startActivity(new Intent(AdminHomeActivity.this, AdminSettingsActivity.class));
 //                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);

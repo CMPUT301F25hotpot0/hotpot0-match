@@ -66,6 +66,10 @@ public class AdminSearchActivity extends AppCompatActivity {
                 startActivity(new Intent(AdminSearchActivity.this, AdminImageActivity.class));
 //                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 return true;
+            } else if (id == R.id.admin_notif) {
+                startActivity(new Intent(AdminSearchActivity.this, AdminNotificationsActivity.class));
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+                return true;
             } else if (id == R.id.admin_settings) {
                 startActivity(new Intent(AdminSearchActivity.this, AdminSettingsActivity.class));
 //                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
