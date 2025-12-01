@@ -2,6 +2,7 @@ package com.example.hotpot0.models;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -266,5 +267,34 @@ public class EventUserLinkDB {
                 callback.onFailure(e);
             }
         });
+    }
+
+    public void listenToNotifications(String userID, @NonNull NotificationListener listener) {
+        db.collection(EVENT_USER_LINK_COLLECTION)
+                .whereArrayContains("userIDs", userID)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        listener.onFailure(e);
+                        return;
+                    }
+                    if (snapshots != null) {
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            if (dc.getType() == DocumentChange.Type.MODIFIED) { // Only new notifications
+                                EventUserLink link = dc.getDocument().toObject(EventUserLink.class);
+                                if (link.getNotifications() != null && !link.getNotifications().isEmpty()) {
+                                    Notification notif = link.getNotifications().get(link.getNotifications().size() - 1);
+                                    listener.onNewNotification(notif);
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
+
+    // Listener interface
+    public interface NotificationListener {
+        void onNewNotification(Notification notification);
+        void onFailure(Exception e);
     }
 }

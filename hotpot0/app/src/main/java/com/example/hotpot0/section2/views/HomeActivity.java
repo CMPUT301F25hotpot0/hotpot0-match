@@ -1,5 +1,6 @@
 package com.example.hotpot0.section2.views;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import com.example.hotpot0.models.EventDB;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
+import com.example.hotpot0.models.Notification;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.List;
 import java.util.ArrayList;
@@ -53,6 +55,32 @@ public class HomeActivity extends AppCompatActivity {
 
         // Load user events into the lists
         loadUserEvents();
+
+        eventUserLinkDB.listenToNotifications(String.valueOf(userID), new EventUserLinkDB.NotificationListener() {
+            @Override
+            public void onNewNotification(Notification notification) {
+                runOnUiThread(() -> showPopupNotification(notification));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                runOnUiThread(() ->
+                        Toast.makeText(HomeActivity.this, "Notification listener error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+            }
+        });
+
+
+    }
+
+    private void showPopupNotification(Notification notification) {
+        // Simple alert dialog as pop-up notification
+        new AlertDialog.Builder(this)
+                .setTitle(notification.getEventName())
+                .setMessage(notification.getText())
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
     }
 
     /**
@@ -147,6 +175,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
+
 
     // Trying to ensure data is refreshed when returning to HomeActivity & Navigation Bar is updated
     private void refreshData() {
