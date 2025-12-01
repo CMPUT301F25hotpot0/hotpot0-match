@@ -49,11 +49,13 @@ public class AdminImageActivity extends AppCompatActivity {
         adapter = new AdminImageAdapter(
                 this,
                 filteredImageUrls,
-                this::deleteImage,
+                null,
                 url -> {
                     Intent intent = new Intent(this, ManageImageActivity.class);
                     intent.putExtra("image_url", url);
-                    startActivity(intent);
+                    int eventId = extractEventId(url);
+                    intent.putExtra("event_name", eventNames.getOrDefault(eventId, "Unknown Event"));
+                    startActivityForResult(intent, 100);
                 },
                 eventNames,
                 this::extractEventId
@@ -127,7 +129,6 @@ public class AdminImageActivity extends AppCompatActivity {
         });
     }
 
-
     /** Setup search functionality */
     private void setupSearch() {
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -177,38 +178,10 @@ public class AdminImageActivity extends AppCompatActivity {
         });
     }
 
-    /** Delete image from Firebase and update UI */
-    private void deleteImage(String url) {
-        int eventId = extractEventId(url);
-        if (eventId == -1) {
-            Toast.makeText(this, "Cannot determine event ID", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        picturesDB.deleteEventImage(eventId, new PicturesDB.Callback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                runOnUiThread(() -> {
-                    allImageUrls.remove(url);
-                    filteredImageUrls.remove(url);
-                    adapter.notifyDataSetChanged();
-                    Toast.makeText(AdminImageActivity.this, "Image deleted", Toast.LENGTH_SHORT).show();
-                });
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                runOnUiThread(() -> Toast.makeText(AdminImageActivity.this,
-                        "Failed to delete image: " + e.getMessage(),
-                        Toast.LENGTH_SHORT).show());
-            }
-        });
-    }
-
-    /** Extract event ID from URL like ".../event-3.png" */
+    /** Extract event ID from URL like */
     private int extractEventId(String url) {
         try {
-            String filename = Uri.parse(url).getLastPathSegment(); // "event-3.png"
+            String filename = Uri.parse(url).getLastPathSegment();
             if (filename != null) {
                 // Look for digits in the filename
                 String digits = filename.replaceAll("\\D+", "");
@@ -218,6 +191,19 @@ public class AdminImageActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
+            String deletedUrl = data.getStringExtra("deleted_image_url");
+            if (deletedUrl != null) {
+                allImageUrls.remove(deletedUrl);
+                filteredImageUrls.remove(deletedUrl);
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
 }

@@ -78,12 +78,6 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
             if (clickListener != null) clickListener.onItemClick(url);
         });
 
-        // Delete button listener
-        if (holder.deleteBtn != null) {
-            holder.deleteBtn.setOnClickListener(v -> {
-                if (deleteCallback != null) deleteCallback.onDelete(url);
-            });
-        }
     }
 
     @Override

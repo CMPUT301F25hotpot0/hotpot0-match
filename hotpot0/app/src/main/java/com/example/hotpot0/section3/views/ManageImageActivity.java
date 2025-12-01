@@ -1,5 +1,6 @@
 package com.example.hotpot0.section3.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -58,13 +59,24 @@ public class ManageImageActivity extends AppCompatActivity {
     private void deleteImage() {
         if (imageUrl == null) return;
 
-        int eventID = Integer.parseInt(android.net.Uri.parse(imageUrl).getLastPathSegment().replace("event-", "").replace(".png", ""));
+        int eventID = Integer.parseInt(
+                android.net.Uri.parse(imageUrl)
+                        .getLastPathSegment()
+                        .replace("event-", "")
+                        .replace(".png", "")
+        );
 
         picturesDB.deleteEventImage(eventID, new PicturesDB.Callback<Void>() {
             @Override
             public void onSuccess(Void result) {
                 Toast.makeText(ManageImageActivity.this, "Image deleted", Toast.LENGTH_SHORT).show();
-                finish();
+
+                // Pass deleted URL back to AdminImageActivity
+                Intent intent = new Intent();
+                intent.putExtra("deleted_image_url", imageUrl);
+                setResult(RESULT_OK, intent);
+
+                finish(); // close activity
             }
 
             @Override
@@ -73,5 +85,8 @@ public class ManageImageActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 }
 
