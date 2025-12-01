@@ -56,7 +56,8 @@
                 android:textColor="@color/text"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="8dp"
+                android:layout_marginTop="24dp" />
 
             <ListView
                 android:id="@+id/pending_list"
@@ -73,7 +74,8 @@
                 android:textColor="@color/text"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="8dp"
+                android:layout_marginTop="24dp" />
 
             <ListView
                 android:id="@+id/past_list"

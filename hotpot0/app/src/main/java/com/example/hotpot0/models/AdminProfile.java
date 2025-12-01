@@ -16,8 +16,9 @@ public class AdminProfile {
 
     // Firestore document fields
     private Integer adminID;     // Firestore document ID
-    private String username;     // Admin username
-    private String password;     // Raw password
+    private String deviceID;     // Device-specific identifier
+    private String username;     // Admin username -- No longer used
+    private String password;     // Raw password -- No longer used
 
     // Constructors
 
