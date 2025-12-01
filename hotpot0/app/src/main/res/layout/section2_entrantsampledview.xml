@@ -204,6 +204,7 @@
             android:layout_marginBottom="16dp"
             android:textSize="15sp" />
 
+        <!-- Geolocation -->
         <TextView
             android:id="@+id/GeolocationStatus"
             android:layout_width="match_parent"
