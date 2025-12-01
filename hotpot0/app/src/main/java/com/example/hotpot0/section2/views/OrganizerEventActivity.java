@@ -146,6 +146,12 @@ public class OrganizerEventActivity extends AppCompatActivity {
         TextView previewCurrentlyWaiting = findViewById(R.id.previewCurrentlyWaiting);
         TextView previewDaysLeft = findViewById(R.id.previewDaysLeft);
         Button generateSampleButton = findViewById(R.id.generate_sample_button);
+
+        if (currentEvent.getTotalSampled() != 0) {
+            generateSampleButton.setEnabled(true);
+        } else {
+            generateSampleButton.setEnabled(false);
+        }
         LinearLayout entrantsContainer = findViewById(R.id.entrants_container);
         previewGeolocation = findViewById(R.id.GeolocationStatus);
         ImageView qrCodeImage = findViewById(R.id.qr_code_image);
@@ -311,7 +317,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
 
                     // Switch to Post-Draw layout
                     setContentView(R.layout.section2_organizereventview_postdraw);
-                    // setupPostDrawLayout();
+                    setupPostDrawLayout();
                 }
 
                 @Override
@@ -391,9 +397,9 @@ public class OrganizerEventActivity extends AppCompatActivity {
         // Populate sampled entrants
         if (currentEvent.getSampledIDs().isEmpty()) {
             buttonConfirm.setEnabled(false);
-        } else {
-            populateSampledEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
         }
+
+        populateSampledEntrants(sampledEntrantsContainer, currentEvent.getSampledIDs());
         populateEntrants(cancelledEntrantsContainer, currentEvent.getCancelledIDs());
         populateEntrants(allEntrantsContainer, currentEvent.getLinkIDs());
 
@@ -576,6 +582,7 @@ public class OrganizerEventActivity extends AppCompatActivity {
                                 Toast.makeText(OrganizerEventActivity.this, "User cancelled successfully", Toast.LENGTH_SHORT).show();
                                 // Refresh the layout to reflect changes
                                 setContentView(R.layout.section2_organizereventview_postdraw);
+
                                 setupPostDrawLayout();
                             }
 

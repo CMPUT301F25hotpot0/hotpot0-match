@@ -485,10 +485,10 @@ public class EventActionHandler {
                     @Override
                     public void onSuccess() {
                         // Successfully updated the status to "Cancelled"
-                        eventDB.addCancelledIDToEvent(event, userID.toString(), new EventDB.GetCallback<Void>() {
+                        eventDB.addCancelledIDToEvent(event, linkID, new EventDB.GetCallback<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                eventDB.removeSampledIDFromEvent(event, userID.toString(), new EventDB.GetCallback<Void>() {
+                                eventDB.removeSampledIDFromEvent(event, linkID.toString(), new EventDB.GetCallback<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         callback.onSuccess(0); // Success: User cancelled

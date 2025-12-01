@@ -274,7 +274,9 @@ public class EventDB {
      * @param callback   callback indicating completion status
      */
     public void removeSampledIDFromEvent(@NonNull Event event, @NonNull String sampledID, @NonNull GetCallback<Void> callback) {
-        if (event.getSampledIDs() != null) event.getSampledIDs().remove(sampledID);
+        if (event.getSampledIDs() != null) {
+            event.getSampledIDs().remove(sampledID);
+        }
 
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
@@ -296,10 +298,8 @@ public class EventDB {
 
         Status status = new Status();
         status.setStatus("Cancelled");
-        ArrayList<String> cancelledIDs = new ArrayList<>();
-        cancelledIDs.add(cancelledID);
 
-        event.addNotification(status, cancelledIDs);
+        event.addNotification(status, event.getCancelledIDs());
 
         DocumentReference eventRef = db.collection(EVENT_COLLECTION)
                 .document(String.valueOf(event.getEventID()));
