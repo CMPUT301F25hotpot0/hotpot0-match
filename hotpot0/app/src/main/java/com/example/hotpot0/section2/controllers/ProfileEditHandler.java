@@ -217,6 +217,19 @@ public class ProfileEditHandler {
                                                                             @Override
                                                                             public void onFailure(Exception e) {
                                                                                 Log.e("EventDB", "Failed to delete event image for event ID: " + eventUserLink.getEventID(), e);
+                                                                                // Delete all events where user is an organizer
+                                                                                eventDB.deleteEvent(eventUserLink.getEventID(), new ProfileDB.ActionCallback() {
+                                                                                    @Override
+                                                                                    public void onSuccess() {
+                                                                                        // Successfully deleted the event
+                                                                                        Log.d("ProfileEditHandler", "Deleted event with ID: " + eventUserLink.getEventID());
+                                                                                    }
+                                                                                    @Override
+                                                                                    public void onFailure(Exception e) {
+                                                                                        // Log the failure but continue
+                                                                                        e.printStackTrace();
+                                                                                    }
+                                                                                });
                                                                             }
                                                                         });
                                                                     }

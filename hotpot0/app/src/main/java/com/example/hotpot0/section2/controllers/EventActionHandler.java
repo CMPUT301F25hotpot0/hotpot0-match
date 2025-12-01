@@ -710,7 +710,17 @@ public class EventActionHandler {
                                                     }
                                                     @Override
                                                     public void onFailure(Exception e) {
-                                                        // Log failure but continue
+                                                        eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
+                                                            @Override
+                                                            public void onSuccess() {
+                                                                // Successfully deleted event
+                                                                callback.onSuccess();
+                                                            }
+                                                            @Override
+                                                            public void onFailure(Exception e) {
+                                                                // Log failure but continue
+                                                            }
+                                                        });
                                                     }
                                                 });
                                             }
