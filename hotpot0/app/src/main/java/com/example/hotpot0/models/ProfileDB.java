@@ -414,18 +414,15 @@ public class ProfileDB {
     }
 
     /**
-     * Gets organizers from database
+     * Gets total users from database
      * @param callback callback to notify success or failure
      */
-    public void getOrganizers(@NonNull GetCallback<Integer> callback) {
+    public void getTotalUsers(@NonNull GetCallback<Integer> callback) {
         db.collection(USERS_COLLECTION)
-                .whereEqualTo("status", "organizer")
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    int count = querySnapshot.size();
-                    callback.onSuccess(count);
-                })
+                .addOnSuccessListener(querySnapshot -> callback.onSuccess(querySnapshot.size()))
                 .addOnFailureListener(callback::onFailure);
     }
+
 
 }

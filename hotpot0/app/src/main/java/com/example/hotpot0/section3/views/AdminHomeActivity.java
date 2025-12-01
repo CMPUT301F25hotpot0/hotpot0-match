@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hotpot0.R;
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
+import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.PicturesDB;
 import com.example.hotpot0.models.ProfileDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -29,6 +30,7 @@ public class AdminHomeActivity extends AppCompatActivity {
     private EventDB eventDB;
     private ProfileDB profileDB;
     private PicturesDB picturesDB;
+    private EventUserLinkDB eventUserLinkDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class AdminHomeActivity extends AppCompatActivity {
         eventDB = new EventDB();
         profileDB = new ProfileDB();
         picturesDB = new PicturesDB();
+        eventUserLinkDB = new EventUserLinkDB();
 
         loadStats();
 
@@ -96,31 +99,21 @@ public class AdminHomeActivity extends AppCompatActivity {
         });
 
         // Active Profiles
-        profileDB.generateNewID("users", new ProfileDB.GetCallback<Integer>() {
+        profileDB.getTotalUsers(new ProfileDB.GetCallback<Integer>() {
             @Override
-            public void onSuccess(Integer result) {
-                // Instead of generating, we count docs:
-                profileDB.getUserByID(result, new ProfileDB.GetCallback<com.example.hotpot0.models.UserProfile>() {
-                    @Override
-                    public void onSuccess(com.example.hotpot0.models.UserProfile userProfile) {
-                        activeProfilesCount.setText(String.valueOf(result - 1));
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        activeProfilesCount.setText("0");
-                    }
-                });
+            public void onSuccess(Integer count) {
+                activeProfilesCount.setText(String.valueOf(count));
             }
 
             @Override
             public void onFailure(Exception e) {
                 activeProfilesCount.setText("0");
+                e.printStackTrace();
             }
         });
 
         // Active Organizers
-        profileDB.getOrganizers(new ProfileDB.GetCallback<Integer>() {
+        eventUserLinkDB.getOrganizers(new EventUserLinkDB.GetCallback<Integer>() {
             @Override
             public void onSuccess(Integer count) {
                 activeOrganizersCount.setText(String.valueOf(count));

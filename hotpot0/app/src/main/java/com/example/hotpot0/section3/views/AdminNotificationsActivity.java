@@ -18,7 +18,7 @@ public class AdminNotificationsActivity extends AppCompatActivity{
 
         BottomNavigationView bottomNav = findViewById(R.id.adminBottomNavigationView);
 
-        bottomNav.setSelectedItemId(R.id.admin_settings);
+        bottomNav.setSelectedItemId(R.id.admin_notif);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();

@@ -46,6 +46,7 @@
         <activity android:name=".section3.views.AdminImageActivity" />
         <activity android:name=".section3.views.ManageImageActivity" />
         <activity android:name=".section3.views.AdminSettingsActivity" />
+        <activity android:name=".section3.views.AdminNotificationsActivity" />
         <activity android:name=".section2.views.ProfileActivity"/>
         <activity android:name=".section2.views.NotificationsActivity"/>
         <activity android:name=".section2.views.SearchActivity"/>
