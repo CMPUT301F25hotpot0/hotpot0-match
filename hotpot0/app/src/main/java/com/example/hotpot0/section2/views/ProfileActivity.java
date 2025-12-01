@@ -78,7 +78,31 @@ public class ProfileActivity extends AppCompatActivity{
         notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
-                String message = isChecked ? "Notifications Enabled" : "Notifications Disabled";
+                profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
+                    @Override
+                    public void onSuccess(UserProfile user) {
+                        if (user != null) {
+                            user.setNotificationsEnabled(isChecked);
+
+                            profileDB.updateUser(user, new ProfileDB.ActionCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    String message = isChecked ? "Notifications Enabled" : "Notifications Disabled";
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(ProfileActivity.this, "Failed to update notification setting.", Toast.LENGTH_SHORT).show();
+                                }
+                            }, user.getLongitude(), user.getLatitude(), isChecked );
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(ProfileActivity.this, "Failed to retrieve user profile.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 

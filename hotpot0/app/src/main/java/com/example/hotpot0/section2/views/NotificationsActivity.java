@@ -70,6 +70,14 @@ public class NotificationsActivity extends AppCompatActivity {
         profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
             @Override
             public void onSuccess(UserProfile userProfile) {
+                if (userProfile.getNotificationsEnabled()) {
+                    emptyInvitationsText.setText("No notifications at the moment.");
+                } else {
+                    emptyInvitationsText.setText("Notifications are disabled in your profile settings.");
+                    emptyInvitationsText.setVisibility(View.VISIBLE);
+                    return;
+                }
+
                 if (userProfile.getLinkIDs() == null || userProfile.getLinkIDs().isEmpty()) {
                     emptyInvitationsText.setVisibility(View.VISIBLE);
                     return;
