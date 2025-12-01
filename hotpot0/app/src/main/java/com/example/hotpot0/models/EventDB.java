@@ -48,6 +48,11 @@ public class EventDB {
         void onFailure(Exception e);
     }
 
+    public interface ActionCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
     // Utility Methods
     // ===============
 

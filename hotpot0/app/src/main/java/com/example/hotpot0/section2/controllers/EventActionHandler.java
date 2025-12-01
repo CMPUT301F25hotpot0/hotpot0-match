@@ -669,4 +669,66 @@ public class EventActionHandler {
         String escaped = value.replace("\"", "\"\"");
         return "\"" + escaped + "\"";
     }
+
+    public void deleteEventLinks(Integer eventID, EventDB.ActionCallback callback) {
+        eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
+            @Override
+            public void onSuccess(Event event) {
+                List<String> linkIDs = event.getLinkIDs();
+                if (linkIDs != null) {
+                    for (String linkID : linkIDs) {
+                        int userID = Integer.parseInt(linkID.split("_")[1]);
+                        eventUserLinkDB.deleteEventUserLink(linkID, new EventUserLinkDB.ActionCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Successfully deleted EventUserLink
+                                profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
+                                    @Override
+                                    public void onSuccess(UserProfile userProfile) {
+                                        profileDB.removeLinkIDFromUser(userProfile, linkID, new ProfileDB.GetCallback<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // Successfully removed linkID from user profile
+                                                eventDB.deleteEvent(eventID, new ProfileDB.ActionCallback() {
+                                                    @Override
+                                                    public void onSuccess() {
+                                                        // Successfully deleted event
+                                                        callback.onSuccess();
+                                                    }
+                                                    @Override
+                                                    public void onFailure(Exception e) {
+                                                        // Log failure but continue
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                // Log failure but continue
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        // Log failure but continue
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                // Log failure but continue
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
 }
