@@ -316,7 +316,7 @@
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:suffixText="people">
+                app:suffixText="participants">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_capacity"
@@ -338,7 +338,7 @@
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:suffixText="people">
+                app:suffixText="participants">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_waiting_list_capacity"

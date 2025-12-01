@@ -1,13 +1,17 @@
 package com.example.hotpot0.models;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -224,6 +228,28 @@ public class EventUserLinkDB {
             });
         }
     }
+
+    /**
+     * Fetches all organizers from database.
+     * @param callback Callback to return the EventUserLink or an error
+     */
+    public void getOrganizers(GetCallback<Integer> callback) {
+        db.collection(EVENT_USER_LINK_COLLECTION)
+                .whereEqualTo("status", "Organizer")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    HashSet<Integer> uniqueOrganizers = new HashSet<>();
+
+                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                        Integer userID = doc.getLong("userID").intValue();
+                        uniqueOrganizers.add(userID);
+                    }
+
+                    callback.onSuccess(uniqueOrganizers.size());
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
 
     /** Adds a notification to the sampled notifications list
      * for the EventUserLink identified by linkID.

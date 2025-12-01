@@ -2,6 +2,7 @@ package com.example.hotpot0.section2.controllers;
 
 import android.content.Context;
 import android.util.Patterns;
+import android.widget.Toast;
 
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLinkDB;

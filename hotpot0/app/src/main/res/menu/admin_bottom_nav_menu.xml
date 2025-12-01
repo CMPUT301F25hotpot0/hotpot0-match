@@ -16,6 +16,11 @@
         android:title="Images" />
 
     <item
+        android:id="@+id/admin_notif"
+        android:icon="@drawable/ic_notifications"
+        android:title="@string/notifications" />
+
+    <item
         android:id="@+id/admin_settings"
         android:icon="@drawable/ic_settings"
         android:title="Settings" />

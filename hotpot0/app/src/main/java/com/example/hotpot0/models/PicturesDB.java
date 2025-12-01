@@ -3,10 +3,13 @@ package com.example.hotpot0.models;
 import android.net.Uri;
 import android.util.Log;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PicturesDB {
 
@@ -71,11 +74,50 @@ public class PicturesDB {
         uploadEventImage(newImageUri, eventID, callback);
     }
 
-    // Delete event image
-    public void deleteEventImage(int eventID, Callback<Void> callback) {
-        StorageReference imageRef = storageRef.child("event_images/" + "event-" + eventID + ".png");
-        imageRef.delete()
-                .addOnSuccessListener(aVoid -> callback.onSuccess(null))
+    public void deleteEventImage(int eventId, Callback<Void> callback) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        StorageReference imageRef = storage.getReference().child("event_images/event-" + eventId + ".png");
+
+        imageRef.delete().addOnSuccessListener(aVoid -> {
+
+            // After storage delete, remove URL from Firestore
+            db.collection("Events")
+                    .document(String.valueOf(eventId))
+                    .update("imageURL", null)
+                    .addOnSuccessListener(a -> callback.onSuccess(null))
+                    .addOnFailureListener(callback::onFailure);
+
+        }).addOnFailureListener(callback::onFailure);
+    }
+
+    public void getAllEventImages(Callback<List<String>> callback) {
+        StorageReference eventsRef = storageRef.child("event_images/");
+
+        eventsRef.listAll()
+                .addOnSuccessListener(listResult -> {
+                    List<String> urls = new ArrayList<>();
+
+                    if (listResult.getItems().isEmpty()) {
+                        callback.onSuccess(urls);
+                        return;
+                    }
+
+                    for (StorageReference item : listResult.getItems()) {
+                        item.getDownloadUrl()
+                                .addOnSuccessListener(uri -> {
+                                    urls.add(uri.toString());
+
+                                    if (urls.size() == listResult.getItems().size()) {
+                                        callback.onSuccess(urls);
+                                    }
+                                })
+                                .addOnFailureListener(callback::onFailure);
+                    }
+                })
                 .addOnFailureListener(callback::onFailure);
     }
+
+
 }

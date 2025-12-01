@@ -412,4 +412,17 @@ public class ProfileDB {
                 .addOnSuccessListener(aVoid -> callback.onSuccess(null))
                 .addOnFailureListener(callback::onFailure);
     }
+
+    /**
+     * Gets total users from database
+     * @param callback callback to notify success or failure
+     */
+    public void getTotalUsers(@NonNull GetCallback<Integer> callback) {
+        db.collection(USERS_COLLECTION)
+                .get()
+                .addOnSuccessListener(querySnapshot -> callback.onSuccess(querySnapshot.size()))
+                .addOnFailureListener(callback::onFailure);
+    }
+
+
 }
