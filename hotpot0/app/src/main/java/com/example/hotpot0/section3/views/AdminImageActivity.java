@@ -24,8 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AdminImageActivity extends AppCompatActivity {
+/**
+ * Allows admin to search for an image by event name and shows all images in database.
+ */
 
+public class AdminImageActivity extends AppCompatActivity {
     private PicturesDB picturesDB;
     private EventDB eventDB = new EventDB();
     private RecyclerView recyclerView;
@@ -66,6 +69,13 @@ public class AdminImageActivity extends AppCompatActivity {
         loadImages();
         setupSearch();
         setupBottomNavigation();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        searchEditText.setText("");
+        loadImages();
     }
 
     /** Load all images from Firebase and fetch event names */
@@ -142,8 +152,8 @@ public class AdminImageActivity extends AppCompatActivity {
                     int eventId = extractEventId(url);
                     String eventName = eventNames.get(eventId);
 
-                    if ((eventName != null && eventName.toLowerCase().contains(query))
-                            || url.toLowerCase().contains(query)) {
+                    if ((eventName != null && eventName.toLowerCase().contains(query))) {
+//                            || url.toLowerCase().contains(query)) {
                         filteredImageUrls.add(url);
                     }
                 }
@@ -166,15 +176,15 @@ public class AdminImageActivity extends AppCompatActivity {
             } else if (id == R.id.admin_search) {
                 Intent searchIntent = new Intent(AdminImageActivity.this, AdminSearchActivity.class);
                 startActivity(searchIntent);
-                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
             } else if (id == R.id.admin_home) {
                 startActivity(new Intent(AdminImageActivity.this, AdminHomeActivity.class));
-                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
             } else if (id == R.id.admin_settings) {
                 startActivity(new Intent(AdminImageActivity.this, AdminSettingsActivity.class));
-                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+//                overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
                 return true;
             }
             return false;
@@ -186,7 +196,7 @@ public class AdminImageActivity extends AppCompatActivity {
         try {
             String filename = Uri.parse(url).getLastPathSegment();
             if (filename != null) {
-                // Look for digits in the filename
+                // Digits in the filename
                 String digits = filename.replaceAll("\\D+", "");
                 if (!digits.isEmpty()) return Integer.parseInt(digits);
             }
@@ -196,7 +206,7 @@ public class AdminImageActivity extends AppCompatActivity {
         return -1;
     }
 
-    /** After delete pressed */
+    /** After delete is pressed */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

@@ -51,16 +51,16 @@
         android:layout_height="0dp"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/headerLayout"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/adminBottomNavigationView">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <!-- EVENT DETAILS CARD -->
             <androidx.cardview.widget.CardView
@@ -68,218 +68,218 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
+                android:backgroundTint="@color/bar"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="6dp"
-                android:backgroundTint="@color/bar">
+                app:cardElevation="6dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:gravity="center_horizontal">
+                    android:padding="16dp">
 
                     <!-- Event Image -->
                     <ImageView
                         android:id="@+id/eventImage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerCrop"
-                        android:maxHeight="400dp"
                         android:layout_marginBottom="20dp"
-                        android:contentDescription="Event Poster" />
+                        android:adjustViewBounds="true"
+                        android:contentDescription="Event Poster"
+                        android:maxHeight="400dp"
+                        android:scaleType="centerCrop" />
 
                     <!-- Description Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Description"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Guidelines Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Guidelines"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewGuidelines"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Location Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Location"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewLocation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Time Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Time"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewTimeAndDay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Date Range Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Event Dates"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewDateRange"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Duration Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Duration"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewDuration"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Price Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Price"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewPrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Capacity Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Total Spots Open"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewSpotsOpen"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Waiting List Title -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Currently in Waiting List"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewWaitingList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="12dp" />
+                        android:textSize="15sp" />
 
                     <!-- Registration Period -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Registration Period"
                         android:textColor="@color/text"
-                        android:textStyle="bold"
                         android:textSize="16sp"
-                        android:layout_marginBottom="4dp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/previewDaysLeft"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="16dp" />
+                        android:textSize="15sp" />
 
                     <!-- Geolocation -->
                     <TextView
                         android:id="@+id/GeolocationStatus"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="24dp"
+                        android:gravity="center"
                         android:text="Geolocation Enabled"
                         android:textColor="@color/text"
                         android:textStyle="bold"
-                        android:gravity="center"
-                        android:layout_marginBottom="24dp"
                         android:visibility="gone" />
 
                 </LinearLayout>
@@ -290,31 +290,18 @@
                 android:id="@+id/removeEventButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:text="@string/remove_event"
                 android:textColor="@color/text"
-                android:layout_marginTop="24dp"
                 app:backgroundTint="@color/bar"
                 app:cornerRadius="8dp"
                 app:strokeColor="@color/text"
                 app:strokeWidth="1dp" />
 
+
         </LinearLayout>
 
     </ScrollView>
 
-    <!-- Bottom navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/adminBottomNavigationView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/bar"
-        app:menu="@menu/admin_bottom_nav_menu"
-        app:itemIconTint="@color/nav_item_selector"
-        app:itemTextColor="@color/nav_item_selector"
-        app:labelVisibilityMode="labeled"
-        app:itemIconSize="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

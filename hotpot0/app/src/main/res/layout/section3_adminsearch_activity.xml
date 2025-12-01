@@ -174,7 +174,7 @@
         <ListView
             android:id="@+id/searchResultsListView"
             android:layout_width="match_parent"
-            android:layout_height="415dp"
+            android:layout_height="390dp"
             android:dividerHeight="1dp" />
     </LinearLayout>
 

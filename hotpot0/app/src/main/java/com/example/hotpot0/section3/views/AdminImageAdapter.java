@@ -17,6 +17,9 @@ import com.example.hotpot0.R;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * Manages the list of images shown when searching for an image.
+ */
 public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.ViewHolder> {
 
     public interface DeleteCallback {
@@ -72,7 +75,6 @@ public class AdminImageAdapter extends RecyclerView.Adapter<AdminImageAdapter.Vi
             holder.filename.setText("Unknown Event");
         }
 
-        // Click listener
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) clickListener.onItemClick(url);
         });
