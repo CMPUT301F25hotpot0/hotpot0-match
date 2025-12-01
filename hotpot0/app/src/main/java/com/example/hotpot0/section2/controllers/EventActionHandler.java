@@ -3,6 +3,8 @@ package com.example.hotpot0.section2.controllers;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.example.hotpot0.models.Event;
 import com.example.hotpot0.models.EventDB;
 import com.example.hotpot0.models.EventUserLink;
@@ -402,61 +404,22 @@ public class EventActionHandler {
             }
         });
     }
-
-//    public void sampleUsers(Integer eventID, ProfileDB.GetCallback<Integer> callback) {
-//        eventDB.getEventByID(eventID, new EventDB.GetCallback<Event>() {
-//            @Override
-//            public void onSuccess(Event eventObj) {
-//                eventDB.sampleEvent(eventObj, new EventDB.GetCallback<List<String>>(){
-//                    @Override
-//                    public void onSuccess(List<String> result) {
-//                        for (String linkID : result) {
-//                            // For each sampled user, update their EventUserLink status to "Sampled"
-//                            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
-//                                @Override
-//                                public void onSuccess(EventUserLink eventUserLink) {
-//                                    eventUserLink.setStatus("Sampled");
-//                                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
-//                                        @Override
-//                                        public void onSuccess() {
-//                                            // Successfully updated the user's status to "Sampled"
-//                                            callback.onSuccess(0); // Success: Users sampled
-//                                        }
-//
-//                                        @Override
-//                                        public void onFailure(Exception e) {
-//                                            // Failed to update the user's status
-//                                            callback.onFailure(e); // Failure to update user status
-//                                        }
-//                                    });
-//                                }
-//
-//                                @Override
-//                                public void onFailure(Exception e) {
-//                                    // Failed to retrieve the EventUserLink
-//                                    callback.onFailure(e); // Failure to retrieve EventUserLink
-//                                }
-//                            });
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Exception e) {
-//                        // Failed to sample users for the event
-//                        callback.onFailure(e); // Failure to sample users
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onFailure(Exception e) {
-//                // Failed to retrieve the event
-//                callback.onFailure(e); // Failure to retrieve event
-//            }
-//        });
-//
-//    }
-
+    /**
+     * Allows an organizer to cancel their participation in an event.
+     * <p>
+     * The user's status is updated to "Cancelled", and the event record
+     * is updated to reflect the cancellation.
+     * </p>
+     *
+     * @param userID   the user’s ID
+     * @param event    the event object
+     * @param callback callback invoked upon completion:
+     *                 <ul>
+     *                     <li>{@code onSuccess(0)} – successfully cancelled participation</li>
+     *                     <li>{@code onSuccess(1)} – user not affiliated</li>
+     *                     <li>{@code onFailure(e)} – failure during update</li>
+     *                 </ul>
+     */
     public void cancelUser(Event event, Integer userID, ProfileDB.GetCallback<Integer> callback) {
         // Construct the linkID
         String linkID = generateLinkID(userID, event.getEventID());
@@ -526,4 +489,40 @@ public class EventActionHandler {
         });
     }
 
+    public void sendCustomNotification(String message, String status, List<String> linkIDs, Event event, @NonNull EventUserLinkDB.ActionCallback callback) {
+        for (String linkID : linkIDs) {
+            eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
+                @Override
+                public void onSuccess(EventUserLink eventUserLink) {
+                    Status statusObj = new Status();
+                    statusObj.setStatus(status);
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    Date date = new Date();
+                    String now = formatter.format(date);
+                    Notification notif = new Notification(now, statusObj, message, event.getName(), event.getEventID(),true);
+                    eventUserLink.addNotification(notif);
+                    eventUserLinkDB.updateEventUserLink(eventUserLink, new EventUserLinkDB.ActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Notification added successfully
+                            callback.onSuccess();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            // Failed to update EventUserLink with notification
+                            callback.onFailure(e);
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    // Failed to retrieve EventUserLink
+                    callback.onFailure(e);
+                }
+            });
+        }
+    }
 }

@@ -474,6 +474,7 @@ public class Event {
      */
     public void addCustomNotification(Status status, String text, ArrayList<String> participantIDs) {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = new Date();
         String now = formatter.format(date);
         Notification notif = new Notification(now, status, text, this.name, this.eventID,true);

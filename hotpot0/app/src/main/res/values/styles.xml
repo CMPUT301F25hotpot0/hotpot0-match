@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="CustomAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <!-- Override dialog buttons -->
+        <item name="buttonBarPositiveButtonStyle">@style/DialogButtonPositive</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DialogButtonNegative</item>
+    </style>
+
+    <style name="DialogButtonPositive" parent="@android:style/Widget.Material.Button.Borderless.Colored">
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="DialogButtonNegative" parent="@android:style/Widget.Material.Button.Borderless.Colored">
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+</resources>

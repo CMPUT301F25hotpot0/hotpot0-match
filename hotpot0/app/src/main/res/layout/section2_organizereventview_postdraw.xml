@@ -220,18 +220,79 @@
                 android:layout_marginBottom="24dp" />
 
             <!-- ===== SAMPLED ENTRANTS ===== -->
-            <TextView
-                android:id="@+id/SampledEntrantsLabel"
+            <LinearLayout
+                android:id="@+id/SampledEntrantsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/sampled_entrants"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/text"
-                android:layout_marginBottom="8dp"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/SampledEntrantsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/sampled_entrants"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/SampledSendCustomNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="Send Custom Notification"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="8dp"
+                    app:tint="@color/text" />
+
+            </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/sampled_entrants_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- ===== ACCEPTED ENTRANTS ===== -->
+            <LinearLayout
+                android:id="@+id/AcceptedEntrantsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/AcceptedEntrantsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/accepted_entrants"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/AcceptedSendCustomNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="Send Custom Notification"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="8dp"
+                    app:tint="@color/text" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/accepted_entrants_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
@@ -250,15 +311,36 @@
                 android:layout_marginBottom="24dp" />
 
             <!-- ===== CANCELLED ENTRANTS ===== -->
-            <TextView
-                android:id="@+id/CancelledEntrantsLabel"
+            <LinearLayout
+                android:id="@+id/CancelledEntrantsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/cancelled_entrants"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/text"
-                android:layout_marginBottom="8dp"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/CancelledEntrantsLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/cancelled_entrants"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/CancelledSendCustomNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="Send Custom Notification"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="8dp"
+                    app:tint="@color/text" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/cancelled_entrants_container"
@@ -284,16 +366,38 @@
                 android:layout_marginBottom="20dp" />
 
             <!-- ===== ALL ENTRANTS ===== -->
-            <TextView
-                android:id="@+id/AllEntrantsLabel"
+            <LinearLayout
+                android:id="@+id/AllEntrantsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/all_entrants"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/text"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/AllEntrantsLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/all_entrants"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <ImageView
+                    android:id="@+id/AllSendCustomNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="Send Custom Notification"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="8dp"
+                    app:tint="@color/text" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/all_entrants_container"

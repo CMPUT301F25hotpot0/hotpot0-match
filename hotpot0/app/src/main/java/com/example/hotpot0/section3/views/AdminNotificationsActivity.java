@@ -1,4 +1,4 @@
-package com.example.hotpot0.section2.views;
+package com.example.hotpot0.section3.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,9 +16,11 @@ import com.example.hotpot0.R;
 import com.example.hotpot0.models.EventUserLink;
 import com.example.hotpot0.models.EventUserLinkDB;
 import com.example.hotpot0.models.Notification;
-import com.example.hotpot0.models.ProfileDB;
-import com.example.hotpot0.models.UserProfile;
 import com.example.hotpot0.section2.controllers.EventActivityController;
+import com.example.hotpot0.section2.views.CreateEventActivity;
+import com.example.hotpot0.section2.views.HomeActivity;
+import com.example.hotpot0.section2.views.ProfileActivity;
+import com.example.hotpot0.section2.views.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.ParseException;
@@ -28,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-public class NotificationsActivity extends AppCompatActivity {
+public class AdminNotificationsActivity extends AppCompatActivity {
 
     private RecyclerView notificationsRecycler;
     private TextView emptyInvitationsText;
@@ -36,8 +38,6 @@ public class NotificationsActivity extends AppCompatActivity {
     private List<Notification> notifications = new ArrayList<>();
 
     private EventUserLinkDB eventUserLinkDB;
-    private ProfileDB profileDB;
-    private Integer userID;
     private EventActivityController controller;
 
     @Override
@@ -53,76 +53,47 @@ public class NotificationsActivity extends AppCompatActivity {
         notificationsRecycler.setAdapter(adapter);
 
         eventUserLinkDB = new EventUserLinkDB();
-        profileDB = new ProfileDB();
-        userID = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("userID", -1);
 
-        if (userID == null) {
-            emptyInvitationsText.setText("User not found.");
-            emptyInvitationsText.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        fetchNotifications();
+        fetchAllNotifications();
         setupBottomNavigation();
     }
 
-    private void fetchNotifications() {
-        profileDB.getUserByID(userID, new ProfileDB.GetCallback<UserProfile>() {
+    /**
+     * Fetches ALL EventUserLinks in the database.
+     * No filtering by user — returns every notification in the system.
+     */
+    private void fetchAllNotifications() {
+        eventUserLinkDB.getAllEventUserLinks(new EventUserLinkDB.GetCallback<List<EventUserLink>>() {
             @Override
-            public void onSuccess(UserProfile userProfile) {
-                if (userProfile.getLinkIDs() == null || userProfile.getLinkIDs().isEmpty()) {
+            public void onSuccess(List<EventUserLink> allLinks) {
+                if (allLinks == null || allLinks.isEmpty()) {
                     emptyInvitationsText.setVisibility(View.VISIBLE);
                     return;
                 }
 
-                List<String> linkIDs = userProfile.getLinkIDs();
-                final int totalLinks = linkIDs.size();
-                final int[] completedLinks = {0};
+                for (EventUserLink link : allLinks) {
+                    if (link.getNotifications() != null) {
+                        notifications.addAll(link.getNotifications());
+                    }
+                }
 
-                for (String linkID : linkIDs) {
-                    eventUserLinkDB.getEventUserLinkByID(linkID, new EventUserLinkDB.GetCallback<EventUserLink>() {
-                        @Override
-                        public void onSuccess(EventUserLink eventUserLink) {
-                            List<Notification> notifs = eventUserLink.getNotifications();
-                            if (notifs != null) {
-                                notifications.addAll(notifs);
-                            }
-
-                            completedLinks[0]++;
-
-                            if (completedLinks[0] == totalLinks) {
-                                if (notifications.isEmpty()) {
-                                    emptyInvitationsText.setVisibility(View.VISIBLE);
-                                } else {
-                                    emptyInvitationsText.setVisibility(View.GONE);
-                                    sortNotificationsNewestFirst();
-                                    adapter.notifyDataSetChanged();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            completedLinks[0]++;
-                            if (completedLinks[0] == totalLinks) {
-                                sortNotificationsNewestFirst();
-                                adapter.notifyDataSetChanged();
-                            }
-                        }
-                    });
+                if (notifications.isEmpty()) {
+                    emptyInvitationsText.setVisibility(View.VISIBLE);
+                } else {
+                    emptyInvitationsText.setVisibility(View.GONE);
+                    sortNotificationsNewestFirst();
+                    adapter.notifyDataSetChanged();
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                // Handle failure
+                Log.e("AdminNotif", "Failed to load EventUserLinks: " + e.getMessage());
             }
         });
     }
 
-    // -------------------------
-    // SORT USING SimpleDateFormat
-    // -------------------------
+    // Sorting using SimpleDateFormat (API 24 compatible)
     private void sortNotificationsNewestFirst() {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -139,12 +110,12 @@ public class NotificationsActivity extends AppCompatActivity {
             });
 
         } catch (Exception e) {
-            Log.e("NotificationsActivity", "Sort failed: " + e.getMessage());
+            Log.e("AdminNotificationsActivity", "Sort failed: " + e.getMessage());
         }
     }
 
+    // Adapter (same as user version)
     private class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
-
         private final List<Notification> notifications;
 
         public NotificationAdapter(List<Notification> notifications) {
@@ -166,6 +137,8 @@ public class NotificationsActivity extends AppCompatActivity {
             holder.preview.setText(notif.getText());
             holder.fullText.setText(notif.getText());
 
+            holder.goToEventBtn.setVisibility(View.GONE);
+
             holder.itemView.setOnClickListener(v -> {
                 if (holder.expandedLayout.getVisibility() == View.GONE) {
                     holder.expandedLayout.setVisibility(View.VISIBLE);
@@ -176,10 +149,10 @@ public class NotificationsActivity extends AppCompatActivity {
                 }
             });
 
-            holder.goToEventBtn.setOnClickListener(v -> {
-                controller = new EventActivityController(NotificationsActivity.this);
-                controller.navigateToEventActivity(notif.getEventID(), userID);
-            });
+//            holder.goToEventBtn.setOnClickListener(v -> {
+//                controller = new EventActivityController(AdminNotificationsActivity.this);
+//                controller.navigateToEventActivity(notif.getEventID(),userID);
+//            });
         }
 
         @Override
@@ -210,31 +183,26 @@ public class NotificationsActivity extends AppCompatActivity {
 
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+
             if (id == R.id.nav_home) {
-                startActivity(new Intent(NotificationsActivity.this, HomeActivity.class));
+                startActivity(new Intent(AdminNotificationsActivity.this, HomeActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 return true;
             }
             if (id == R.id.nav_profile) {
-                startActivity(new Intent(NotificationsActivity.this, ProfileActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                startActivity(new Intent(AdminNotificationsActivity.this, ProfileActivity.class));
                 return true;
             }
             if (id == R.id.nav_notifications) {
-                startActivity(new Intent(NotificationsActivity.this, NotificationsActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                startActivity(new Intent(AdminNotificationsActivity.this, AdminNotificationsActivity.class));
                 return true;
             }
             if (id == R.id.nav_search) {
-                Intent intent = new Intent(NotificationsActivity.this, SearchActivity.class);
-                startActivity(intent);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
+                startActivity(new Intent(AdminNotificationsActivity.this, SearchActivity.class));
                 return true;
             }
             if (id == R.id.nav_events) {
-                startActivity(new Intent(NotificationsActivity.this, CreateEventActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                startActivity(new Intent(AdminNotificationsActivity.this, CreateEventActivity.class));
                 return true;
             }
             return false;

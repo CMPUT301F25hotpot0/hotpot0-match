@@ -41,7 +41,8 @@
     <string name="current_invitations">Current Invitations</string>
     <string name="other_updates">Other Updates</string>
     <string name="fill_spots">Fill Spots</string>
-    <string name="sampled_entrants">Sampled Entrants</string>
+    <string name="sampled_entrants">Pending Entrants</string>
+    <string name="accepted_entrants">Accepted Entrants</string>
     <string name="cancelled_entrants">Cancelled Entrants</string>
     <string name="all_entrants">All Entrants</string>
     <string name="event_location">Location %1$s</string>
